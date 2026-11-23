@@ -805,6 +805,28 @@ export const es = {
     silencioVarios: 'Acomodamos {n} hábitos en días libres.',
     reprogramadoHoy: 'Reprogramado para hoy',
     error: 'No pudimos guardar el cambio. Inténtalo de nuevo.',
+    // Lista de barreras (RF-17 + RF-19): una pregunta, 3 opciones, alternativa en un toque.
+    fueAyer: 'ayer',
+    fueDia: 'el {dia} {n}',
+    barreraPregunta: '«{habito}» no salió {cuando}. Pasa. ¿Qué se atravesó?',
+    barreras: {
+      tiempo: 'No me alcanzó el tiempo',
+      recursos: 'Me faltó algo que necesitaba',
+      acceso: 'No pude llegar o no tenía dónde',
+    },
+    prefieroNoDecir: 'Prefiero no decir',
+    alternativasTitulo: {
+      tiempo: 'Pasa. ¿Lo hacemos más corto?',
+      recursos: 'Tiene sentido. ¿Lo pasamos a otro día?',
+      acceso: 'Tiene sentido. ¿Lo pasamos a otro día?',
+    },
+    sinContra: 'Ese día no cuenta en contra.',
+    probarLigero: 'Probar versión de {duracion}',
+    probarLigeroA11y: 'Probar «{titulo}», de {duracion}',
+    moverA: 'Moverlo {destino}',
+    dejarAsi: 'Dejarlo así',
+    ligeroListo: 'Listo: ahora toca «{titulo}».',
+    dejadoListo: 'Listo. Ese día no cuenta en contra.',
   },
   // Progresión (SDD 6.3, docs/textos.md 5): tarjetas en Hoy cada 7 días.
   crearMeta: {

@@ -176,6 +176,7 @@ export const TABLAS = [
       fecha_original: T,
       fecha_nueva: T,
       estado: T,
+      barrera: T,
       creado_en: T,
       updated_at: T,
     },

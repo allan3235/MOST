@@ -98,6 +98,21 @@ describe('ocurrencias para estadísticas', () => {
     expect(lista).toContain('2026-11-13 false');
   });
 
+  it('RF-17: una descartada con barrera no cuenta (no queda como fallo)', () => {
+    const ocurrencias: Ocurrencia[] = [
+      {
+        habit_id: 'a',
+        fecha_original: '2026-11-13',
+        fecha_nueva: null,
+        estado: 'descartada',
+        barrera: 'tiempo',
+      },
+    ];
+    const lista = fechas(datos({ ocurrencias }));
+    expect(lista).not.toContain('2026-11-13 false');
+    expect(lista).toContain('2026-11-11 false');
+  });
+
   it('un archivado cuenta hasta el día anterior a archivarlo', () => {
     const d = datos({ habitos: [habito('a', { archivado_en: '2026-11-13T18:00:00' })] });
     expect(fechas(d)).toEqual(['2026-11-09 false', '2026-11-11 false']);

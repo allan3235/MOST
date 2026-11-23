@@ -29,6 +29,8 @@ import {
   type Tarjeta,
   type ValoresNivel,
 } from '@/features/progression/domain/progresion';
+import type { Barrera, PasoLigero } from '@/features/reschedule/domain/barreras';
+import type { Propuesta } from '@/features/reschedule/domain/reprogramar';
 import { historial, type Pausa } from '@/features/stats/domain/cumplimiento';
 import { rachaDeHabito } from '@/features/stats/domain/rachas';
 import { pedirApi } from '@/lib/clienteApi';
@@ -47,7 +49,7 @@ import { aplicar } from './aplicar-cambio';
 import { actualizarFila, getDb, guardarFilas, leerFilas } from './database';
 import { avisarCambioLocal } from './db-version-store';
 import { categoriasPorId, guardarVersionHorario, idCategoria } from './habits-repository';
-import { descartarMovidasDelPatron } from './occurrences-repository';
+import { descartarMovidasDelPatron, filasDe, guardarOcurrencias } from './occurrences-repository';
 import { leerAjustesEn, leerConfigProgresion, leerPresupuestos } from './settings-repository';
 
 // Progresión (SDD 6.3). Cada 7 días, al abrir la app, se revisan los hábitos del plan: las
@@ -600,27 +602,94 @@ export async function leerDetallePlan(userId: string, planId: string): Promise<D
   };
 }
 
+type Bajada = { despues: ValoresNivel; objetivo: string };
+
+/** El paso más ligero de un hábito del plan, o null si no es del plan o ya va en el más ligero. */
+function bajadaCon(
+  comunes: Comunes | null,
+  planes: readonly PlanActivo[],
+  habitId: string,
+): Bajada | null {
+  const habito = comunes?.habitos.find((h) => h.id === habitId);
+  const plan = planes.find((p) => p.id === habito?.plan_id);
+  if (!comunes || !habito || !plan || !esDelPlan(habito)) {
+    return null;
+  }
+  const despues = pasoHaciaAbajo(habito, entradaDelPlan(comunes, plan));
+  return despues ? { despues, objetivo: habito.objetivo } : null;
+}
+
+async function bajadaDe(
+  db: SQLiteDatabase,
+  userId: string,
+  habitId: string,
+): Promise<Bajada | null> {
+  return bajadaCon(await leerComunes(db, userId), await leerPlanesActivos(db, userId), habitId);
+}
+
 /**
  * «Hacerlo más ligero» (decisión del usuario): baja el hábito un paso ahora, igual que la revisión
  * (nivel anterior o versión corta), y reinicia su ventana. Devuelve los valores nuevos para pedir
  * sus textos a la IA, o null si ya estaba en su paso más ligero.
  */
-export async function hacerMasLigero(
-  userId: string,
-  habitId: string,
-): Promise<{ despues: ValoresNivel; objetivo: string } | null> {
-  let resultado: { despues: ValoresNivel; objetivo: string } | null = null;
+export async function hacerMasLigero(userId: string, habitId: string): Promise<Bajada | null> {
+  let resultado: Bajada | null = null;
   await aplicar(async (db) => {
-    const comunes = await leerComunes(db, userId);
-    const habito = comunes?.habitos.find((h) => h.id === habitId);
-    const plan = (await leerPlanesActivos(db, userId)).find((p) => p.id === habito?.plan_id);
-    if (!comunes || !habito || !plan || !esDelPlan(habito)) return [];
-    const despues = pasoHaciaAbajo(habito, entradaDelPlan(comunes, plan));
-    if (!despues) return [];
-    resultado = { despues, objetivo: habito.objetivo };
-    return aplicarNivel(db, userId, habitId, despues);
+    resultado = await bajadaDe(db, userId, habitId);
+    return resultado ? aplicarNivel(db, userId, habitId, resultado.despues) : [];
   });
   return resultado;
+}
+
+/**
+ * Versión más ligera de cada hábito con un día por resolver (lista de barreras, RF-17), para
+ * mostrarla en el botón antes de tocarlo. Los que no tienen una no aparecen.
+ * @param userId Usuario con sesión.
+ * @param habitIds Hábitos de las propuestas de hoy.
+ * @returns habit_id → título y minutos de su versión más ligera.
+ */
+export async function leerPasosLigeros(
+  userId: string,
+  habitIds: readonly string[],
+): Promise<Record<string, PasoLigero>> {
+  const resultado: Record<string, PasoLigero> = {};
+  if (habitIds.length === 0) {
+    return resultado;
+  }
+  const db = await getDb();
+  const comunes = await leerComunes(db, userId);
+  const planes = await leerPlanesActivos(db, userId);
+  for (const id of habitIds) {
+    const bajada = bajadaCon(comunes, planes, id);
+    if (bajada) {
+      resultado[id] = { titulo: bajada.despues.titulo, duracion_min: bajada.despues.duracion_min };
+    }
+  }
+  return resultado;
+}
+
+/**
+ * Alternativa «versión más ligera» de la lista de barreras (RF-17 + RF-19): en una sola escritura
+ * baja el hábito un paso y deja el día con su barrera, así no cuenta como fallo.
+ * @param userId Usuario con sesión.
+ * @param propuesta Día por resolver.
+ * @param barrera Lo que se atravesó.
+ * @returns El título nuevo, o null si ya no había un paso más ligero (el día queda resuelto igual).
+ */
+export async function aliviarConPasoLigero(
+  userId: string,
+  propuesta: Propuesta,
+  barrera: Barrera,
+): Promise<string | null> {
+  let titulo: string | null = null;
+  await aplicar(async (db) => {
+    const bajada = await bajadaDe(db, userId, propuesta.habito.id);
+    const dia = await guardarOcurrencias(db, filasDe(userId, propuesta, null, barrera));
+    if (!bajada) return dia;
+    titulo = bajada.despues.titulo;
+    return [...dia, ...(await aplicarNivel(db, userId, propuesta.habito.id, bajada.despues))];
+  });
+  return titulo;
 }
 
 /**

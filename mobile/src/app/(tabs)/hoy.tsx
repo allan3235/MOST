@@ -22,6 +22,7 @@ import { ProgressionCard } from '@/features/progression/components/progression-c
 import { useProgresion } from '@/features/progression/use-progresion';
 import { DayDialog } from '@/features/reschedule/components/day-dialog';
 import { RescheduleCard } from '@/features/reschedule/components/reschedule-card';
+import { TarjetaBarreras } from '@/features/reschedule/components/TarjetaBarreras';
 import { useReprogramacion } from '@/features/reschedule/use-reprogramacion';
 import { descripcionPlanta, PlantImage } from '@/features/rewards/components/plant-image';
 import { plantaDestacada } from '@/features/rewards/domain/planta-destacada';
@@ -132,8 +133,25 @@ export default function HoyScreen() {
 
   const lista = (
     <>
-      {/* Reprogramación (SDD 6.2): una propuesta a la vez, arriba de los hábitos. */}
-      {reprogramar.actual ? (
+      {/* Reprogramación (SDD 6.2) con la lista de barreras (RF-17 + RF-19): una propuesta a la
+          vez, arriba de los hábitos. Primero qué se atravesó; si prefiere no decir, la de siempre. */}
+      {reprogramar.actual && reprogramar.paso !== 'clasica' ? (
+        <TarjetaBarreras
+          propuesta={reprogramar.actual}
+          hoy={reprogramar.hoy}
+          barrera={reprogramar.barrera}
+          alternativas={reprogramar.alternativas}
+          indice={reprogramar.indice}
+          total={reprogramar.total}
+          ocupado={reprogramar.ocupado}
+          onBarrera={reprogramar.elegirBarrera}
+          onLigero={reprogramar.probarLigero}
+          onMover={reprogramar.elegirDia}
+          onOtroDia={reprogramar.abrirDias}
+          onDejar={reprogramar.dejar}
+        />
+      ) : null}
+      {reprogramar.actual && reprogramar.paso === 'clasica' ? (
         <RescheduleCard
           propuesta={reprogramar.actual}
           hoy={reprogramar.hoy}

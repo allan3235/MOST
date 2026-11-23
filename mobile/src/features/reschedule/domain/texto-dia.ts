@@ -20,6 +20,8 @@ type TextosDia = Pick<
   | 'diasCortos'
 >;
 
+type TextosFue = Pick<typeof es.reprogramar, 'fueAyer' | 'fueDia' | 'dias'>;
+
 export function destinoDia(fecha: string, hoy: string, t: TextosDia = es.reprogramar): string {
   const distancia = diasEntre(hoy, fecha);
   if (distancia === 0) return t.destinoHoy;
@@ -39,4 +41,10 @@ export function diaCorto(fecha: string, hoy: string, t: TextosDia = es.reprogram
   if (distancia === 0) return t.cortoHoy;
   if (distancia === 1) return t.cortoManana;
   return formatear(t.cortoDia, { dia: t.diasCortos[diaIso(fecha) - 1], n: Number(fecha.slice(8)) });
+}
+
+/** El día que no salió, dicho en la tarjeta de barreras: «ayer» o «el lunes 21» (RF-17). */
+export function cuandoFue(fecha: string, hoy: string, t: TextosFue = es.reprogramar): string {
+  if (diasEntre(fecha, hoy) === 1) return t.fueAyer;
+  return formatear(t.fueDia, { dia: t.dias[diaIso(fecha) - 1], n: Number(fecha.slice(8)) });
 }

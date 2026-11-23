@@ -1,4 +1,4 @@
-import { destinoDia, diaCorto, quedoPara } from '../texto-dia';
+import { cuandoFue, destinoDia, diaCorto, quedoPara } from '../texto-dia';
 
 // Hoy es miércoles 2026-11-18.
 const HOY = '2026-11-18';
@@ -21,5 +21,10 @@ describe('nombre del día destino', () => {
     expect(diaCorto(HOY, HOY)).toBe('Hoy');
     expect(diaCorto('2026-11-19', HOY)).toBe('Mañana');
     expect(diaCorto('2026-11-22', HOY)).toBe('Dom 22');
+  });
+
+  it('en la lista de barreras: ayer o el día con su número', () => {
+    expect(cuandoFue('2026-11-17', HOY)).toBe('ayer');
+    expect(cuandoFue('2026-11-16', HOY)).toBe('el lunes 16');
   });
 });

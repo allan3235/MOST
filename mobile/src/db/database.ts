@@ -28,7 +28,8 @@ const NOMBRE = 'most.db';
 // 8: micro_pasos y habits.paso_actual (most.; base nueva most.db con el backend NestJS).
 // 9: habit_pausas (los días en pausa no cuentan como fallo, RF-09).
 // 10: user_settings.resumen_nocturno (interruptor propio, RF-18).
-const ESQUEMA_VERSION = 10;
+// 11: habit_occurrences.barrera (lista de barreras, RF-17 + RF-19).
+const ESQUEMA_VERSION = 11;
 
 let abierta: Promise<SQLite.SQLiteDatabase> | null = null;
 

@@ -39,6 +39,8 @@ export type Ocurrencia = {
   fecha_original: string;
   fecha_nueva: string | null;
   estado: 'movida' | 'descartada';
+  /** Lo que se atravesó ese día (RF-17); con causa, el día no cuenta en el cumplimiento. */
+  barrera?: string | null;
 };
 
 export type Registro = { habit_id: string; fecha: string; eliminado_en: string | null };

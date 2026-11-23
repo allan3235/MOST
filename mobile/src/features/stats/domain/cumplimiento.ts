@@ -16,7 +16,8 @@ import { rachaDeHabito, type Racha } from './rachas';
 // Cumplimiento de Progreso (SDD 8). Funciones puras sobre las filas de SQLite.
 //
 // - Una ocurrencia es un día del patrón vigente o un día al que llegó por reprogramación; el día
-//   original de una movida no cuenta, y una descartada cuenta como no hecha.
+//   original de una movida no cuenta, y una descartada cuenta como no hecha, salvo que tenga
+//   barrera (RF-17): si la persona dijo qué se atravesó, ese día no cuenta, como una pausa.
 // - Hoy solo suma lo que ya se hizo: lo pendiente de hoy no baja el resultado ni resta del avance.
 // - Archivados: cuentan hasta el día anterior a archivarlos.
 // - En pausa (RF-09): los días de cada periodo de habit_pausas no cuentan, ni antes ni después de
@@ -160,8 +161,11 @@ function recorrer(
   }
   const incluir = cuentaEn(ultimoRegistro, datos.pausas);
   const registrosPorDia = agrupar(datos.registros, (r) => [r.fecha]);
-  // Solo las movidas: una descartada se queda en su día y cuenta como no hecha.
-  const movidas = datos.ocurrencias.filter((o) => o.estado === 'movida');
+  // Las movidas y las que tienen barrera salen de su día; una descartada sin barrera se queda en
+  // su día y cuenta como no hecha.
+  const movidas = datos.ocurrencias.filter(
+    (o) => o.estado === 'movida' || (o.barrera ?? null) !== null,
+  );
   const ocurrenciasPorDia = agrupar(movidas, (o) => [o.fecha_original, o.fecha_nueva]);
 
   for (let fecha = desde; fecha <= hasta; fecha = sumarDias(fecha, 1)) {

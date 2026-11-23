@@ -13,6 +13,7 @@ import {
   propuestasDeReprogramacion,
   type Propuesta,
 } from '@/features/reschedule/domain/reprogramar';
+import type { Barrera } from '@/features/reschedule/domain/barreras';
 import { diaIso, fechaLocal, sumarDias } from '@/lib/dates';
 import type { OperacionOutbox } from '@/sync/domain/sync-rules';
 
@@ -64,10 +65,11 @@ type FilaOcurrencia = {
   fecha_original: string;
   fecha_nueva: string | null;
   estado: 'movida' | 'descartada';
+  barrera?: Barrera | null;
 };
 
 /** Guarda las ocurrencias y devuelve sus operaciones de la cola. */
-async function guardarOcurrencias(
+export async function guardarOcurrencias(
   db: SQLiteDatabase,
   filas: readonly FilaOcurrencia[],
 ): Promise<OperacionOutbox[]> {
@@ -85,34 +87,52 @@ async function guardarOcurrencias(
   }));
 }
 
-/** Los días anteriores sin hacer del mismo hábito se dejan pasar: quedan «descartada». */
-function filasDe(
+/**
+ * Los días anteriores sin hacer del mismo hábito se dejan pasar: quedan «descartada». La barrera
+ * (RF-17) solo va en el día por el que se preguntó.
+ */
+export function filasDe(
   userId: string,
   propuesta: Propuesta,
   fechaNueva: string | null,
+  barrera: Barrera | null = null,
 ): FilaOcurrencia[] {
-  const fila = (fecha_original: string, fecha_nueva: string | null): FilaOcurrencia => ({
+  const fila = (
+    fecha_original: string,
+    fecha_nueva: string | null,
+    causa: Barrera | null = null,
+  ): FilaOcurrencia => ({
     id: randomUUID(),
     habit_id: propuesta.habito.id,
     user_id: userId,
     fecha_original,
     fecha_nueva,
     estado: fecha_nueva === null ? 'descartada' : 'movida',
+    barrera: causa,
   });
   return [
     ...propuesta.anteriores.map((fecha) => fila(fecha, null)),
-    fila(propuesta.fechaOriginal, fechaNueva),
+    fila(propuesta.fechaOriginal, fechaNueva, barrera),
   ];
 }
 
-/** Mueve el hábito a `fecha` (un día libre). */
-export function moverOcurrencia(userId: string, propuesta: Propuesta, fecha: string) {
-  return aplicar((db) => guardarOcurrencias(db, filasDe(userId, propuesta, fecha)));
+/** Mueve el hábito a `fecha` (un día libre), con la barrera si la persona la dijo. */
+export function moverOcurrencia(
+  userId: string,
+  propuesta: Propuesta,
+  fecha: string,
+  barrera: Barrera | null = null,
+) {
+  return aplicar((db) => guardarOcurrencias(db, filasDe(userId, propuesta, fecha, barrera)));
 }
 
 /** «Dejarlo» o «La dejamos para la próxima»: no se vuelve a ofrecer. */
-export function descartarOcurrencia(userId: string, propuesta: Propuesta) {
-  return aplicar((db) => guardarOcurrencias(db, filasDe(userId, propuesta, null)));
+export function descartarOcurrencia(
+  userId: string,
+  propuesta: Propuesta,
+  barrera: Barrera | null = null,
+) {
+  return aplicar((db) => guardarOcurrencias(db, filasDe(userId, propuesta, null, barrera)));
 }
 
 /**
