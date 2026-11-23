@@ -230,6 +230,9 @@ model habits {
   created_at            DateTime            @default(now()) @db.Timestamptz(6)
   updated_at            DateTime            @default(now()) @db.Timestamptz(6)
   nivel_desde           DateTime?           @db.Date
+  /// Micro-paso en curso (orden en micro_pasos); null si el hábito no tiene micro-pasos.
+  paso_actual           Int?                @db.SmallInt
+  micro_pasos           micro_pasos[]
   habit_logs            habit_logs[]
   habit_occurrences     habit_occurrences[]
   habit_places          habit_places[]
@@ -312,6 +315,7 @@ model profiles {
   habit_places        habit_places[]
   habit_schedules     habit_schedules[]
   habits              habits[]
+  micro_pasos         micro_pasos[]
   onboarding_answers  onboarding_answers?
   plans               plans[]
   plant_progress      plant_progress[]
@@ -368,5 +372,28 @@ model wallets {
   updated_at DateTime @default(now()) @db.Timestamptz(6)
   profiles   profiles @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
+  @@schema("public")
+}
+
+/// Secuencia ordenada de micro-pasos de un hábito (RF-03), de menor a mayor esfuerzo. La genera la
+/// IA (o el catálogo si la IA falla). duracion_min = 0 significa recordatorio sin duración.
+/// Restricciones CHECK y políticas RLS en la migración 20261123080815_micro_pasos.
+model micro_pasos {
+  id                    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  habit_id              String   @db.Uuid
+  user_id               String   @db.Uuid
+  orden                 Int      @db.SmallInt
+  titulo                String
+  descripcion           String?
+  duracion_min          Int
+  duracion_reducida_min Int
+  dias_semana           Int[]    @db.SmallInt
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime @default(now()) @db.Timestamptz(6)
+  habits                habits   @relation(fields: [habit_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profiles              profiles @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([habit_id, orden])
+  @@index([user_id, updated_at], map: "micro_pasos_user_updated_idx")
   @@schema("public")
 }

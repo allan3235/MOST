@@ -19,6 +19,7 @@ export type Configuracion = z.infer<typeof esquemaConfiguracion>;
 
 const LARGO_MINIMO_SECRETO = 32;
 const PUERTO_POR_DEFECTO = 3001;
+const LIMITE_DIARIO_IA_POR_DEFECTO = 10;
 
 const esquemaConfiguracion = z.object({
   DATABASE_URL: z.string().min(1, 'Falta DATABASE_URL'),
@@ -27,6 +28,12 @@ const esquemaConfiguracion = z.object({
     .min(LARGO_MINIMO_SECRETO, `JWT_SECRETO debe tener ${LARGO_MINIMO_SECRETO} caracteres o más`),
   JWT_EXPIRA: z.string().default('30d'),
   PUERTO: z.coerce.number().int().positive().default(PUERTO_POR_DEFECTO),
+  /** Modelo para crear planes y descomponer metas (trabajo creativo). */
+  IA_MODELO_GRANDE: z.string().default('claude-opus-5-5'),
+  /** Modelo para ajustes cortos de un plan que ya existe (más barato). */
+  IA_MODELO_PEQUENO: z.string().default('claude-haiku-5-5'),
+  /** Llamadas a la IA por usuario al día; al pasarlo se usa el catálogo. */
+  IA_LIMITE_DIARIO: z.coerce.number().int().min(0).default(LIMITE_DIARIO_IA_POR_DEFECTO),
 });
 
 // ===== Principal =====

@@ -43,8 +43,12 @@ Decisiones del 22-nov:
 **Dónde vive**
 
 - Solo en el backend NestJS (módulo `ia`). La clave del proveedor **nunca** va en la app.
-- Proveedor intercambiable (Gemini gratuito por defecto; Claude u OpenAI), reutilizando `ai-provider.ts` de Supabase.
-- Límite de generaciones por usuario al día.
+- Proveedor: **Claude** (decisión del 23-nov), con un modelo por tarea para no gastar de más:
+  - Crear el plan y descomponer una meta (diseñar la secuencia completa) → `claude-opus-5-5`, esfuerzo `medium`, con respaldo automático del servidor si el modelo rechaza la petición.
+  - Paso más ligero cuando a la persona le cuesta (ajustar un paso de un plan que ya existe) → `claude-haiku-5-5`, esfuerzo `low`.
+  - Se cambian con `IA_MODELO_GRANDE` e `IA_MODELO_PEQUENO` en `backend/.env`.
+- Detrás de la interfaz `ProveedorIa`: en las pruebas se usa una IA simulada (sin gastar).
+- Límite de llamadas por usuario al día (`IA_LIMITE_DIARIO`, 10 por defecto), registrado en `ai_requests`.
 - Se envía lo mínimo: respuestas de la encuesta y el texto de la meta. Nunca nombre, correo ni datos de introspección (RR-04).
 - Crear un plan o una meta con IA necesita conexión; marcar micro-pasos sigue funcionando sin conexión.
 
@@ -106,14 +110,16 @@ Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las m
 - [x] Módulo **sync**: `POST /sync/operacion` (upsert, update, complete, uncomplete, archive), `POST /sync/lote` (atómico, para guardar un plan), `GET /sync/cambios` (descarga por cursor) y `POST /sync/fila`. Hábitos, horarios, ajustes y planes se escriben por aquí, protegidos por RLS. Las recompensas usan las funciones SQL de siempre.
 - [x] `POST /tienda/comprar`.
 - [x] Errores de Postgres → respuestas con `code` (rechazo definitivo para la cola de la app).
-- [ ] Módulo **ia**: proveedor intercambiable, prompt, validación Zod con las reglas de «Generación con IA», límite diario y respaldo al catálogo. Pruebas con respuestas falsas de la IA (sin gastar cuota).
-- [ ] Endpoint `POST /planes/borrador` (encuesta → hábitos con micro-pasos) y `POST /metas/descomponer` (meta escrita → micro-pasos).
+- [x] Tabla **`micro_pasos`** (migración de Prisma `20261123080815_micro_pasos`) y `habits.paso_actual`, con CHECK del candado mínimo y políticas RLS; se sincroniza por `/sync`.
+- [x] Módulo **ia** con Claude: salida estructurada validada con Zod, reglas de MOST aplicadas en código (`reglasMicroPasos.ts`), 2 intentos, respaldo al catálogo, límite diario y registro en `ai_requests`. Pruebas con IA simulada.
+- [x] `POST /ia/plan` (encuesta → hábitos con micro-pasos), `POST /ia/meta` (meta escrita → micro-pasos) y `POST /ia/paso-ligero` (meta intermedia, RF-15, modelo pequeño).
+- [ ] Probar con Claude de verdad: poner `ANTHROPIC_API_KEY` en `backend/.env` (lo hace Allan; cada plan cuesta centavos).
 
 ### Fase 2: Conectar la app con NestJS
 - [ ] Cambiar `lib/supabase.ts` por un cliente HTTP (`lib/api.ts`) con el token en SecureStore.
 - [ ] Ajustar `sync-engine.ts` y los 5 repositorios que hoy llaman a Supabase.
 - [ ] Simplificar las pantallas de auth (quitar confirmación de correo y recuperación por código del MVP).
-- [ ] El onboarding pide el borrador a `POST /planes/borrador` (IA) y muestra la revisión; sin conexión: «Necesitas conexión para crear tu plan».
+- [ ] El onboarding pide el borrador a `POST /ia/plan` y muestra la revisión; sin conexión: «Necesitas conexión para crear tu plan».
 - [ ] Modelo local de micro-pasos: un hábito guarda su secuencia completa y el paso actual (hoy guarda solo el nivel).
 - [ ] Borrar `supabase/`.
 - [ ] Probar en Expo Go: registro → encuesta → plan generado por la IA → marcar → planta y monedas.
@@ -164,5 +170,5 @@ Expo Go sirve para desarrollar, pero **no basta para todas las pruebas**:
 4. Cómo se registra la agenda o los tiempos libres (RF-02).
 5. Hitos: 50/80 (RF-16) o 50/100 (RI-03).
 6. Estándar ECM-TS: completo en el código nuevo; encabezados por script en el existente.
-7. Proveedor de IA para la demo: Gemini gratuito (propuesta) o una cuenta de pago (Claude u OpenAI). El nivel gratuito de Gemini puede usar los datos enviados; por eso se manda lo mínimo.
+7. ~~Proveedor de IA~~ → decidido el 23-nov: Claude, con modelo grande para crear y pequeño para ajustar.
 8. Cuántos micro-pasos por meta (propuesta: 3 a 5) y si el usuario puede editar cada uno antes de confirmar (propuesta: sí).

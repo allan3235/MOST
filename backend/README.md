@@ -57,5 +57,24 @@ Comprueba que responde: abre http://localhost:3001/salud → `{"estado":"ok","ba
 | `GET /sync/cambios` | Sí | Filas que cambiaron desde un cursor (`?tabla=&desde=`) |
 | `POST /sync/fila` | Sí | Una fila por su clave |
 | `POST /tienda/comprar` | Sí | Comprar un accesorio |
+| `POST /ia/plan` | Sí | Encuesta → borrador del plan con micro-pasos (`origen: 'ia'` o `'catalogo'`) |
+| `POST /ia/meta` | Sí | Meta escrita → hábito con micro-pasos (503 `IA_NO_DISPONIBLE`, 422 `META_NO_APROPIADA`) |
+| `POST /ia/paso-ligero` | Sí | Paso intermedio más ligero que el actual (meta intermedia, RF-15) |
 
 «Sesión» = encabezado `Authorization: Bearer <token>`. Los rechazos definitivos (por ejemplo, una política RLS o una regla de negocio) responden con `code`, y la app los saca de su cola en vez de reintentarlos.
+
+## IA (Claude)
+
+Los hábitos y sus micro-pasos los genera Claude, con un modelo según la tarea para no gastar de más:
+
+| Tarea | Modelo | Esfuerzo |
+|---|---|---|
+| Crear el plan (`/ia/plan`) y descomponer una meta (`/ia/meta`) | `claude-opus-5-5` | `medium` |
+| Paso más ligero (`/ia/paso-ligero`) | `claude-haiku-5-5` | `low` |
+
+- **Clave:** `ANTHROPIC_API_KEY` en `backend/.env`. Nunca va en la app ni en el repositorio. Sin clave, los planes salen del catálogo y `/ia/meta` responde 503.
+- **Reglas de MOST:** la IA propone y `src/ia/reglasMicroPasos.ts` corrige. El primer paso dura 5 min o menos; hay de 3 a 5 pasos, cada uno a lo mucho el triple del anterior; nada pasa del tiempo diario; la reducida es de al menos 1 min.
+- **Respaldo:** hay 2 intentos. Si fallan, se acaba el límite diario (`IA_LIMITE_DIARIO`) o la IA rechaza la petición, el plan sale del catálogo semilla.
+- **Privacidad:** a la IA solo se envían claves de la encuesta o el texto de la meta, nunca nombre ni correo.
+- **Uso:** cada llamada queda en la tabla `ai_requests` (tarea, estado y tokens).
+- **Pruebas:** `test/ia.e2e-spec.ts` usa una IA simulada, así que no gasta dinero.
