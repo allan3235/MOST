@@ -28,6 +28,7 @@ import { es, formatear } from '@/i18n/es';
 import { cardShadow, colors, tintes } from '@/theme';
 import { navegar } from '@/lib/navegar';
 
+import { ListaMicroPasos } from '../components/ListaMicroPasos';
 import { PlanHabitRow } from '../components/plan-habit-row';
 import { ResumenPlanCard } from '../components/resumen-plan-card';
 
@@ -110,6 +111,7 @@ export default function DetallePlanScreen() {
 
   const Icono = ICONO_CATEGORIA[plan.area];
   const items = (habitos.data ?? []).filter((item) => delDetalle.has(item.habito.id));
+  const conPasos = (plan?.habitos ?? []).filter((h) => h.pasos.length > 0 && h.habito.activo);
   const desde = formatear(t.desde, {
     dia: String(Number(plan.inicio.slice(8, 10))),
     mes: es.estadisticas.meses[Number(plan.inicio.slice(5, 7)) - 1] ?? '',
@@ -214,6 +216,21 @@ export default function DetallePlanScreen() {
             />
           ) : null}
         </Seccion>
+
+        {/* RF-03: la secuencia de cada hábito y en qué paso va. */}
+        {conPasos.length > 0 ? (
+          <Seccion titulo={es.microPasos.seccion}>
+            <AppText variant="small" tone="ink-soft">
+              {es.microPasos.seccionAyuda}
+            </AppText>
+            {conPasos.map(({ habito, pasos }) => (
+              <View key={habito.id} style={cardShadow} className="gap-2 rounded-card bg-campo p-4">
+                <AppText weight="bold">{habito.titulo}</AppText>
+                <ListaMicroPasos pasos={pasos} pasoActual={habito.paso_actual} />
+              </View>
+            ))}
+          </Seccion>
+        ) : null}
 
         {/* Abajo del todo y como botón principal (decisión del usuario): terminar no borra nada,
             los hábitos se quedan como propios; por eso va en verde y se confirma. */}

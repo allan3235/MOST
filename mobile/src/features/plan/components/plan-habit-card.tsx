@@ -8,10 +8,12 @@ import type { BorradorPlan, HabitoPlan } from '@/schemas/plan';
 import { cardShadow, colors } from '@/theme';
 
 import { textoHorario } from '../domain/plan-format';
+import { ListaMicroPasos } from './ListaMicroPasos';
 
 // Tarjeta de un hábito del plan (mockups «Tu plan está listo» y «Sugerencias de hábitos»): fondo
 // claro, verificación verde, título, duración con días y hora, la etiqueta de su categoría y los
 // enlaces de acción («Editar» y «Quitar», o «Agregar»). Los enlaces dicen su acción con texto.
+// most.: si el hábito trae micro-pasos, se ve su secuencia antes de confirmar el plan (RF-03).
 
 export type AccionTarjeta = {
   label: string;
@@ -65,6 +67,11 @@ export function PlanHabitCard({ habito, ventana, acciones, nota }: PlanHabitCard
       <AppText variant="small" tone="ink-soft">
         {textoHorario(habito, ventana, t)}
       </AppText>
+      {habito.micro_pasos && habito.micro_pasos.length > 0 ? (
+        <View className="border-t border-divisor pt-2">
+          <ListaMicroPasos pasos={habito.micro_pasos} pasoActual={habito.paso_actual} />
+        </View>
+      ) : null}
 
       <View className="flex-row items-center justify-between gap-2">
         <View className="rounded-field bg-accent-claro px-3 py-1">

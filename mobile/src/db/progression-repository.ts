@@ -18,6 +18,7 @@ import {
   esDelPlan,
   llegoAlLimiteTotal,
   pasoHaciaAbajo,
+  pasosDe,
   cumplimientoDe,
   tocaDesbloquear,
   tocaEvaluar,
@@ -465,11 +466,13 @@ export async function aceptarNuevo(
 export type HabitoDelDetalle = {
   habito: Habito;
   horario: Horario | null;
-  /** Racha actual: ocurrencias programadas seguidas que se completaron. */
+  /** Veces completado en total (nunca baja). */
   racha: number;
+  /** Secuencia de micro-pasos (RF-03); vacía si el hábito no tiene. */
+  pasos: MicroPasoLocal[];
   /** El paso más ligero para «Hacerlo más ligero», o null si ya está en el más ligero. */
   masLigero: ValoresNivel | null;
-  /** Va por debajo del 50 % en su ventana: la fila sugiere hacerlo más ligero. */
+  /** Va por debajo del 40 % en los últimos 7 días (RF-15): la fila sugiere hacerlo más ligero. */
   sugerirMasLigero: boolean;
 };
 
@@ -503,7 +506,7 @@ export async function leerDetallePlan(userId: string, planId: string): Promise<D
     const horario = horarioDeReferencia(horarios, entrada.hoy) ?? null;
     const ocurrencias = entrada.ocurrencias.filter((o) => o.habitId === habito.id);
     const masLigero = esDelPlan(habito) ? pasoHaciaAbajo(habito, entrada) : null;
-    // Misma ventana y mismo umbral de bajar que la revisión, pero solo como sugerencia.
+    // Misma ventana y mismo umbral de bajar que la revisión (RF-15), pero solo como sugerencia.
     const conteo = horario
       ? cumplimientoDe(
           habito,
@@ -511,12 +514,14 @@ export async function leerDetallePlan(userId: string, planId: string): Promise<D
           entrada.ocurrencias,
           entrada.hoy,
           entrada.config,
+          'bajar',
         )
       : null;
     return {
       habito,
       horario,
       racha: rachaDeHabito(ocurrencias).actual,
+      pasos: pasosDe(entrada.microPasos, habito.id),
       masLigero,
       sugerirMasLigero:
         masLigero !== null &&

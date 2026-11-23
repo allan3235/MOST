@@ -125,7 +125,6 @@ Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las m
 - [x] Token de 60 días, igual que el límite sin conexión de la app.
 - [x] Verificado sin teléfono: 359 pruebas de la app, 30 unitarias y 19 e2e del backend, Metro empaqueta y un script repitió el flujo de la app contra el backend real.
 - [ ] **Probar en Expo Go (Allan):** registro → encuesta → plan → «Empezar» → marcar → planta y monedas.
-- [ ] Mostrar la secuencia de micro-pasos en la revisión del plan y en el detalle del hábito (va con RF-03 en la Fase 3).
 
 ### Fase 3: Alinear los flujos existentes con el SRS
 - [ ] **Aplicar las migraciones nuevas** con Docker abierto: `pnpm db:migrar` y revisar que `pnpm db:nueva-migracion --name verificar` salga vacía (se escribieron sin base porque Docker estaba cerrado).
@@ -135,7 +134,7 @@ Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las m
 - [x] Resumen nocturno como interruptor (RF-18): `user_settings.resumen_nocturno` (migración `20261123140000_resumen_nocturno`); se suma a cualquier estilo desde «Avisos y horas».
 - [x] La pausa no cuenta como fallo (RF-09): tabla `habit_pausas` (migración `20261123130000_habit_pausas`); estadísticas y progresión saltan esos días, también después de reanudar.
 - [ ] Pantalla «Crear meta» (RF-03): escribir meta → la IA la descompone → revisar, editar y confirmar.
-- [ ] Secuencia de micro-pasos visible en el detalle (RF-03).
+- [x] Secuencia de micro-pasos visible (RF-03): en la revisión del plan antes de «Empezar» y en el detalle del plan («Tus micro-pasos»), con estado por icono y texto (Superado / Vas aquí / Después).
 - [x] El reajuste (subir o bajar) se mueve dentro de la secuencia de micro-pasos; sin secuencia, por los niveles del catálogo. Los títulos dicen los minutos reales de la versión reducida.
 - [ ] Cuando ya no hay paso más ligero en la secuencia, pedir uno intermedio a la IA (`/ia/paso-ligero`) respetando el candado mínimo.
 - [ ] Revisar textos con tono TCC/ACT (RNF-09).

@@ -807,6 +807,14 @@ export const es = {
     error: 'No pudimos guardar el cambio. Inténtalo de nuevo.',
   },
   // Progresión (SDD 6.3, docs/textos.md 5): tarjetas en Hoy cada 7 días.
+  microPasos: {
+    titulo: 'Tus micro-pasos',
+    paso: 'Paso {n}',
+    estados: { superado: 'Superado', actual: 'Vas aquí', siguiente: 'Después' },
+    a11y: 'Paso {n} de {total}: {titulo}. {estado}.',
+    seccion: 'Tus micro-pasos',
+    seccionAyuda: 'Cada hábito avanza un paso a la vez. Si uno cuesta, se hace más pequeño.',
+  },
   progresion: {
     subir: 'Te está saliendo muy bien «{actual}». ¿Probamos con «{titulo}» ({min} min)?',
     subirCompleta: 'Te está saliendo muy bien con «{titulo}». ¿Volvemos a {min} min?',
