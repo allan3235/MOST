@@ -98,11 +98,13 @@ Gestor: **pnpm** con workspaces (`node-linker=hoisted` para que Expo funcione).
 - [x] Nuevo `CLAUDE.md`; `AGENTS.md` con comandos de pnpm.
 
 ### Fase 1: Backend NestJS mínimo (sin esto la app no inicia sesión)
-- [ ] PostgreSQL en Docker (`docker compose up`) y Prisma con el esquema convertido de las migraciones de Supabase.
-- [ ] Semilla: categorías, catálogo de 105 micro-pasos, accesorios y configuración.
-- [ ] Módulo **auth**: registro y login con correo y contraseña, JWT, contraseña con hash.
-- [ ] Módulo **hábitos y horarios** (CRUD; archivar en vez de borrar).
-- [ ] Módulo **registros**: `completar` y `deshacer` con las reglas de XP y monedas (pasar a TypeScript las funciones SQL `complete_habit` y `uncomplete_habit`), con pruebas.
+Decisión técnica (22-nov): **`pg` + migraciones SQL en lugar de Prisma.** El esquema de Habit Green ya trae en SQL sus reglas de monedas y XP (`complete_habit`, `uncomplete_habit`…), sus disparadores y 34 políticas RLS. Se conservan tal cual: en cada petición, NestJS abre una transacción con el rol `authenticated` y el id del usuario (`BaseDatosServicio.comoUsuario`), y Postgres aplica las mismas reglas que ya funcionaban. Prisma no maneja funciones ni políticas, y su versión «latest» era una candidata (8.0.0-rc).
+
+- [x] PostgreSQL en Docker (`backend/docker-compose.yml`, puerto 5433) y migraciones SQL (`backend/db/migraciones`, `pnpm db:migrar`). Las 16 migraciones de Supabase quedaron consolidadas en `0001_esquema.sql`.
+- [x] Datos de referencia: categorías, catálogo de micro-pasos, accesorios y configuración (`0002_datos_referencia.sql`).
+- [x] Módulo **auth**: registro, login y `GET /auth/yo`; JWT y contraseña con scrypt. Pruebas unitarias y de punta a punta (incluyen que RLS impide darse monedas).
+- [ ] Hábitos, horarios, ajustes y planes: se escriben por el módulo **sync** (operaciones genéricas protegidas por RLS), como antes con Supabase.
+- [ ] Módulo **registros**: rutas para `complete_habit`, `uncomplete_habit`, `archivar_habito` y `comprar_accesorio` (las funciones SQL se conservan).
 - [ ] Módulo **sync**: recibir la cola de cambios de la app y devolver los cambios del servidor.
 - [ ] Módulo **ia**: proveedor intercambiable, prompt, validación Zod con las reglas de «Generación con IA», límite diario y respaldo al catálogo. Pruebas con respuestas falsas de la IA (sin gastar cuota).
 - [ ] Endpoint `POST /planes/borrador` (encuesta → hábitos con micro-pasos) y `POST /metas/descomponer` (meta escrita → micro-pasos).
@@ -152,7 +154,7 @@ Expo Go sirve para desarrollar, pero **no basta para todas las pruebas**:
 - Las notificaciones locales funcionan, pero el propio SRS pide validarlas en una development build (CP-03, 06, 08).
 - El cifrado de SQLite (SQLCipher) **no existe en Expo Go**.
 - El acceso a No Molestar (CP-15) necesita una development build.
-- El teléfono y la PC deben estar en la misma red Wi-Fi, y el firewall de Windows debe permitir el puerto 3000.
+- El teléfono y la PC deben estar en la misma red Wi-Fi, y el firewall de Windows debe permitir el puerto 3001.
 
 ## Decisiones pendientes
 

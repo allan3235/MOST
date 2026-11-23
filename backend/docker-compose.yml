@@ -1,0 +1,18 @@
+# Base de datos local de most. Uso (desde backend/): docker compose up -d
+# Se publica en el puerto 5433 para no chocar con un PostgreSQL instalado en la computadora.
+services:
+  db:
+    image: postgres:17
+    container_name: most-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: most
+      POSTGRES_PASSWORD: most
+      POSTGRES_DB: most
+    ports:
+      - '5433:5432'
+    volumes:
+      - most-db:/var/lib/postgresql/data
+
+volumes:
+  most-db:
