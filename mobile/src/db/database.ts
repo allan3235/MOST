@@ -31,7 +31,8 @@ const NOMBRE = 'most.db';
 // 11: habit_occurrences.barrera (lista de barreras, RF-17 + RF-19).
 // 12: tabla propia avisos_motivacionales (máximo un aviso al día, RF-13).
 // 13: tablas propias hitos_celebrados y preferencias_locales (hitos 50/80 %, RF-16).
-const ESQUEMA_VERSION = 13;
+// 14: tabla propia introspecciones (RF-04, solo en el teléfono).
+const ESQUEMA_VERSION = 14;
 
 let abierta: Promise<SQLite.SQLiteDatabase> | null = null;
 

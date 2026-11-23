@@ -18,6 +18,9 @@ import { useCheckIn } from '@/features/habits/use-check-in';
 import { CoinBalance } from '@/features/rewards/components/coin-balance';
 import { CoinBurst } from '@/features/rewards/components/coin-burst';
 import { PhaseCelebration } from '@/features/rewards/components/phase-celebration';
+import { DialogoIntrospeccion } from '@/features/introspeccion/components/DialogoIntrospeccion';
+import { TarjetaReflexion } from '@/features/introspeccion/components/TarjetaReflexion';
+import { useIntrospeccion } from '@/features/introspeccion/use-introspeccion';
 import { CelebracionHito } from '@/features/progression/components/CelebracionHito';
 import { ProgressionCard } from '@/features/progression/components/progression-card';
 import { useProgresion } from '@/features/progression/use-progresion';
@@ -59,6 +62,7 @@ export default function HoyScreen() {
   const semanaApoyo = useLocalQuery(`apoyo-${userId}`, () => leerSemanaApoyo(userId));
   const checkIn = useCheckIn(userId);
   const reprogramar = useReprogramacion(userId);
+  const introspeccion = useIntrospeccion(userId);
   const progresion = useProgresion(userId);
   const { height, fontScale } = useWindowDimensions();
   const todoDesplazable = fontScale >= ESCALA_MAXIMA_FIJA || height < ALTO_MINIMO_FIJO;
@@ -176,6 +180,13 @@ export default function HoyScreen() {
           onIrAPerfil={progresion.irAPerfil}
         />
       ) : null}
+      {/* RF-04: la reflexión semanal, solo si no hay otra tarjeta arriba. */}
+      {!reprogramar.actual && !progresion.actual && introspeccion.tocaSemanal ? (
+        <TarjetaReflexion
+          onEmpezar={() => introspeccion.abrir('semanal')}
+          onAhoraNo={introspeccion.posponer}
+        />
+      ) : null}
       {apoyo ? <Alert variant="info" message={apoyo.mensaje} /> : null}
       {items.length === 0 ? (
         <View className="flex-1 items-center justify-center gap-4 py-6">
@@ -218,6 +229,7 @@ export default function HoyScreen() {
     <>
       <PhaseCelebration celebracion={checkIn.celebracion} onCerrar={checkIn.cerrarCelebracion} />
       <CelebracionHito hito={checkIn.hito} onCerrar={checkIn.cerrarHito} />
+      <DialogoIntrospeccion motivo={introspeccion.motivo} onTerminar={introspeccion.terminar} />
       {reprogramar.eligiendo && reprogramar.actual ? (
         <DayDialog
           dias={reprogramar.actual.diasLibres}

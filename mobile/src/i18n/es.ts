@@ -785,6 +785,27 @@ export const es = {
     errorGuardar: 'No pudimos guardar el cambio. Inténtalo de nuevo.',
   },
   // Reprogramación (SDD 6.2): tarjeta arriba de la lista de Hoy. Tono neutro, sin culpa.
+  // Introspección por valores (RF-04): sin diagnóstico ni etiquetas; no hay respuestas correctas.
+  introspeccion: {
+    tarjetaTitulo: 'Un momento para ti',
+    tarjetaTexto: 'Tres preguntas cortas sobre lo que te importa. No hay respuestas correctas.',
+    empezar: 'Empezar',
+    ahoraNo: 'Ahora no',
+    introPausa: 'Pausar también es cuidarte. Si quieres, tómate un minuto para ti.',
+    contador: 'Pregunta {n} de {total}',
+    preguntas: {
+      cerca_de_lo_importante: '¿Qué tan cerca te sentiste esta semana de lo que te importa?',
+      amabilidad: '¿Qué tan amable fuiste contigo cuando algo no salió como querías?',
+      persona_que_quiero_ser: '¿Qué tanto tus pasos te acercan a la persona que quieres ser?',
+    },
+    escala: ['Nada', 'Poco', 'Algo', 'Bastante', 'Mucho'],
+    a11yValor: '{n} de {max}, {texto}',
+    siguiente: 'Siguiente',
+    saltar: 'Saltar',
+    gracias: 'Gracias por tomarte este momento',
+    privacidad: 'Tus respuestas se quedan en tu teléfono. Solo son para ti.',
+    listo: 'Listo',
+  },
   // Hitos del micro-paso (RF-16): 5 y 8 de 10. Solo celebran.
   hitos: {
     titulo: { 50: '¡Vas a la mitad de este paso!', 80: '¡Ya casi dominas este paso!' },

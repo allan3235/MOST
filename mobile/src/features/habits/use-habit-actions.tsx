@@ -13,6 +13,8 @@ import { es, formatear } from '@/i18n/es';
 import { useFechaHoy } from '@/lib/fecha-hoy';
 import { navegar } from '@/lib/navegar';
 
+import { DialogoIntrospeccion } from '../introspeccion/components/DialogoIntrospeccion';
+import { useIntrospeccion } from '../introspeccion/use-introspeccion';
 import { CelebracionHito } from '../progression/components/CelebracionHito';
 import { PhaseCelebration } from '../rewards/components/phase-celebration';
 import type { HabitCheckCardProps } from './components/habit-check-card';
@@ -52,6 +54,8 @@ export function useHabitActions(
     setEliminando(null);
   }
 
+  const introspeccion = useIntrospeccion(userId);
+
   const guardar = async (accion: () => Promise<void>) => {
     setErrorGuardar(false);
     try {
@@ -72,6 +76,10 @@ export function useHabitActions(
       }
     }
     await guardar(() => cambiarActivo(habito.id, !habito.activo));
+    // UC-11 extiende UC-08: al pausar se ofrecen las preguntas de introspección (se pueden cerrar).
+    if (habito.activo) {
+      introspeccion.abrir('pausa');
+    }
   };
 
   const editar = (id: string) => navegar.push({ pathname: '/habit/[id]', params: { id } });
@@ -144,6 +152,7 @@ export function useHabitActions(
 
       <PhaseCelebration celebracion={checkIn.celebracion} onCerrar={checkIn.cerrarCelebracion} />
       <CelebracionHito hito={checkIn.hito} onCerrar={checkIn.cerrarHito} />
+      <DialogoIntrospeccion motivo={introspeccion.motivo} onTerminar={introspeccion.terminar} />
     </>
   );
 
