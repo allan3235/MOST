@@ -44,6 +44,7 @@ yarn-error.*
 
 # Motor de Impeccable (19 MB): se descarga solo la primera vez que hace falta
 .claude/skills/impeccable/scripts/bin/
+.agents/skills/impeccable/scripts/bin/
 
 # impeccable-ignore-start
 # Ephemeral output, runtime state, and per-dev overrides.
