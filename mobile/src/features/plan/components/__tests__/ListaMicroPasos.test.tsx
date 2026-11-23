@@ -33,6 +33,20 @@ describe('ListaMicroPasos', () => {
     expect(screen.getByLabelText('Paso 3 de 3: Leer 20 min. Después.')).toBeTruthy();
   });
 
+  it('si el hábito va en versión ligera, el paso en curso muestra sus minutos reales', async () => {
+    await render(
+      <ListaMicroPasos
+        pasos={PASOS}
+        pasoActual={1}
+        enCurso={{ titulo: 'Leer 2 min', duracion_min: 2 }}
+      />,
+    );
+    expect(
+      screen.getByLabelText('Paso 1 de 3: Leer 2 min. Vas aquí, versión ligera.'),
+    ).toBeTruthy();
+    expect(screen.getByText('Paso 1 · 2 min · Vas aquí, versión ligera')).toBeTruthy();
+  });
+
   it('sin secuencia no muestra nada', async () => {
     await render(<ListaMicroPasos pasos={[]} pasoActual={null} />);
     expect(screen.queryByText('Tus micro-pasos')).toBeNull();

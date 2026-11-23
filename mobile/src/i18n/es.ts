@@ -836,6 +836,7 @@ export const es = {
     titulo: 'Tus micro-pasos',
     paso: 'Paso {n}',
     estados: { superado: 'Superado', actual: 'Vas aquí', siguiente: 'Después' },
+    ligera: 'versión ligera',
     a11y: 'Paso {n} de {total}: {titulo}. {estado}.',
     seccion: 'Tus micro-pasos',
     seccionAyuda: 'Cada hábito avanza un paso a la vez. Si uno cuesta, se hace más pequeño.',

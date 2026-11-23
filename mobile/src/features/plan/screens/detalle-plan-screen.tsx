@@ -226,7 +226,12 @@ export default function DetallePlanScreen() {
             {conPasos.map(({ habito, pasos }) => (
               <View key={habito.id} style={cardShadow} className="gap-2 rounded-card bg-campo p-4">
                 <AppText weight="bold">{habito.titulo}</AppText>
-                <ListaMicroPasos pasos={pasos} pasoActual={habito.paso_actual} />
+                <ListaMicroPasos
+                  pasos={pasos}
+                  pasoActual={habito.paso_actual}
+                  enCurso={habito}
+                  conTitulo={false}
+                />
               </View>
             ))}
           </Seccion>

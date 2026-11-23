@@ -3,11 +3,13 @@
  * @proyecto most.
  * @descripcion Secuencia ordenada de micro-pasos de un hábito (RF-03): los superados, en el que
  *   va y los que siguen. Cada estado lleva icono y texto (no solo color) y TalkBack lee cada paso
- *   como una frase («Paso 2 de 3: Leer 10 min. Vas aquí.»).
+ *   como una frase («Paso 2 de 3: Leer 10 min. Vas aquí.»). Si el hábito está en una versión
+ *   más ligera que su paso, el paso en curso muestra lo que de verdad toca hoy.
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-23
- * @version 1.0.0
- * @historial 1.0.0 (2026-11-23): creación.
+ * @version 1.1.0
+ * @historial 1.0.0 (2026-11-23): creación. 1.1.0 (2026-11-23): versión ligera en el paso en
+ *   curso y título opcional.
  */
 
 import { Circle, CircleCheck, Footprints, type LucideIcon } from 'lucide-react-native';
@@ -32,6 +34,10 @@ export type ListaMicroPasosProps = {
   pasos: readonly PasoDeLista[];
   /** Orden del paso en curso; sin él se toma el primero. */
   pasoActual: number | null | undefined;
+  /** Lo que el hábito pide hoy; si es más corto que el paso en curso, se muestra en su lugar. */
+  enCurso?: { titulo: string; duracion_min: number };
+  /** false cuando la pantalla ya pone el título «Tus micro-pasos». */
+  conTitulo?: boolean;
 };
 
 // ===== Constantes =====
@@ -63,7 +69,12 @@ function estadoDe(orden: number, actual: number): EstadoPaso {
  * @param props Pasos y paso actual.
  * @returns La lista, o null.
  */
-export function ListaMicroPasos({ pasos, pasoActual }: ListaMicroPasosProps) {
+export function ListaMicroPasos({
+  pasos,
+  pasoActual,
+  enCurso,
+  conTitulo = true,
+}: ListaMicroPasosProps) {
   const t = es.microPasos;
   if (pasos.length === 0) {
     return null;
@@ -73,15 +84,25 @@ export function ListaMicroPasos({ pasos, pasoActual }: ListaMicroPasosProps) {
 
   return (
     <View className="gap-2">
-      <AppText variant="small" weight="bold">
-        {t.titulo}
-      </AppText>
-      {ordenados.map((paso) => {
-        const estado = estadoDe(paso.orden, actual);
+      {conTitulo ? (
+        <AppText variant="small" weight="bold">
+          {t.titulo}
+        </AppText>
+      ) : null}
+      {ordenados.map((pasoBase) => {
+        const estado = estadoDe(pasoBase.orden, actual);
+        const esLigera =
+          estado === 'actual' &&
+          enCurso !== undefined &&
+          enCurso.duracion_min > 0 &&
+          enCurso.duracion_min < pasoBase.duracion_min;
+        const paso = esLigera
+          ? { orden: pasoBase.orden, titulo: enCurso.titulo, duracion_min: enCurso.duracion_min }
+          : pasoBase;
         const estilo = ESTILO_POR_ESTADO[estado];
         const Icono = estilo.icono;
         const duracion = paso.duracion_min > 0 ? textoDuracion(paso.duracion_min) : null;
-        const etiqueta = t.estados[estado];
+        const etiqueta = esLigera ? `${t.estados[estado]}, ${t.ligera}` : t.estados[estado];
         return (
           <View
             key={paso.orden}
