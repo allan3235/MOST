@@ -6,18 +6,24 @@
  *   políticas RLS de la base decidan qué filas puede leer o escribir (igual que en Supabase).
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-22
- * @version 1.0.0
- * @historial 1.0.0 (2026-11-22): creación.
+ * @version 1.1.0
+ * @historial 1.0.0 (2026-11-22): creación. 1.1.0: fechas como texto ISO y sesión en UTC.
  */
 
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import pg from 'pg';
 
 import { leerConfiguracion } from '../comun/configuracion.js';
+import { configurarTiposPostgres } from './tiposPostgres.js';
 
 // ===== Tipos =====
 
 export type ClienteBaseDatos = pg.PoolClient;
+
+// ===== Constantes =====
+
+/** Las marcas de tiempo salen en UTC sin importar la zona del servidor. */
+const OPCIONES_SESION = '-c TimeZone=UTC';
 
 // ===== Principal =====
 
@@ -26,7 +32,11 @@ export class BaseDatosServicio implements OnModuleDestroy {
   private readonly pool: pg.Pool;
 
   constructor() {
-    this.pool = new pg.Pool({ connectionString: leerConfiguracion().DATABASE_URL });
+    configurarTiposPostgres();
+    this.pool = new pg.Pool({
+      connectionString: leerConfiguracion().DATABASE_URL,
+      options: OPCIONES_SESION,
+    });
   }
 
   /**

@@ -1,6 +1,6 @@
 # Plan de rescate de most.
 
-Actualizado: 22-nov-2026. Fuente de requisitos: `MOST_CONTEXTO.md` (SRS v4.0). Este archivo es el backlog vivo: al terminar una tarea, marca la casilla.
+Actualizado: 22-nov-2026. Fuente de requisitos: `docs/MOST_CONTEXTO.md` (SRS v4.0). Este archivo es el backlog vivo: al terminar una tarea, marca la casilla.
 
 ## Punto de partida
 
@@ -52,11 +52,11 @@ Decisiones del 22-nov:
 
 ```
 MOST/
-  mobile/       # app Expo (lo que hoy está en src/, assets/, app.json…)
-  backend/      # API NestJS + Prisma + PostgreSQL (Docker)
-  compartido/   # tipos y esquemas Zod que usan mobile y backend
-  docs/         # plan, decisiones, legado de Habit Green
-  MOST_CONTEXTO.md
+  mobile/       # app Expo
+  backend/      # API NestJS + PostgreSQL (Docker) con migraciones SQL
+  compartido/   # tipos y esquemas Zod que usan mobile y backend (se crea en la Fase 1)
+  docs/         # MOST_CONTEXTO.md (requisitos) y este plan
+  legado/       # documentos y supabase/ de Habit Green, solo como referencia
   pnpm-workspace.yaml
 ```
 
@@ -103,9 +103,9 @@ Decisión técnica (22-nov): **`pg` + migraciones SQL en lugar de Prisma.** El e
 - [x] PostgreSQL en Docker (`backend/docker-compose.yml`, puerto 5433) y migraciones SQL (`backend/db/migraciones`, `pnpm db:migrar`). Las 16 migraciones de Supabase quedaron consolidadas en `0001_esquema.sql`.
 - [x] Datos de referencia: categorías, catálogo de micro-pasos, accesorios y configuración (`0002_datos_referencia.sql`).
 - [x] Módulo **auth**: registro, login y `GET /auth/yo`; JWT y contraseña con scrypt. Pruebas unitarias y de punta a punta (incluyen que RLS impide darse monedas).
-- [ ] Hábitos, horarios, ajustes y planes: se escriben por el módulo **sync** (operaciones genéricas protegidas por RLS), como antes con Supabase.
-- [ ] Módulo **registros**: rutas para `complete_habit`, `uncomplete_habit`, `archivar_habito` y `comprar_accesorio` (las funciones SQL se conservan).
-- [ ] Módulo **sync**: recibir la cola de cambios de la app y devolver los cambios del servidor.
+- [x] Módulo **sync**: `POST /sync/operacion` (upsert, update, complete, uncomplete, archive), `POST /sync/lote` (atómico, para guardar un plan), `GET /sync/cambios` (descarga por cursor) y `POST /sync/fila`. Hábitos, horarios, ajustes y planes se escriben por aquí, protegidos por RLS. Las recompensas usan las funciones SQL de siempre.
+- [x] `POST /tienda/comprar`.
+- [x] Errores de Postgres → respuestas con `code` (rechazo definitivo para la cola de la app).
 - [ ] Módulo **ia**: proveedor intercambiable, prompt, validación Zod con las reglas de «Generación con IA», límite diario y respaldo al catálogo. Pruebas con respuestas falsas de la IA (sin gastar cuota).
 - [ ] Endpoint `POST /planes/borrador` (encuesta → hábitos con micro-pasos) y `POST /metas/descomponer` (meta escrita → micro-pasos).
 
