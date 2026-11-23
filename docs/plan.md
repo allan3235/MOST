@@ -138,7 +138,7 @@ Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las m
 - [x] Secuencia de micro-pasos visible (RF-03): en la revisión del plan antes de «Empezar» y en el detalle del plan («Tus micro-pasos»), con estado por icono y texto (Superado / Vas aquí / Después).
 - [x] El reajuste (subir o bajar) se mueve dentro de la secuencia de micro-pasos; sin secuencia, por los niveles del catálogo. Los títulos dicen los minutos reales de la versión reducida.
 - [ ] Cuando ya no hay paso más ligero en la secuencia, pedir uno intermedio a la IA (`/ia/paso-ligero`) respetando el candado mínimo.
-- [ ] Revisar textos con tono TCC/ACT (RNF-09).
+- [x] Revisar textos con tono TCC/ACT (RNF-09): sin palabras de culpa ni fracaso; «Me desanimo cuando fallo un día» → «Me desanimo cuando un día no sale». Los días sin marcar se ven neutros (sin rojo ni tachas).
 
 ### Fase 4: Lo que falta, en orden de prioridad
 - [ ] RF-17+19 Lista de barreras con alternativa en un toque.

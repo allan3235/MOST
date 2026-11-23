@@ -248,7 +248,7 @@ export const es = {
         poco_tiempo: 'No me alcanza el tiempo',
         olvido: 'Se me olvida',
         motivacion: 'Pierdo la motivación',
-        desanimo: 'Me desanimo cuando fallo un día',
+        desanimo: 'Me desanimo cuando un día no sale',
         distraccion: 'Me distraigo fácilmente',
         recursos: 'No tengo los recursos o el espacio',
       },
