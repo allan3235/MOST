@@ -112,6 +112,28 @@ describe('ocurrencias para estadísticas', () => {
     expect(fechas(datos({ habitos: [habito('a', { activo: false })] }))).toEqual([]);
   });
 
+  it('RF-09: los días en pausa no cuentan como fallo, ni después de reanudar', () => {
+    // Pausado del 11 al 13 y reanudado el 14: el 11 y el 13 no cuentan; el 16 sí.
+    const d = datos({
+      pausas: [{ habit_id: 'a', desde: '2026-11-11', hasta: '2026-11-13' }],
+      registros: [hecho('a', '2026-11-09')],
+    });
+    expect(fechas(d)).toEqual(['2026-11-09 true', '2026-11-16 false']);
+  });
+
+  it('RF-09: con la pausa abierta, desde que empezó ya nada cuenta', () => {
+    const d = datos({
+      habitos: [habito('a', { activo: false })],
+      pausas: [{ habit_id: 'a', desde: '2026-11-12', hasta: null }],
+    });
+    expect(fechas(d)).toEqual(['2026-11-09 false', '2026-11-11 false']);
+  });
+
+  it('RF-09: pausar y reanudar el mismo día deja una pausa vacía', () => {
+    const d = datos({ pausas: [{ habit_id: 'a', desde: '2026-11-11', hasta: '2026-11-10' }] });
+    expect(fechas(d)).toContain('2026-11-11 false');
+  });
+
   it('un registro deshecho no cuenta como hecho', () => {
     const d = datos({
       registros: [{ habit_id: 'a', fecha: '2026-11-09', eliminado_en: '2026-11-09T10:00:00Z' }],

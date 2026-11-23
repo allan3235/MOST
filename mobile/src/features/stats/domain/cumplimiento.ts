@@ -18,8 +18,10 @@ import { rachaDeHabito, type Racha } from './rachas';
 // - Una ocurrencia es un día del patrón vigente o un día al que llegó por reprogramación; el día
 //   original de una movida no cuenta, y una descartada cuenta como no hecha.
 // - Hoy solo suma lo que ya se hizo: lo pendiente de hoy no baja el resultado ni resta del avance.
-// - Archivados: cuentan hasta el día anterior a archivarlos. En pausa: hasta su último registro
-//   (la app no guarda desde cuándo están en pausa; decisión del usuario).
+// - Archivados: cuentan hasta el día anterior a archivarlos.
+// - En pausa (RF-09): los días de cada periodo de habit_pausas no cuentan, ni antes ni después de
+//   reanudar. Un hábito pausado antes de que existieran los periodos cuenta hasta su último
+//   registro (regla anterior).
 // - Los topes de XP y monedas no importan: un registro hecho cuenta igual.
 
 export type DatosEstadisticas = {
@@ -31,7 +33,12 @@ export type DatosEstadisticas = {
   registros: readonly Registro[];
   /** category_id → área. */
   categorias: ReadonlyMap<string, Area>;
+  /** Periodos de pausa (RF-09). */
+  pausas?: readonly Pausa[];
 };
+
+/** Un periodo de pausa: de `desde` a `hasta` (null si sigue en pausa), fechas "YYYY-MM-DD". */
+export type Pausa = { habit_id: string; desde: string; hasta: string | null };
 
 /**
  * Estado de un hábito en un día que le toca: hecho, sin marcar (día pasado), pendiente (hoy) o
@@ -78,12 +85,23 @@ export type HabitoDeUnDia = {
 };
 
 /** Regla de archivados y pausados para `habitosDelDia`. */
-export function cuentaEn(ultimoRegistro: ReadonlyMap<string, string>) {
+export function cuentaEn(
+  ultimoRegistro: ReadonlyMap<string, string>,
+  pausas: readonly Pausa[] = [],
+) {
+  const pausasPorHabito = new Map<string, Pausa[]>();
+  for (const pausa of pausas) {
+    pausasPorHabito.set(pausa.habit_id, [...(pausasPorHabito.get(pausa.habit_id) ?? []), pausa]);
+  }
   return (habito: Habito, fecha: string): boolean => {
     if (habito.archivado_en !== null && fecha >= fechaLocal(new Date(habito.archivado_en))) {
       return false;
     }
-    if (!habito.activo) {
+    const suyas = pausasPorHabito.get(habito.id) ?? [];
+    const enPausa = suyas.some((p) => p.desde <= fecha && (p.hasta === null || fecha <= p.hasta));
+    if (enPausa) return false;
+    // Pausado sin periodo abierto (de antes de habit_pausas): regla anterior.
+    if (!habito.activo && !suyas.some((p) => p.hasta === null)) {
       const ultimo = ultimoRegistro.get(habito.id);
       return ultimo !== undefined && fecha <= ultimo;
     }
@@ -140,7 +158,7 @@ function recorrer(
     const previo = ultimoRegistro.get(r.habit_id);
     if (previo === undefined || r.fecha > previo) ultimoRegistro.set(r.habit_id, r.fecha);
   }
-  const incluir = cuentaEn(ultimoRegistro);
+  const incluir = cuentaEn(ultimoRegistro, datos.pausas);
   const registrosPorDia = agrupar(datos.registros, (r) => [r.fecha]);
   // Solo las movidas: una descartada se queda en su día y cuenta como no hecha.
   const movidas = datos.ocurrencias.filter((o) => o.estado === 'movida');

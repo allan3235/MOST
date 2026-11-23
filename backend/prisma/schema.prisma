@@ -233,6 +233,7 @@ model habits {
   /// Micro-paso en curso (orden en micro_pasos); null si el hábito no tiene micro-pasos.
   paso_actual           Int?                @db.SmallInt
   micro_pasos           micro_pasos[]
+  habit_pausas          habit_pausas[]
   habit_logs            habit_logs[]
   habit_occurrences     habit_occurrences[]
   habit_places          habit_places[]
@@ -316,6 +317,7 @@ model profiles {
   habit_schedules     habit_schedules[]
   habits              habits[]
   micro_pasos         micro_pasos[]
+  habit_pausas        habit_pausas[]
   onboarding_answers  onboarding_answers?
   plans               plans[]
   plant_progress      plant_progress[]
@@ -395,5 +397,24 @@ model micro_pasos {
 
   @@unique([habit_id, orden])
   @@index([user_id, updated_at], map: "micro_pasos_user_updated_idx")
+  @@schema("public")
+}
+
+/// Periodos en que un hábito estuvo en pausa (RF-09): esos días no cuentan como fallo. hasta = null
+/// mientras sigue en pausa. Restricciones CHECK y políticas RLS en la migración
+/// 20261123130000_habit_pausas.
+model habit_pausas {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  habit_id   String    @db.Uuid
+  user_id    String    @db.Uuid
+  desde      DateTime  @db.Date
+  hasta      DateTime? @db.Date
+  created_at DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at DateTime  @default(now()) @db.Timestamptz(6)
+  habits     habits    @relation(fields: [habit_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profiles   profiles  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([habit_id], map: "habit_pausas_habit_idx")
+  @@index([user_id, updated_at], map: "habit_pausas_user_updated_idx")
   @@schema("public")
 }

@@ -4,7 +4,7 @@ import type {
   Ocurrencia,
   Registro,
 } from '@/features/habits/domain/habitos-del-dia';
-import type { DatosEstadisticas } from '@/features/stats/domain/cumplimiento';
+import type { DatosEstadisticas, Pausa } from '@/features/stats/domain/cumplimiento';
 
 import { getDb, leerFilas } from './database';
 import { categoriasPorId } from './habits-repository';
@@ -21,20 +21,23 @@ export type DatosProgreso = DatosEstadisticas & {
 
 export async function leerDatosEstadisticas(userId: string): Promise<DatosProgreso> {
   const db = await getDb();
-  const [habitos, horarios, ocurrencias, registros, categorias, ajustes] = await Promise.all([
-    leerFilas<Habito>(db, 'habits', '1 = 1 ORDER BY created_at'),
-    leerFilas<Horario>(db, 'habit_schedules'),
-    leerFilas<Ocurrencia>(db, 'habit_occurrences'),
-    leerFilas<Registro>(db, 'habit_logs', 'eliminado_en IS NULL'),
-    categoriasPorId(db),
-    leerAjustesEn(db, userId),
-  ]);
+  const [habitos, horarios, ocurrencias, registros, categorias, ajustes, pausas] =
+    await Promise.all([
+      leerFilas<Habito>(db, 'habits', '1 = 1 ORDER BY created_at'),
+      leerFilas<Horario>(db, 'habit_schedules'),
+      leerFilas<Ocurrencia>(db, 'habit_occurrences'),
+      leerFilas<Registro>(db, 'habit_logs', 'eliminado_en IS NULL'),
+      categoriasPorId(db),
+      leerAjustesEn(db, userId),
+      leerFilas<Pausa>(db, 'habit_pausas'),
+    ]);
   return {
     habitos,
     horarios,
     ocurrencias,
     registros,
     categorias,
+    pausas,
     desanimo: ajustes?.estrategias.includes('desanimo') ?? false,
   };
 }

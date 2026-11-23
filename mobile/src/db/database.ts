@@ -26,7 +26,8 @@ const NOMBRE = 'most.db';
 // 5: user_settings.subidas_plan. 6: user_accessories.categorias_equipadas (pulidos antes del APK).
 // 7: plans.area, respuestas, ultima_evaluacion y limite_desbloqueado (un plan por área).
 // 8: micro_pasos y habits.paso_actual (most.; base nueva most.db con el backend NestJS).
-const ESQUEMA_VERSION = 8;
+// 9: habit_pausas (los días en pausa no cuentan como fallo, RF-09).
+const ESQUEMA_VERSION = 9;
 
 let abierta: Promise<SQLite.SQLiteDatabase> | null = null;
 

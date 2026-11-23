@@ -153,6 +153,19 @@ export const TABLAS = [
     },
   },
   {
+    // Periodos de pausa (RF-09): esos días no cuentan como fallo. hasta = null mientras sigue.
+    nombre: 'habit_pausas',
+    clave: ['id'],
+    columnas: {
+      id: T,
+      habit_id: T,
+      user_id: T,
+      desde: T,
+      hasta: T,
+      updated_at: T,
+    },
+  },
+  {
     nombre: 'habit_occurrences',
     clave: ['id'],
     columnas: {
@@ -262,6 +275,7 @@ CREATE TABLE IF NOT EXISTS progresion_tarjetas (
 CREATE INDEX IF NOT EXISTS habit_logs_fecha_idx ON habit_logs (fecha);
 CREATE INDEX IF NOT EXISTS habit_schedules_habit_idx ON habit_schedules (habit_id);
 CREATE INDEX IF NOT EXISTS micro_pasos_habit_idx ON micro_pasos (habit_id, orden);
+CREATE INDEX IF NOT EXISTS habit_pausas_habit_idx ON habit_pausas (habit_id);
 `;
 
 /** Clave de una fila en el formato de outbox.clave: los valores de la clave primaria unidos. */

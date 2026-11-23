@@ -16,7 +16,7 @@ import { nuevaVersionHorario, type VersionHorario } from '@/features/habits/doma
 import { alcanzoLimiteHabitos, limiteHabitos } from '@/features/habits/domain/limite-habitos';
 import { ajustePresupuesto, minutosPorDia } from '@/features/habits/domain/presupuesto';
 import { aplicarArchivar } from '@/features/rewards/domain/recompensas';
-import { fechaLocal } from '@/lib/dates';
+import { fechaLocal, sumarDias } from '@/lib/dates';
 import { AREAS, type Area } from '@/schemas/onboarding';
 import type { HabitoFormValues } from '@/schemas/habit';
 import type { OperacionOutbox } from '@/sync/domain/sync-rules';
@@ -332,21 +332,63 @@ export async function editarHabito(
   return { presupuestoNuevo };
 }
 
-async function cambiarHabito(id: string, cambios: Record<string, unknown>): Promise<void> {
+/**
+ * Pausar (activo = falso) o reanudar. Un hábito pausado no aparece en Hoy. Cada pausa queda como
+ * un periodo en habit_pausas (desde hoy; al reanudar, hasta ayer), así sus días no cuentan como
+ * fallo ni después de reanudar (RF-09).
+ */
+export async function cambiarActivo(id: string, activo: boolean): Promise<void> {
   await aplicar(async (db) => {
-    await actualizarFila(
-      db,
-      'habits',
-      { id },
-      { ...cambios, updated_at: new Date().toISOString() },
-    );
-    return [{ operacion: 'update', tabla: 'habits', clave: id, payload: cambios }];
-  });
-}
+    const ahora = new Date().toISOString();
+    const hoy = fechaLocal();
+    await actualizarFila(db, 'habits', { id }, { activo, updated_at: ahora });
+    const operaciones: OperacionOutbox[] = [
+      { operacion: 'update', tabla: 'habits', clave: id, payload: { activo } },
+    ];
 
-/** Pausar (activo = falso) o reanudar. Un hábito pausado no aparece en Hoy. */
-export function cambiarActivo(id: string, activo: boolean): Promise<void> {
-  return cambiarHabito(id, { activo });
+    if (!activo) {
+      const habito = await db.getFirstAsync<{ user_id: string }>(
+        'SELECT user_id FROM habits WHERE id = ?',
+        [id],
+      );
+      if (!habito) return operaciones;
+      const pausa = {
+        id: randomUUID(),
+        habit_id: id,
+        user_id: habito.user_id,
+        desde: hoy,
+        hasta: null,
+      };
+      await guardarFilas(db, 'habit_pausas', [{ ...pausa, updated_at: ahora }]);
+      operaciones.push({
+        operacion: 'upsert',
+        tabla: 'habit_pausas',
+        clave: pausa.id,
+        payload: pausa,
+      });
+      return operaciones;
+    }
+
+    // Al reanudar se cierra la pausa abierta: hasta ayer (hoy ya cuenta). Si se pausó hoy mismo,
+    // queda vacía (hasta = desde - 1).
+    const abiertas = await leerFilas<{ id: string }>(
+      db,
+      'habit_pausas',
+      'habit_id = ? AND hasta IS NULL',
+      [id],
+    );
+    const hasta = sumarDias(hoy, -1);
+    for (const abierta of abiertas) {
+      await actualizarFila(db, 'habit_pausas', { id: abierta.id }, { hasta, updated_at: ahora });
+      operaciones.push({
+        operacion: 'update',
+        tabla: 'habit_pausas',
+        clave: abierta.id,
+        payload: { hasta },
+      });
+    }
+    return operaciones;
+  });
 }
 
 /**

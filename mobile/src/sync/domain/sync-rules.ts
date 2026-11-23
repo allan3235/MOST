@@ -4,7 +4,7 @@
 export type OperacionOutbox =
   | {
       operacion: 'upsert';
-      tabla: 'habits' | 'habit_schedules' | 'habit_occurrences';
+      tabla: 'habits' | 'habit_schedules' | 'habit_occurrences' | 'habit_pausas' | 'micro_pasos';
       clave: string;
       payload: Record<string, unknown>;
     }
@@ -12,7 +12,14 @@ export type OperacionOutbox =
       // Cambio parcial de una fila que ya existe: el upsert no sirve porque Postgres revisa los
       // NOT NULL de la fila completa antes de detectar el conflicto.
       operacion: 'update';
-      tabla: 'habits' | 'habit_schedules' | 'user_settings' | 'user_accessories' | 'plans';
+      tabla:
+        | 'habits'
+        | 'habit_schedules'
+        | 'user_settings'
+        | 'user_accessories'
+        | 'plans'
+        | 'habit_pausas'
+        | 'micro_pasos';
       clave: string;
       payload: Record<string, unknown>;
     }

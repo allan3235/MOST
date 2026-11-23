@@ -128,11 +128,12 @@ Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las m
 - [ ] Mostrar la secuencia de micro-pasos en la revisión del plan y en el detalle del hábito (va con RF-03 en la Fase 3).
 
 ### Fase 3: Alinear los flujos existentes con el SRS
+- [ ] **Aplicar las migraciones nuevas** con Docker abierto: `pnpm db:migrar` y revisar que `pnpm db:nueva-migracion --name verificar` salga vacía (se escribieron sin base porque Docker estaba cerrado).
 - [x] Umbrales de reajuste: < 40 % en 7 días (RF-15) con `UMBRAL_CUMPLIMIENTO` y `DIAS_EVALUADOS`; la meta intermedia es una tarjeta «Probar este paso» (ya no baja sola). Migración `20261123120000_progresion_rf15` para `app_config`.
 - [x] `META_MINIMA = 1` (RR-03): ningún reajuste deja menos de 1 minuto ni menos de 1 día; un paso de 1 minuto no tiene versión más corta (solo apoyo).
 - [x] Sin rachas que se reinician (RNF-07): se muestra el total de veces completado, que nunca baja, con un brote en lugar de la llama.
 - [ ] Resumen nocturno como interruptor (RF-18).
-- [ ] La pausa no cuenta como fallo (RF-09).
+- [x] La pausa no cuenta como fallo (RF-09): tabla `habit_pausas` (migración `20261123130000_habit_pausas`); estadísticas y progresión saltan esos días, también después de reanudar.
 - [ ] Pantalla «Crear meta» (RF-03): escribir meta → la IA la descompone → revisar, editar y confirmar.
 - [ ] Secuencia de micro-pasos visible en el detalle (RF-03).
 - [x] El reajuste (subir o bajar) se mueve dentro de la secuencia de micro-pasos; sin secuencia, por los niveles del catálogo. Los títulos dicen los minutos reales de la versión reducida.

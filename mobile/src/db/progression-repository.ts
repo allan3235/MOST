@@ -27,7 +27,7 @@ import {
   type Tarjeta,
   type ValoresNivel,
 } from '@/features/progression/domain/progresion';
-import { historial } from '@/features/stats/domain/cumplimiento';
+import { historial, type Pausa } from '@/features/stats/domain/cumplimiento';
 import { rachaDeHabito } from '@/features/stats/domain/rachas';
 import { fechaLocal } from '@/lib/dates';
 import {
@@ -132,6 +132,7 @@ async function leerComunes(db: SQLiteDatabase, userId: string): Promise<Comunes 
   const categorias = await categoriasPorId(db);
   const catalogo = await leerFilas<FilaCatalogo>(db, 'habit_catalog');
   const microPasos = await leerFilas<MicroPasoLocal>(db, 'micro_pasos');
+  const pausas = await leerFilas<Pausa>(db, 'habit_pausas');
   const config: ConfigProgresion = await leerConfigProgresion(db);
   const presupuestos = await leerPresupuestos(db);
 
@@ -139,7 +140,7 @@ async function leerComunes(db: SQLiteDatabase, userId: string): Promise<Comunes 
     hoy,
     habitos,
     horarios,
-    ocurrencias: historial({ habitos, horarios, ocurrencias, registros, categorias }, hoy),
+    ocurrencias: historial({ habitos, horarios, ocurrencias, registros, categorias, pausas }, hoy),
     microPasos,
     catalogo,
     respuestas,
