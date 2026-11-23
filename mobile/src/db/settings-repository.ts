@@ -112,6 +112,8 @@ export type Ajustes = {
   estilo: Acompanamiento;
   estrategias: Obstaculo[];
   segundoAviso: boolean;
+  /** RF-18: resumen nocturno con lo de mañana, además del estilo elegido. */
+  resumenNocturno: boolean;
   /** Las horas de Perfil sobre las de `app_config`. */
   horas: HorasAvisos;
 };
@@ -121,6 +123,7 @@ type FilaAjustes = {
   estilo_notificaciones: string;
   estrategias: unknown;
   segundo_aviso: boolean;
+  resumen_nocturno?: boolean | null;
   horas_por_momento: unknown;
 };
 
@@ -138,6 +141,7 @@ export async function leerAjustesEn(db: SQLiteDatabase, userId: string): Promise
       (OBSTACULOS as readonly string[]).includes(String(e)),
     ),
     segundoAviso: fila.segundo_aviso,
+    resumenNocturno: fila.resumen_nocturno === true,
     horas: { ...HORAS_POR_DEFECTO, ...base, ...horasValidas(fila.horas_por_momento) },
   };
 }
@@ -198,6 +202,7 @@ export type CambiosAjustes = Partial<{
   presupuesto_min: number;
   estilo_notificaciones: Acompanamiento;
   segundo_aviso: boolean;
+  resumen_nocturno: boolean;
   horas_por_momento: HorasAvisos;
 }>;
 

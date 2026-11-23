@@ -223,6 +223,21 @@ describe('planificarAvisos', () => {
     expect(avisos[1]?.cuerpo).toBe('Hábito a, Hábito b y Hábito c. Descansa bien.');
   });
 
+  it('RF-18: el interruptor suma el resumen a los avisos por hábito', () => {
+    const avisos = sinFin(
+      planificarAvisos(datos({ estilo: 'recordatorio_suave', resumenNocturno: true }), AHORA),
+    );
+    expect(avisos.some((a) => a.id.startsWith('resumen'))).toBe(true);
+    expect(avisos.some((a) => a.habitId === 'a')).toBe(true);
+    const resumen = avisos.find((a) => a.id.startsWith('resumen'));
+    expect(resumen?.fecha).toEqual(fechaHora('2026-11-16', '21:00'));
+  });
+
+  it('RF-18: sin el interruptor, el recordatorio suave no manda resumen', () => {
+    const avisos = planificarAvisos(datos({ estilo: 'recordatorio_suave' }), AHORA);
+    expect(avisos.some((a) => a.id.startsWith('resumen'))).toBe(false);
+  });
+
   it('resumen nocturno con un solo hábito', () => {
     const [primero] = planificarAvisos(datos({ estilo: 'resumen_nocturno' }), AHORA);
     expect(primero?.titulo).toBe('Mañana te espera un hábito');

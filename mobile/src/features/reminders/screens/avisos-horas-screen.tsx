@@ -8,6 +8,7 @@ import { BackButton } from '@/components/ui/back-button';
 import { Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
 import { SettingsRow } from '@/components/ui/settings-row';
+import { SwitchRow } from '@/components/ui/switch-row';
 import { Snackbar } from '@/components/ui/snackbar';
 import { guardarAjustes, leerAjustesPerfil, type CambiosAjustes } from '@/db/settings-repository';
 import { useLocalQuery } from '@/db/use-local-query';
@@ -22,7 +23,7 @@ import type { MomentoAviso } from '../domain/planificar-avisos';
 import { useAvisosActivos } from '../use-avisos-activos';
 
 // «Avisos y horas» (Perfil → Avisos y horas; decisión del usuario, Perfil como índice): el estilo
-// de avisos, el segundo aviso y las horas por momento. Cada cambio se guarda al momento en el
+// de avisos, el resumen nocturno (RF-18), el segundo aviso y las horas por momento. Cada cambio se guarda al momento en el
 // teléfono y se sube con la cola (funciona sin conexión) y los avisos se recalculan solos. Las
 // horas son las generales: cada hábito conserva la suya.
 
@@ -61,6 +62,8 @@ export default function AvisosHorasScreen() {
   const [eligiendoEstilo, setEligiendoEstilo] = useState(false);
   const [errorGuardar, setErrorGuardar] = useState(false);
   const ajustes = perfil.data?.ajustes ?? null;
+  // La hora del resumen aparece con su estilo o con el interruptor encendido (RF-18).
+  const conResumen = ajustes?.estilo === 'resumen_nocturno' || ajustes?.resumenNocturno === true;
 
   const guardar = (cambios: CambiosAjustes) => {
     setErrorGuardar(false);
@@ -110,8 +113,19 @@ export default function AvisosHorasScreen() {
                   label={t.estilo}
                   value={t.estilos[ajustes.estilo]}
                   onPress={() => setEligiendoEstilo(true)}
-                  ultima={ajustes.estilo === 'resumen_nocturno'}
                 />
+                {/* RF-18: el resumen nocturno se suma a cualquier estilo. Con su propio estilo
+                    ya llega siempre, así que el interruptor no hace falta. */}
+                {ajustes.estilo === 'resumen_nocturno' ? null : (
+                  <View className="px-4 py-2">
+                    <SwitchRow
+                      label={t.resumenInterruptor}
+                      help={t.resumenInterruptorAyuda}
+                      value={ajustes.resumenNocturno}
+                      onChange={(activo) => guardar({ resumen_nocturno: activo })}
+                    />
+                  </View>
+                )}
                 {/* El segundo aviso solo existe con avisos por hábito (SDD 5.6). */}
                 {ajustes.estilo === 'resumen_nocturno' ? null : (
                   <View className="px-4 py-2">
@@ -132,10 +146,10 @@ export default function AvisosHorasScreen() {
                     label={es.onboarding.formulario.momento[momento]}
                     value={ajustes.horas[momento]}
                     onPress={() => elegirHora(momento)}
-                    ultima={i === MOMENTOS.length - 1 && ajustes.estilo !== 'resumen_nocturno'}
+                    ultima={i === MOMENTOS.length - 1 && !conResumen}
                   />
                 ))}
-                {ajustes.estilo === 'resumen_nocturno' ? (
+                {conResumen ? (
                   <SettingsRow
                     label={t.resumen}
                     value={ajustes.horas.resumen_nocturno}

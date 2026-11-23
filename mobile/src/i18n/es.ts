@@ -758,6 +758,8 @@ export const es = {
     },
     horas: 'Horas',
     resumen: 'Resumen nocturno',
+    resumenInterruptor: 'Resumen nocturno',
+    resumenInterruptorAyuda: 'Cada noche, un aviso con lo que te toca mañana.',
     horasNota:
       'Se usan para tus hábitos nuevos, el resumen y el horario flexible. Cada hábito conserva su hora.',
     tiempo: 'Tiempo diario',

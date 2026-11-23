@@ -79,6 +79,7 @@ export async function leerDatosAvisos(userId: string): Promise<DatosAvisos | nul
     estilo: ajustes.estilo,
     estrategias: ajustes.estrategias,
     segundoAviso: ajustes.segundoAviso,
+    resumenNocturno: ajustes.resumenNocturno,
     horas: ajustes.horas,
     config,
     ...contexto,

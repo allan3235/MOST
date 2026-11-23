@@ -51,6 +51,11 @@ export type DatosAvisos = {
   estilo: Acompanamiento;
   estrategias: readonly Obstaculo[];
   segundoAviso: boolean;
+  /**
+   * RF-18: resumen nocturno con lo de mañana además del estilo elegido. Con el estilo
+   * "resumen_nocturno" siempre llega (y no hay avisos por hábito).
+   */
+  resumenNocturno?: boolean;
   horas: HorasAvisos;
   config: ConfigAvisos;
   /** P5 del formulario; null en modo tradicional. */
@@ -143,7 +148,8 @@ export function planificarAvisos(datos: DatosAvisos, ahora: Date): AvisoPlaneado
     const conSegundo = i <= 1;
     const pendientes = delDia(fecha).filter((item) => !item.hecho && item.horario.notificar);
 
-    if (estilo === 'resumen_nocturno') {
+    // Resumen nocturno (RF-18): con su estilo o con el interruptor encendido.
+    if (estilo === 'resumen_nocturno' || datos.resumenNocturno === true) {
       const manana = delDia(sumarDias(fecha, 1)).filter((item) => item.horario.notificar);
       if (manana.length > 0) {
         agregar(
@@ -155,6 +161,9 @@ export function planificarAvisos(datos: DatosAvisos, ahora: Date): AvisoPlaneado
           formatear(t.resumenCuerpo, { lista: lista(manana.map((m) => m.habito.titulo)) }),
         );
       }
+    }
+
+    if (estilo === 'resumen_nocturno') {
       // `olvido` con resumen: como no hay avisos por hábito, uno solo al día a la hora del momento.
       if (olvido && pendientes.length > 0) {
         agregar(

@@ -38,6 +38,7 @@ export const TABLAS = [
       estrategias: J,
       horas_por_momento: J,
       segundo_aviso: B,
+      resumen_nocturno: B,
       ultima_evaluacion: T,
       limite_plan_desbloqueado: B,
       subidas_plan: N,

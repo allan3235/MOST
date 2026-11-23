@@ -132,7 +132,7 @@ Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las m
 - [x] Umbrales de reajuste: < 40 % en 7 días (RF-15) con `UMBRAL_CUMPLIMIENTO` y `DIAS_EVALUADOS`; la meta intermedia es una tarjeta «Probar este paso» (ya no baja sola). Migración `20261123120000_progresion_rf15` para `app_config`.
 - [x] `META_MINIMA = 1` (RR-03): ningún reajuste deja menos de 1 minuto ni menos de 1 día; un paso de 1 minuto no tiene versión más corta (solo apoyo).
 - [x] Sin rachas que se reinician (RNF-07): se muestra el total de veces completado, que nunca baja, con un brote en lugar de la llama.
-- [ ] Resumen nocturno como interruptor (RF-18).
+- [x] Resumen nocturno como interruptor (RF-18): `user_settings.resumen_nocturno` (migración `20261123140000_resumen_nocturno`); se suma a cualquier estilo desde «Avisos y horas».
 - [x] La pausa no cuenta como fallo (RF-09): tabla `habit_pausas` (migración `20261123130000_habit_pausas`); estadísticas y progresión saltan esos días, también después de reanudar.
 - [ ] Pantalla «Crear meta» (RF-03): escribir meta → la IA la descompone → revisar, editar y confirmar.
 - [ ] Secuencia de micro-pasos visible en el detalle (RF-03).

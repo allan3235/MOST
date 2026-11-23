@@ -355,6 +355,8 @@ model user_settings {
   estrategias              String[]  @default([])
   horas_por_momento        Json?
   segundo_aviso            Boolean   @default(false)
+  /// RF-18: resumen nocturno con lo de mañana, además del estilo de avisos elegido.
+  resumen_nocturno         Boolean   @default(false)
   ultima_evaluacion        DateTime? @db.Date
   limite_plan_desbloqueado Boolean   @default(false)
   created_at               DateTime  @default(now()) @db.Timestamptz(6)
