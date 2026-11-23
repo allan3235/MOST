@@ -1,0 +1,11 @@
+packages:
+  - mobile
+  - backend
+
+# React Native y varias librerías nativas esperan encontrar sus dependencias en node_modules
+# "planos" (como npm). Con el modo aislado de pnpm algunas fallan al empaquetar.
+nodeLinker: hoisted
+
+# pnpm bloquea los scripts de instalación de las dependencias; aquí van los aprobados.
+allowBuilds:
+  '@parcel/watcher': true

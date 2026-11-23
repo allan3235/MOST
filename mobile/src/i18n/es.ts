@@ -34,7 +34,7 @@ export const es = {
     olvidoTitulo: '¿Un momento para tus hábitos de hoy?',
     olvidoCuerpo: '{lista}. Todavía estás a tiempo.',
     finTitulo: 'Tus hábitos te esperan',
-    finCuerpo: 'Abre Habit Green para seguir recibiendo tus avisos.',
+    finCuerpo: 'Abre most. para seguir recibiendo tus avisos.',
     y: 'y',
     animo: [
       'Un paso pequeño también cuenta.',
@@ -160,7 +160,7 @@ export const es = {
   },
   onboarding: {
     empezar: {
-      titulo: '¡Hola, bienvenid@ a Habit Green!',
+      titulo: '¡Hola, bienvenid@ a most.!',
       descripcion:
         'Descompón tus hábitos en micro-pasos, enfócate a tu ritmo y adapta tus metas según tu energía diaria. Aquí celebramos cada avance.',
       boton: 'Empezar',
@@ -216,7 +216,7 @@ export const es = {
           ayuda: 'Elige la que más se parezca a ti.',
         },
         acompanamiento: {
-          titulo: '¿Cómo te gustaría que Habit Green te acompañe?',
+          titulo: '¿Cómo te gustaría que most. te acompañe?',
           ayuda: 'Puedes cambiarlo cuando quieras en Perfil.',
         },
       },
