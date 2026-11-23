@@ -1,0 +1,406 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowLeft, X } from 'lucide-react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { BackHandler, Pressable, View } from 'react-native';
+
+import { Alert } from '@/components/ui/alert';
+import { AppText } from '@/components/ui/app-text';
+import { Button } from '@/components/ui/button';
+import { ChoiceDialog } from '@/components/ui/choice-dialog';
+import { DateWheelDialog } from '@/components/ui/date-wheel-dialog';
+import { DaySquares } from '@/components/ui/day-squares';
+import { Field } from '@/components/ui/field';
+import { OptionChip } from '@/components/ui/option-chip';
+import { ProgressSteps } from '@/components/ui/progress-steps';
+import { Screen } from '@/components/ui/screen';
+import { SettingsRow } from '@/components/ui/settings-row';
+import { es } from '@/i18n/es';
+import {
+  crearHabitoFormSchema,
+  limitesDeTexto,
+  type HabitoFormInput,
+  type HabitoFormValues,
+} from '@/schemas/habit';
+import { AREAS } from '@/schemas/onboarding';
+import { cardShadow, colors } from '@/theme';
+
+import { usePermisoAvisos } from '@/features/reminders/use-permiso-avisos';
+
+import { ICONO_CATEGORIA } from '../categoria-icono';
+import type { PasoAsistente } from '../domain/borrador-habito';
+import { textoFecha } from '../domain/fechas';
+import { textoDuracion } from '../domain/formato';
+import { DurationDialog } from './duration-dialog';
+import { ReminderDialog } from './reminder-dialog';
+
+// Asistente de crear y editar hábito (mockups «Crear hábito #1–#3» y «Editar hábito #1–#3»):
+// 1) nombre y descripción opcional; 2) categoría (fija al editar, definición 6); 3) días,
+// recordatorio, duración y fechas de inicio y fin. Cada paso se valida al pulsar «Siguiente». Al
+// crear, lo escrito se guarda como borrador por si Android cierra la app (`onBorrador`).
+
+const TOTAL_PASOS = 3;
+// Lo que se elige en los diálogos cuenta como cambio (para preguntar antes de salir sin guardar).
+const MARCAR = { shouldDirty: true } as const;
+type Paso = PasoAsistente;
+// Espera tras el último cambio antes de guardar el borrador, para no escribir con cada letra.
+const ESPERA_BORRADOR_MS = 400;
+type Dialogo = 'hora' | 'duracion' | 'inicio' | 'fin' | null;
+
+export type HabitWizardProps = {
+  titulo: string;
+  textoFinal: string;
+  valoresIniciales: HabitoFormInput;
+  editando: boolean;
+  /** Fecha local de hoy: la mínima para el inicio y el fin. */
+  hoy: string;
+  /** Al editar, la fecha de inicio solo cambia si el hábito todavía no empieza. */
+  inicioEditable: boolean;
+  /** Hora con que abre el reloj del recordatorio (la de «Mañana» en Perfil). */
+  horaInicial?: string;
+  /** La duración puede quedar en 0, «Sin duración fija»: solo hábitos propios (SDD 6.5). */
+  permitirSinDuracion?: boolean;
+  /** Minutos máximos de un hábito del plan; sin límite si no se pasa. */
+  limiteDuracion?: number | null;
+  enviando: boolean;
+  error: boolean;
+  onEnviar: (valores: HabitoFormValues) => void;
+  onCerrar: () => void;
+  /** Paso con que abre (al retomar un borrador). */
+  pasoInicial?: Paso;
+  /** Los valores iniciales ya son cambios sin guardar (un borrador retomado). */
+  conCambios?: boolean;
+  /** Se llama con lo escrito y el paso cuando hay cambios sin guardar. */
+  onBorrador?: (valores: HabitoFormInput, paso: Paso) => void;
+};
+
+export function HabitWizard({
+  titulo,
+  textoFinal,
+  valoresIniciales,
+  editando,
+  hoy,
+  inicioEditable,
+  horaInicial,
+  permitirSinDuracion = false,
+  limiteDuracion = null,
+  enviando,
+  error,
+  onEnviar,
+  onCerrar,
+  pasoInicial = 1,
+  conCambios = false,
+  onBorrador,
+}: HabitWizardProps) {
+  const t = es.habitForm;
+  const areas = es.onboarding.formulario.areas;
+  const [paso, setPaso] = useState<Paso>(pasoInicial);
+  const [dialogo, setDialogo] = useState<Dialogo>(null);
+  // Salir con cambios sin guardar: Guardar, Descartar o Cancelar (decisión del usuario).
+  const [saliendo, setSaliendo] = useState(false);
+  // Al editar, un nombre o descripción más largos que el límite se respetan (no se alargan).
+  const limites = useMemo(
+    () =>
+      editando
+        ? limitesDeTexto({
+            nombre: valoresIniciales.nombre,
+            descripcion: valoresIniciales.descripcion ?? null,
+          })
+        : limitesDeTexto(),
+    [editando, valoresIniciales.nombre, valoresIniciales.descripcion],
+  );
+  // Los recordatorios necesitan el permiso de avisos: se pide al elegir la hora (SDD 7.1).
+  const permiso = usePermisoAvisos();
+  const {
+    control,
+    handleSubmit,
+    trigger,
+    setValue,
+    getValues,
+    formState: { errors, isDirty: cambiado },
+  } = useForm<HabitoFormInput, unknown, HabitoFormValues>({
+    resolver: zodResolver(crearHabitoFormSchema(limites)),
+    defaultValues: valoresIniciales,
+  });
+  const valores = useWatch({ control }) as HabitoFormInput;
+  const isDirty = cambiado || conCambios;
+
+  // Borrador: se guarda un momento después del último cambio, con el paso en que vas.
+  useEffect(() => {
+    if (!onBorrador || !isDirty) return;
+    const temporizador = setTimeout(() => onBorrador(getValues(), paso), ESPERA_BORRADOR_MS);
+    return () => clearTimeout(temporizador);
+  }, [valores, paso, isDirty, onBorrador, getValues]);
+
+  const siguiente = async () => {
+    const campos = paso === 1 ? (['nombre', 'descripcion'] as const) : (['categoria'] as const);
+    if (await trigger(campos)) setPaso((p) => (p + 1) as Paso);
+  };
+  const intentarSalir = () => (isDirty ? setSaliendo(true) : onCerrar());
+  const atras = () => (paso === 1 ? intentarSalir() : setPaso((p) => (p - 1) as Paso));
+
+  // Guardar desde el diálogo: valida todo y, si falta algo, lleva al paso del primer error.
+  const guardarAlSalir = () => {
+    setSaliendo(false);
+    void handleSubmit(onEnviar, (fallas) => {
+      if (fallas.nombre || fallas.descripcion) setPaso(1);
+      else if (fallas.categoria) setPaso(2);
+      else setPaso(3);
+    })();
+  };
+
+  // El botón «atrás» del sistema regresa al paso anterior; en el primero, si hay cambios, pregunta
+  // antes de salir.
+  useEffect(() => {
+    if (paso === 1 && !isDirty) return;
+    const suscripcion = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (paso === 1) setSaliendo(true);
+      else setPaso((p) => (p - 1) as Paso);
+      return true;
+    });
+    return () => suscripcion.remove();
+  }, [paso, isDirty]);
+
+  const textoRecordatorio = valores.notificar ? (valores.hora ?? t.flexible) : t.ninguno;
+  const minimaFin = valores.fecha_inicio > hoy ? valores.fecha_inicio : hoy;
+  const Atras = paso === 1 ? X : ArrowLeft;
+
+  return (
+    <Screen scroll contentClassName="gap-6 pt-2">
+      <View className="flex-row items-center">
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={paso === 1 ? t.cerrar : es.comun.volver}
+          onPress={atras}
+          className="-ml-3 h-12 w-12 items-center justify-center"
+        >
+          <Atras size={26} color={colors.ink} />
+        </Pressable>
+        <AppText variant="h3" className="flex-1 text-center">
+          {titulo}
+        </AppText>
+        <View className="h-12 w-12" />
+      </View>
+      <ProgressSteps current={paso} total={TOTAL_PASOS} />
+
+      {paso === 1 ? (
+        <View className="gap-6">
+          <Controller
+            control={control}
+            name="nombre"
+            render={({ field }) => (
+              <Field
+                label={t.nombre}
+                placeholder={t.nombrePlaceholder}
+                value={field.value}
+                onChangeText={field.onChange}
+                onBlur={field.onBlur}
+                maxLength={limites.nombre}
+                contador={limites.nombre}
+                error={errors.nombre?.message}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="descripcion"
+            render={({ field }) => (
+              <Field
+                label={t.descripcion}
+                placeholder={t.descripcionPlaceholder}
+                value={field.value}
+                onChangeText={field.onChange}
+                onBlur={field.onBlur}
+                multiline
+                maxLength={limites.descripcion}
+                contador={limites.descripcion}
+                error={errors.descripcion?.message}
+              />
+            )}
+          />
+        </View>
+      ) : null}
+
+      {paso === 2 ? (
+        <View className="gap-4">
+          <AppText weight="semibold" className="text-center">
+            {t.categoriaTitulo}
+          </AppText>
+          {editando ? (
+            <AppText variant="small" tone="ink-soft" className="text-center">
+              {t.categoriaFija}
+            </AppText>
+          ) : null}
+          <Controller
+            control={control}
+            name="categoria"
+            render={({ field }) => (
+              <View className="gap-3" accessibilityRole="radiogroup">
+                {AREAS.filter((a) => !editando || a === field.value).map((area) => {
+                  const Icono = ICONO_CATEGORIA[area];
+                  return (
+                    <OptionChip
+                      key={area}
+                      label={areas[area]}
+                      selected={field.value === area}
+                      icon={<Icono size={26} color={colors.ink} />}
+                      onPress={() => {
+                        if (!editando) field.onChange(area);
+                      }}
+                    />
+                  );
+                })}
+              </View>
+            )}
+          />
+          {errors.categoria?.message ? (
+            <Alert variant="error" message={errors.categoria.message} />
+          ) : null}
+        </View>
+      ) : null}
+
+      {paso === 3 ? (
+        <View className="gap-4">
+          <AppText weight="bold">{t.frecuencia}</AppText>
+          <Controller
+            control={control}
+            name="dias"
+            render={({ field }) => (
+              <DaySquares
+                value={field.value}
+                onChange={field.onChange}
+                iniciales={t.iniciales}
+                nombres={t.dias}
+              />
+            )}
+          />
+          {errors.dias?.message ? <Alert variant="error" message={errors.dias.message} /> : null}
+
+          <View style={cardShadow} className="mt-2 overflow-hidden rounded-card bg-campo">
+            <SettingsRow
+              label={t.recordatorios}
+              value={textoRecordatorio}
+              onPress={() => setDialogo('hora')}
+            />
+            <SettingsRow
+              label={t.duracion}
+              value={textoDuracion(valores.duracion)}
+              onPress={() => setDialogo('duracion')}
+            />
+            <SettingsRow
+              label={t.fechaInicio}
+              value={textoFecha(valores.fecha_inicio)}
+              destacada
+              onPress={!editando || inicioEditable ? () => setDialogo('inicio') : undefined}
+            />
+            <SettingsRow
+              label={t.fechaFin}
+              value={valores.fecha_fin ? textoFecha(valores.fecha_fin) : t.ninguno}
+              onPress={() => setDialogo('fin')}
+              ultima
+            />
+          </View>
+          {/* Un recordatorio guardado con los avisos apagados no suena: se dice y se ofrece activarlos. */}
+          {valores.notificar && permiso.concedido === false ? (
+            <View className="gap-2">
+              <Alert variant="advertencia" message={es.avisos.apagadosHabito} />
+              <Button
+                variant="secondary"
+                label={es.avisos.activar}
+                onPress={() => void permiso.conPermiso(() => {}, 'exigir')}
+              />
+            </View>
+          ) : null}
+          {editando && !inicioEditable ? (
+            <AppText variant="small" tone="ink-soft">
+              {t.inicioFijo}
+            </AppText>
+          ) : null}
+          {errors.hora?.message ? <Alert variant="error" message={errors.hora.message} /> : null}
+          {errors.fecha_fin?.message ? (
+            <Alert variant="error" message={errors.fecha_fin.message} />
+          ) : null}
+          {error ? <Alert variant="error" message={t.errorGuardar} /> : null}
+        </View>
+      ) : null}
+
+      <Button
+        label={paso < TOTAL_PASOS ? t.siguiente : textoFinal}
+        loading={enviando}
+        // handleSubmit espera un evento web; en React Native se llama sin argumentos.
+        onPress={() => (paso < TOTAL_PASOS ? void siguiente() : void handleSubmit(onEnviar)())}
+        className="mt-auto"
+      />
+
+      {dialogo === 'hora' ? (
+        <ReminderDialog
+          hora={valores.hora}
+          horaInicial={horaInicial}
+          antesDeElegir={(abrir) => void permiso.conPermiso(abrir, 'exigir')}
+          onElegir={(hora) => {
+            setValue('hora', hora, MARCAR);
+            setValue('notificar', true, MARCAR);
+            setValue('flexible', false, MARCAR);
+          }}
+          onSinRecordatorio={() => setValue('notificar', false, MARCAR)}
+          onCerrar={() => setDialogo(null)}
+        />
+      ) : null}
+      {permiso.dialogo}
+      {dialogo === 'duracion' ? (
+        <DurationDialog
+          valor={valores.duracion}
+          permitirSinDuracion={permitirSinDuracion}
+          limite={limiteDuracion}
+          onElegir={(minutos) => setValue('duracion', minutos, MARCAR)}
+          onCerrar={() => setDialogo(null)}
+        />
+      ) : null}
+      {dialogo === 'inicio' ? (
+        <DateWheelDialog
+          textos={t.dialogoFecha}
+          valor={valores.fecha_inicio < hoy ? hoy : valores.fecha_inicio}
+          minima={hoy}
+          onCancelar={() => setDialogo(null)}
+          onAceptar={(fecha) => {
+            setValue('fecha_inicio', fecha, MARCAR);
+            // Una fecha de fin anterior al nuevo inicio deja de tener sentido.
+            if (valores.fecha_fin !== null && valores.fecha_fin < fecha)
+              setValue('fecha_fin', null, MARCAR);
+            setDialogo(null);
+          }}
+        />
+      ) : null}
+      {dialogo === 'fin' ? (
+        <DateWheelDialog
+          textos={t.dialogoFecha}
+          valor={valores.fecha_fin ?? minimaFin}
+          minima={minimaFin}
+          onCancelar={() => setDialogo(null)}
+          onAceptar={(fecha) => {
+            setValue('fecha_fin', fecha, MARCAR);
+            setDialogo(null);
+          }}
+          onQuitar={() => {
+            setValue('fecha_fin', null, MARCAR);
+            setDialogo(null);
+          }}
+        />
+      ) : null}
+      <ChoiceDialog
+        visible={saliendo}
+        titulo={t.salir.titulo}
+        mensaje={t.salir.mensaje}
+        principal={t.salir.guardar}
+        peligro={t.salir.descartar}
+        cancelar={t.salir.cancelar}
+        onPrincipal={guardarAlSalir}
+        onPeligro={() => {
+          setSaliendo(false);
+          onCerrar();
+        }}
+        onCancelar={() => setSaliendo(false)}
+      />
+    </Screen>
+  );
+}

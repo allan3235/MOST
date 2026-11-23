@@ -1,0 +1,67 @@
+{
+  "expo": {
+    "name": "Habit Green",
+    "slug": "HabitGreen",
+    "owner": "nueve_36",
+    "scheme": "habitgreen",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.habitgreen.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#DFF2E4",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "backgroundColor": "#FBFBF6"
+        }
+      ],
+      "expo-secure-store",
+      "expo-sqlite",
+      "expo-image",
+      "@react-native-community/datetimepicker",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/android-icon-monochrome.png",
+          "color": "#2E7D4F",
+          "defaultChannel": "recordatorios"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "22f9cf84-5b12-4500-807d-4febeaecb183"
+      }
+    }
+  }
+}
