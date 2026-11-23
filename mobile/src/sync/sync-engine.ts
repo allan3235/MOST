@@ -2,7 +2,7 @@
  * @file sync-engine.ts
  * @proyecto most.
  * @descripcion Sincronización con el backend de most. (SDD 3.4). Cada vuelta:
- *   0. Sale si no hay red o no hay sesión.
+ *   0. Sale si no hay sesión (sin red, las peticiones fallan y la cola espera).
  *   1. Comprueba que la base local sea de este usuario (si no, la vacía).
  *   2. Actualiza la zona horaria del perfil, para que «hoy» nunca llegue como fecha futura.
  *   3. Sube la cola de salida en orden (POST /sync/operacion). Un rechazo definitivo (respuesta
@@ -18,7 +18,6 @@
  */
 
 import type { SQLiteDatabase } from 'expo-sqlite';
-import * as Network from 'expo-network';
 
 import { avisarCambioLocal } from '@/db/db-version-store';
 import { asegurarDuenoBaseLocal, enTransaccion, getDb, guardarFilas } from '@/db/database';
@@ -97,20 +96,13 @@ export function sincronizarAhora(): Promise<void> {
 
 class SinRed extends Error {}
 
-async function hayRed(): Promise<boolean> {
-  try {
-    const estado = await Network.getNetworkStateAsync();
-    return estado.isConnected !== false && estado.isInternetReachable !== false;
-  } catch {
-    return true;
-  }
-}
-
 async function unaVuelta(userId: string): Promise<void> {
   const db = await getDb();
   // Si la base era de otra cuenta y se vació, las pantallas se actualizan ya, sin esperar la vuelta.
   if (await asegurarDuenoBaseLocal(userId)) avisarCambioLocal();
-  if (!(await hayRed())) return;
+  // No se pregunta antes al sistema si "hay internet": Android puede decir que no aunque el backend
+  // sí responda (red sin validar, red local, emulador). Se intenta y, sin red de verdad, la petición
+  // falla al momento (SinRed) y la cola espera a la siguiente vuelta.
   // Sin sesión el servidor rechazaría las operaciones y se descartarían de la cola.
   if (leerSesion() === null) return;
 
