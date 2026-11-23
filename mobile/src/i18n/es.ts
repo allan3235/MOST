@@ -10,6 +10,13 @@ export const es = {
   },
   avisos: {
     canal: 'Recordatorios de hábitos',
+    // RF-13: aviso a los 3, 6, 9… días seguidos. Solo suma; nunca habla de perder nada.
+    motivacionTitulo: '{n} días seguidos dando pasos 🌱',
+    motivacionCuerpo: [
+      'Cada paso pequeño suma. Toca para ver tu avance.',
+      'Lo estás haciendo a tu ritmo, y se nota. Mira tu progreso.',
+      'Pequeños pasos, grandes cambios. Toca para ver cómo vas.',
+    ],
     explicacion:
       'Te avisaremos a la hora de cada hábito, de forma suave. Puedes cambiarlo cuando quieras en Perfil.',
     ahoraNo: 'Ahora no',

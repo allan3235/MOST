@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AccessibilityInfo } from 'react-native';
 
 import { completarHabito, deshacerHabito, RelojAtrasadoError } from '@/db/logs-repository';
+import { mandarAvisoMotivacional } from '@/features/reminders/avisos';
 import { es, formatear } from '@/i18n/es';
 import { fechaLocal } from '@/lib/dates';
 import { useFechaHoy } from '@/lib/fecha-hoy';
@@ -68,6 +69,10 @@ export function useCheckIn(userId: string) {
       if (r.cambioFase !== null && r.cambioFase > 1) {
         setCelebracion({ area: habito.categoria, fase: r.cambioFase });
       }
+      // RF-13: a los 3, 6, 9… días seguidos, un aviso de ánimo (máximo uno al día).
+      mandarAvisoMotivacional(userId).catch((causa: unknown) => {
+        console.warn('No se pudo mandar el aviso motivacional', causa);
+      });
     });
 
   const deshacer = (habito: HabitoParaCheck) =>

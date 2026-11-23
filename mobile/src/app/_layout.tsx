@@ -18,6 +18,7 @@ import { SessionProvider } from '@/features/auth/session-provider';
 import type { AppZone } from '@/features/auth/domain/session-route';
 import { useAppZone } from '@/features/auth/use-app-zone';
 import { prepararAvisos } from '@/features/reminders/avisos';
+import { useAbrirDesdeAviso } from '@/features/reminders/use-abrir-desde-aviso';
 
 SplashScreen.preventAutoHideAsync().catch(() => {
   // En recargas rápidas la pantalla de carga ya puede estar oculta.
@@ -59,6 +60,8 @@ function RootNavigator() {
   const [ultimaZona, setUltimaZona] = useState<ZonaVisible | null>(null);
   if (zonaActual !== 'loading' && zonaActual !== ultimaZona) setUltimaZona(zonaActual);
   const zone = zonaActual === 'loading' ? ultimaZona : zonaActual;
+  // RF-13: tocar el aviso motivacional abre Progreso.
+  useAbrirDesdeAviso(zone === 'tabs');
 
   useEffect(() => {
     if (zone !== null) {

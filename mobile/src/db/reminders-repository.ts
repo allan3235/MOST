@@ -6,6 +6,10 @@ import type {
   Ocurrencia,
   Registro,
 } from '@/features/habits/domain/habitos-del-dia';
+import {
+  diasSeguidos,
+  tocaAvisoMotivacional,
+} from '@/features/reminders/domain/aviso-motivacional';
 import type { DatosAvisos } from '@/features/reminders/domain/planificar-avisos';
 import { historialDelPlan } from '@/features/reminders/domain/historial-plan';
 import {
@@ -95,4 +99,40 @@ export async function leerSemanaApoyo(userId: string): Promise<SemanaApoyo | nul
   const db = await getDb();
   const { planes } = await leerContexto(db, userId);
   return semanaDeApoyoEnPlanes(planes, fechaLocal());
+}
+
+/** Días hacia atrás que se revisan para contar los días seguidos. */
+const DIAS_REVISADOS_MOTIVACION = 400;
+
+/**
+ * Aviso motivacional (RF-13): si con lo de hoy se llega a 3, 6, 9… días seguidos con algún paso
+ * hecho y hoy no se avisó, deja hoy como día avisado (máximo uno al día) y devuelve los días. Con
+ * el estilo «Lo mínimo» no se avisa.
+ * @param userId Usuario con sesión.
+ * @returns Los días seguidos si toca avisar, o null.
+ */
+export async function revisarAvisoMotivacional(userId: string): Promise<number | null> {
+  const db = await getDb();
+  const ajustes = await leerAjustesEn(db, userId);
+  if (!ajustes || ajustes.estilo === 'minimo') {
+    return null;
+  }
+  const hoy = fechaLocal();
+  const filas = await db.getAllAsync<{ fecha: string }>(
+    'SELECT DISTINCT fecha FROM habit_logs WHERE user_id = ? AND eliminado_en IS NULL AND fecha >= ?',
+    [userId, sumarDias(hoy, -DIAS_REVISADOS_MOTIVACION)],
+  );
+  const dias = diasSeguidos(new Set(filas.map((f) => f.fecha)), hoy);
+  const ultimo = await db.getFirstAsync<{ ultima_fecha: string }>(
+    'SELECT ultima_fecha FROM avisos_motivacionales WHERE user_id = ?',
+    [userId],
+  );
+  if (!tocaAvisoMotivacional(dias, ultimo?.ultima_fecha ?? null, hoy)) {
+    return null;
+  }
+  await db.runAsync(
+    'INSERT OR REPLACE INTO avisos_motivacionales (user_id, ultima_fecha) VALUES (?, ?)',
+    [userId, hoy],
+  );
+  return dias;
 }

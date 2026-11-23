@@ -29,7 +29,8 @@ const NOMBRE = 'most.db';
 // 9: habit_pausas (los días en pausa no cuentan como fallo, RF-09).
 // 10: user_settings.resumen_nocturno (interruptor propio, RF-18).
 // 11: habit_occurrences.barrera (lista de barreras, RF-17 + RF-19).
-const ESQUEMA_VERSION = 11;
+// 12: tabla propia avisos_motivacionales (máximo un aviso al día, RF-13).
+const ESQUEMA_VERSION = 12;
 
 let abierta: Promise<SQLite.SQLiteDatabase> | null = null;
 

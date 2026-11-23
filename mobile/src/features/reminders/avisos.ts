@@ -9,10 +9,11 @@ import {
   setNotificationHandler,
 } from 'expo-notifications';
 
-import { leerDatosAvisos } from '@/db/reminders-repository';
-import { es } from '@/i18n/es';
+import { leerDatosAvisos, revisarAvisoMotivacional } from '@/db/reminders-repository';
+import { es, formatear } from '@/i18n/es';
 import { colors } from '@/theme';
 
+import { DIAS_PARA_AVISO } from './domain/aviso-motivacional';
 import { siguientePaso, type SiguientePaso } from './domain/permiso';
 import { planificarAvisos, type AvisoPlaneado } from './domain/planificar-avisos';
 
@@ -110,4 +111,34 @@ export function reprogramarAvisos(userId: string): Promise<void> {
 export async function cancelarAvisos(): Promise<void> {
   ultimaFirma = null;
   await cancelAllScheduledNotificationsAsync();
+}
+
+/** Pantalla que abre el aviso motivacional al tocarlo (acceso directo, RF-13). */
+export const RUTA_AVISO_MOTIVACIONAL = '/estadisticas' as const;
+
+/**
+ * Aviso motivacional (RF-13): se llama al completar un paso. Si toca, llega al momento como banner
+ * y al tocarlo abre Progreso. Sin permiso no se gasta el aviso del día.
+ * @param userId Usuario con sesión.
+ */
+export async function mandarAvisoMotivacional(userId: string): Promise<void> {
+  if (!(await permisoConcedido())) {
+    return;
+  }
+  const dias = await revisarAvisoMotivacional(userId);
+  if (dias === null) {
+    return;
+  }
+  const t = es.avisos;
+  await scheduleNotificationAsync({
+    content: {
+      title: formatear(t.motivacionTitulo, { n: dias }),
+      body:
+        t.motivacionCuerpo[(dias / DIAS_PARA_AVISO) % t.motivacionCuerpo.length] ??
+        t.motivacionCuerpo[0],
+      data: { ruta: RUTA_AVISO_MOTIVACIONAL },
+    },
+    // Solo el canal: se muestra en cuanto se programa.
+    trigger: { channelId: CANAL_RECORDATORIOS },
+  });
 }
