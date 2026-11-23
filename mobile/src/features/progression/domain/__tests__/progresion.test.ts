@@ -5,13 +5,16 @@ import { sumarDias } from '@/lib/dates';
 import type { Respuestas } from '@/schemas/onboarding';
 
 import {
+  aplicarCandado,
   cumplimientoDe,
   decidir,
+  META_MINIMA,
   pasoHaciaAbajo,
   PROGRESION_POR_DEFECTO,
   tocaDesbloquear,
   tocaEvaluar,
   type EntradaProgresion,
+  type MicroPasoLocal,
   type Tarjeta,
 } from '../progresion';
 
@@ -187,11 +190,17 @@ describe('tabla de 6.3', () => {
     expect(con(21, 25, { ...CONFIG, ventana_dias: 25 })).toEqual([]);
   });
 
-  it('50 % se mantiene; 49 % baja un nivel', () => {
-    expect(con(7, 14)).toEqual([]);
-    expect(tipos(con(49, 100, { ...CONFIG, ventana_dias: 100 }))).toEqual(['bajar']);
-    const [t] = con(6, 14);
+  it('RF-15 (CP-11): 2 de 7 días (28 %) propone una meta intermedia', () => {
+    const [t] = con(2, 7);
     expect(t).toMatchObject({ tipo: 'bajar', despues: { nivel: 1, duracion_min: 5 } });
+  });
+
+  it('RF-15: se mira solo la última semana, con el umbral de 40 %', () => {
+    // Semana con 3 de 7 (43 %): no baja, aunque en 14 días vaya en 21 %.
+    expect(con(3, 14)).toEqual([]);
+    // 40 % justo no baja; 30 % sí.
+    expect(con(4, 10, { ...CONFIG, ventana_dias_bajar: 10 })).toEqual([]);
+    expect(tipos(con(3, 10, { ...CONFIG, ventana_dias_bajar: 10 }))).toEqual(['bajar']);
   });
 
   it('en el nivel 1 baja a la versión corta; si ya la usa, solo apoyo', () => {
@@ -390,5 +399,96 @@ describe('desbloqueo del límite', () => {
       false,
     );
     expect(tocaDesbloquear(HOY, inicio, true, [habito('a')], occ(28), CONFIG)).toBe(false);
+  });
+});
+
+describe('micro-pasos (RF-03)', () => {
+  const PASOS: MicroPasoLocal[] = [5, 10, 20].map((duracion, i) => ({
+    habit_id: 'a',
+    orden: i + 1,
+    titulo: `Leer ${duracion} min`,
+    descripcion: null,
+    duracion_min: duracion,
+    duracion_reducida_min: Math.ceil(duracion / 2),
+    dias_semana: TODOS,
+  }));
+
+  function enPaso(paso: number, hechos: number, total: number, pasos = PASOS) {
+    const actual = pasos[paso - 1];
+    return decidir(
+      entrada({
+        habitos: [
+          habito('a', {
+            paso_actual: paso,
+            titulo: actual.titulo,
+            duracion_min: actual.duracion_min,
+          }),
+        ],
+        microPasos: pasos,
+        ocurrencias: ocurrencias('a', hechos, total),
+      }),
+    );
+  }
+
+  it('subir va al siguiente micro-paso sin cambiar el nivel del plan', () => {
+    const [t] = enPaso(2, 13, 14);
+    expect(t).toMatchObject({
+      tipo: 'subir',
+      antes: { paso_actual: 2, duracion_min: 10 },
+      despues: { nivel: 2, paso_actual: 3, titulo: 'Leer 20 min', duracion_min: 20 },
+    });
+  });
+
+  it('la meta intermedia es el micro-paso anterior', () => {
+    const [t] = enPaso(2, 2, 7);
+    expect(t).toMatchObject({ tipo: 'bajar', despues: { paso_actual: 1, duracion_min: 5 } });
+  });
+
+  it('en el primer paso propone la versión reducida, con sus minutos en el título', () => {
+    const [t] = enPaso(1, 2, 7);
+    expect(t).toMatchObject({
+      tipo: 'bajar',
+      despues: {
+        paso_actual: 1,
+        duracion_min: 3,
+        usa_duracion_reducida: true,
+        titulo: 'Leer 3 min',
+      },
+    });
+  });
+
+  it('en el último paso no hay a dónde subir', () => {
+    expect(tipos(enPaso(3, 13, 14))).not.toContain('subir');
+  });
+
+  it('candado mínimo: un paso de 1 minuto no tiene versión más corta, solo apoyo', () => {
+    const minimos = PASOS.map((p, i) =>
+      i === 0 ? { ...p, titulo: 'Leer 1 min', duracion_min: 1, duracion_reducida_min: 1 } : p,
+    );
+    const [t] = enPaso(1, 2, 7, minimos);
+    expect(t).toMatchObject({ tipo: 'apoyo', habitId: 'a' });
+  });
+});
+
+describe('candado mínimo (RR-03)', () => {
+  const base = {
+    nivel: 1 as const,
+    paso_actual: null,
+    titulo: 'x',
+    descripcion: null,
+    usa_duracion_reducida: true,
+    nivel_desde: null,
+  };
+
+  it('ningún reajuste deja menos de 1 minuto ni menos de 1 día', () => {
+    expect(META_MINIMA).toBe(1);
+    expect(aplicarCandado({ ...base, duracion_min: 0.4, dias_semana: [] })).toMatchObject({
+      duracion_min: 1,
+      dias_semana: [1],
+    });
+  });
+
+  it('un recordatorio (0 min) sigue sin duración', () => {
+    expect(aplicarCandado({ ...base, duracion_min: 0, dias_semana: [2] }).duracion_min).toBe(0);
   });
 });

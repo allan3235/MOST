@@ -128,14 +128,15 @@ Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las m
 - [ ] Mostrar la secuencia de micro-pasos en la revisión del plan y en el detalle del hábito (va con RF-03 en la Fase 3).
 
 ### Fase 3: Alinear los flujos existentes con el SRS
-- [ ] Umbrales de reajuste: < 40 % en 7 días (RF-15), con constantes con nombre.
-- [ ] `META_MINIMA` (RR-03).
+- [x] Umbrales de reajuste: < 40 % en 7 días (RF-15) con `UMBRAL_CUMPLIMIENTO` y `DIAS_EVALUADOS`; la meta intermedia es una tarjeta «Probar este paso» (ya no baja sola). Migración `20261123120000_progresion_rf15` para `app_config`.
+- [x] `META_MINIMA = 1` (RR-03): ningún reajuste deja menos de 1 minuto ni menos de 1 día; un paso de 1 minuto no tiene versión más corta (solo apoyo).
 - [ ] Quitar las rachas que se reinician; progreso solo acumulado (RNF-07).
 - [ ] Resumen nocturno como interruptor (RF-18).
 - [ ] La pausa no cuenta como fallo (RF-09).
 - [ ] Pantalla «Crear meta» (RF-03): escribir meta → la IA la descompone → revisar, editar y confirmar.
 - [ ] Secuencia de micro-pasos visible en el detalle (RF-03).
-- [ ] El reajuste (subir o bajar) se mueve dentro de la secuencia que generó la IA; si hace falta un paso más ligero (meta intermedia, RF-15), se le pide a la IA con el mismo candado mínimo.
+- [x] El reajuste (subir o bajar) se mueve dentro de la secuencia de micro-pasos; sin secuencia, por los niveles del catálogo. Los títulos dicen los minutos reales de la versión reducida.
+- [ ] Cuando ya no hay paso más ligero en la secuencia, pedir uno intermedio a la IA (`/ia/paso-ligero`) respetando el candado mínimo.
 - [ ] Revisar textos con tono TCC/ACT (RNF-09).
 
 ### Fase 4: Lo que falta, en orden de prioridad

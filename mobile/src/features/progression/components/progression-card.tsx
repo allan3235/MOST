@@ -14,11 +14,12 @@ import { Card } from '@/components/ui/card';
 import { es, formatear } from '@/i18n/es';
 import { colors } from '@/theme';
 
-import type { Tarjeta } from '../domain/progresion';
+import type { Tarjeta, ValoresNivel } from '../domain/progresion';
 
 // Tarjeta de progresión en Hoy (SDD 6.3), con el mismo acomodo que la de reprogramación: arriba de
 // la lista, icono sobre verde rocío, el mensaje y botones con borde para no competir con marcar
-// los hábitos. Tono sin culpa: subir se propone, bajar ya se hizo y se puede deshacer.
+// los hábitos. Tono sin culpa: subir y la meta intermedia (RF-15) se proponen y se aplican en un
+// toque; la persona decide.
 
 export type ProgressionCardProps = {
   tarjeta: Tarjeta;
@@ -28,9 +29,13 @@ export type ProgressionCardProps = {
   ocupado: boolean;
   onAceptar: () => void;
   onCerrar: () => void;
-  onMantener: () => void;
   onIrAPerfil: () => void;
 };
+
+/** Mismo paso (y nivel): solo cambia entre la versión corta y la normal. */
+function esMismoPaso(antes: ValoresNivel, despues: ValoresNivel): boolean {
+  return antes.nivel === despues.nivel && antes.paso_actual === despues.paso_actual;
+}
 
 type Contenido = {
   icono: LucideIcon;
@@ -46,7 +51,6 @@ export function ProgressionCard({
   ocupado,
   onAceptar,
   onCerrar,
-  onMantener,
   onIrAPerfil,
 }: ProgressionCardProps) {
   const t = es.progresion;
@@ -55,7 +59,7 @@ export function ProgressionCard({
     switch (tarjeta.tipo) {
       case 'subir': {
         const { antes, despues } = tarjeta;
-        const completa = antes.nivel === despues.nivel;
+        const completa = esMismoPaso(antes, despues);
         return {
           icono: TrendingUp,
           mensaje: completa
@@ -85,14 +89,15 @@ export function ProgressionCard({
         };
       case 'bajar': {
         const { antes, despues } = tarjeta;
-        const corta = antes.nivel === despues.nivel;
+        const corta = esMismoPaso(antes, despues);
         return {
           icono: Feather,
-          mensaje: corta
-            ? formatear(t.bajarCorta, { titulo: antes.titulo, min: despues.duracion_min })
-            : formatear(t.bajar, { actual: antes.titulo, titulo: despues.titulo }),
-          principal: { label: t.entendido, onPress: onCerrar },
-          secundario: { label: t.mantener, onPress: onMantener },
+          mensaje: formatear(corta ? t.bajarCorta : t.bajar, {
+            actual: antes.titulo,
+            titulo: despues.titulo,
+          }),
+          principal: { label: t.probarPaso, onPress: onAceptar },
+          secundario: { label: t.seguirComoEsta, onPress: onCerrar },
         };
       }
       case 'apoyo':

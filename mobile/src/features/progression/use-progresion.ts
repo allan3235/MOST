@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useDbVersion } from '@/db/db-version-store';
 import {
+  aceptarBajada,
   aceptarNuevo,
   aceptarSubida,
   cerrarTarjeta,
-  deshacerBajada,
   leerTarjetas,
   pedirTextosIa,
   revisarProgresion,
@@ -18,8 +18,9 @@ import { navegar } from '@/lib/navegar';
 
 import type { Tarjeta } from './domain/progresion';
 
-// Progresión en Hoy (SDD 6.3). Cada 7 días, al abrir la app, se revisan los hábitos del plan:
-// las bajadas se aplican solas y todo se muestra como tarjetas, una a la vez. La revisión se
+// Progresión en Hoy (SDD 6.3). Cada 7 días, al abrir la app, se revisan los hábitos del plan y
+// las propuestas (subir, meta intermedia de RF-15, hábito nuevo) se muestran como tarjetas, una a
+// la vez; nada cambia hasta que la persona acepta. La revisión se
 // intenta con cada cambio local y al cambiar el día: mientras no toca es solo una lectura de dos
 // fechas, y al instalar la app los datos llegan después de la primera sincronización. Ya hecha,
 // `ultima_evaluacion` queda en hoy y no se repite.
@@ -50,11 +51,6 @@ export function useProgresion(userId: string, opciones: OpcionesProgresion = {})
     if (!revisar || !userId || sincronizando || revisando.current) return;
     revisando.current = true;
     revisarProgresion(userId)
-      .then(({ bajadas }) => {
-        for (const b of bajadas) {
-          void pedirTextosIa(userId, b.habitId, 'bajar', { ...b.despues, objetivo: b.objetivo });
-        }
-      })
       .catch((causa: unknown) => console.warn('No se pudo revisar la progresión', causa))
       .finally(() => {
         revisando.current = false;
@@ -87,10 +83,16 @@ export function useProgresion(userId: string, opciones: OpcionesProgresion = {})
     ocupado,
     aviso,
     error,
-    /** «Sí, vamos»: sube de nivel o suma el hábito nuevo. */
+    /** «Sí, vamos» o «Probar este paso»: sube, aplica la meta intermedia o suma el hábito nuevo. */
     aceptar: () => {
       if (!actual) return;
-      if (actual.tipo === 'subir') {
+      if (actual.tipo === 'bajar') {
+        void resolver(actual, async () => {
+          if (await aceptarBajada(userId, actual)) {
+            setAviso(formatear(t.listoBajar, { titulo: actual.despues.titulo }));
+          }
+        });
+      } else if (actual.tipo === 'subir') {
         void resolver(actual, async () => {
           if (await aceptarSubida(userId, actual)) {
             setAviso(formatear(t.listoSubir, { titulo: actual.despues.titulo }));
@@ -115,10 +117,6 @@ export function useProgresion(userId: string, opciones: OpcionesProgresion = {})
     /** «Más adelante» o «Entendido»: vuelve en la siguiente revisión si sigue igual. */
     cerrar: () => {
       if (actual) void resolver(actual, () => cerrarTarjeta(userId, actual.id));
-    },
-    /** «Mantenerlo como estaba» de una bajada. */
-    mantener: () => {
-      if (actual?.tipo === 'bajar') void resolver(actual, () => deshacerBajada(userId, actual));
     },
     /** «Ir a Perfil» cuando el día está completo. */
     irAPerfil: () => {

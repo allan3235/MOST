@@ -14,8 +14,12 @@
  */
 
 import type { Area } from '@most/compartido/encuesta';
+import { ajustarMinutosEnTitulo } from '@most/compartido/textos';
 
 import type { HabitoIa, HabitoPropuesto, MicroPaso, PasoIa } from './esquemasIa.js';
+
+/** Se reexporta para las pruebas y para quien ya la importaba desde aquí. */
+export { ajustarMinutosEnTitulo };
 
 // ===== Tipos =====
 
@@ -83,21 +87,6 @@ function corregirDuracion(
 function corregirReducida(propuesta: number, duracion: number): number {
   const valor = propuesta > 0 ? propuesta : duracion / 2;
   return acotar(valor, META_MINIMA, Math.max(duracion - 1, META_MINIMA));
-}
-
-/**
- * Si se cambiaron los minutos de un paso, el título deja de decir los minutos viejos
- * ("Caminar 15 min" recortado a 10 → "Caminar 10 min").
- * @param titulo Título propuesto.
- * @param original Minutos propuestos.
- * @param nuevo Minutos después de aplicar las reglas.
- * @returns Título con los minutos reales.
- */
-export function ajustarMinutosEnTitulo(titulo: string, original: number, nuevo: number): string {
-  if (original === nuevo) {
-    return titulo;
-  }
-  return titulo.replace(new RegExp(`\\b${original}(\\s*)min`), `${nuevo}$1min`);
 }
 
 // ===== Principal =====

@@ -23,6 +23,7 @@ import {
   tocaEvaluar,
   type ConfigProgresion,
   type EntradaProgresion,
+  type MicroPasoLocal,
   type Tarjeta,
   type ValoresNivel,
 } from '@/features/progression/domain/progresion';
@@ -47,7 +48,7 @@ import { descartarMovidasDelPatron } from './occurrences-repository';
 import { leerAjustesEn, leerConfigProgresion, leerPresupuestos } from './settings-repository';
 
 // Progresión (SDD 6.3). Cada 7 días, al abrir la app, se revisan los hábitos del plan: las
-// bajadas se aplican solas y las propuestas quedan como tarjetas en Hoy. Todo se escribe en SQLite
+// propuestas (subir, meta intermedia de RF-15, hábito nuevo) quedan como tarjetas en Hoy. Todo se escribe en SQLite
 // y se sube con la cola, así que funciona sin conexión. Las tarjetas pendientes viven solo en este
 // teléfono (`progresion_tarjetas`).
 // Varios planes por usuario (uno por área): cada plan tiene su propia revisión de 7 días, su
@@ -130,6 +131,7 @@ async function leerComunes(db: SQLiteDatabase, userId: string): Promise<Comunes 
   const registros = await leerFilas<Registro>(db, 'habit_logs', 'eliminado_en IS NULL');
   const categorias = await categoriasPorId(db);
   const catalogo = await leerFilas<FilaCatalogo>(db, 'habit_catalog');
+  const microPasos = await leerFilas<MicroPasoLocal>(db, 'micro_pasos');
   const config: ConfigProgresion = await leerConfigProgresion(db);
   const presupuestos = await leerPresupuestos(db);
 
@@ -138,6 +140,7 @@ async function leerComunes(db: SQLiteDatabase, userId: string): Promise<Comunes 
     habitos,
     horarios,
     ocurrencias: historial({ habitos, horarios, ocurrencias, registros, categorias }, hoy),
+    microPasos,
     catalogo,
     respuestas,
     configPlan: { presupuestos, horas: ajustes.horas },
@@ -183,6 +186,7 @@ async function aplicarNivel(
 ): Promise<OperacionOutbox[]> {
   const cambios = {
     nivel: valores.nivel,
+    paso_actual: valores.paso_actual,
     titulo: valores.titulo,
     descripcion: valores.descripcion,
     duracion_min: valores.duracion_min,
@@ -230,26 +234,19 @@ export async function leerTarjetas(userId: string): Promise<TarjetaGuardada[]> {
   return leerTarjetasGuardadas(await getDb(), userId);
 }
 
-export type ResultadoRevision = {
-  /** Bajadas aplicadas solas: se les piden textos a la IA. */
-  bajadas: Extract<Tarjeta, { tipo: 'bajar' }>[];
-};
-
 /**
- * Revisión de cada 7 días, plan por plan: solo se revisan los planes a los que ya les toca. Aplica
- * sus bajadas, reemplaza sus tarjetas (las de los otros planes se quedan) y anota en cada plan su
+ * Revisión de cada 7 días, plan por plan: solo se revisan los planes a los que ya les toca.
+ * Reemplaza sus tarjetas (las de los otros planes se quedan) y anota en cada plan su
  * `ultima_evaluacion` y, si toca, su desbloqueo.
  */
-export async function revisarProgresion(userId: string): Promise<ResultadoRevision> {
-  const sinNada: ResultadoRevision = { bajadas: [] };
+export async function revisarProgresion(userId: string): Promise<void> {
   // Revisión ligera (solo fechas) antes de leer todo: se llama con cada cambio local.
   const db = await getDb();
   const config = await leerConfigProgresion(db);
   const hoy = fechaLocal();
   const toca = (p: PlanActivo) => tocaEvaluar(hoy, p.ultimaEvaluacion, p.inicio, config);
-  if (!(await leerPlanesActivos(db, userId)).some(toca)) return sinNada;
+  if (!(await leerPlanesActivos(db, userId)).some(toca)) return;
 
-  let resultado = sinNada;
   await aplicar(async (dbEscritura) => {
     const comunes = await leerComunes(dbEscritura, userId);
     if (!comunes) return [];
@@ -259,7 +256,6 @@ export async function revisarProgresion(userId: string): Promise<ResultadoRevisi
     if (planes.length === 0) return [];
 
     const operaciones: OperacionOutbox[] = [];
-    const bajadas: Extract<Tarjeta, { tipo: 'bajar' }>[] = [];
     const revisados = new Set(planes.map((p) => p.id));
     // Las tarjetas de los planes que no se revisan hoy se quedan como estaban.
     const tarjetas: TarjetaGuardada[] = (await leerTarjetasGuardadas(dbEscritura, userId)).filter(
@@ -272,10 +268,6 @@ export async function revisarProgresion(userId: string): Promise<ResultadoRevisi
         // «Sin espacio» no tiene hábito ni objetivo: su id lleva el plan para no repetirse.
         const id = t.tipo === 'sin_espacio' ? `sin_espacio-${plan.id}` : t.id;
         tarjetas.push({ ...t, id, planId: plan.id });
-        if (t.tipo === 'bajar') {
-          bajadas.push(t);
-          operaciones.push(...(await aplicarNivel(dbEscritura, userId, t.habitId, t.despues)));
-        }
       }
 
       const desbloquear = tocaDesbloquear(
@@ -306,16 +298,24 @@ export async function revisarProgresion(userId: string): Promise<ResultadoRevisi
         [userId, t.id, orden, JSON.stringify(t)],
       );
     }
-    resultado = { bajadas };
     return operaciones;
   });
-  return resultado;
 }
 
-/** El hábito sigue como cuando se hizo la tarjeta (no se archivó ni cambió de nivel). */
-async function sigueIgual(db: SQLiteDatabase, habitId: string, nivel: number): Promise<boolean> {
+/** El hábito sigue como cuando se hizo la tarjeta (no se archivó ni cambió de paso o nivel). */
+async function sigueIgual(
+  db: SQLiteDatabase,
+  habitId: string,
+  antes: ValoresNivel,
+): Promise<boolean> {
   const [habito] = await leerFilas<Habito>(db, 'habits', 'id = ?', [habitId]);
-  return habito !== undefined && habito.archivado_en === null && habito.nivel === nivel;
+  return (
+    habito !== undefined &&
+    habito.archivado_en === null &&
+    habito.nivel === antes.nivel &&
+    (habito.paso_actual ?? null) === antes.paso_actual &&
+    (habito.usa_duracion_reducida ?? false) === antes.usa_duracion_reducida
+  );
 }
 
 /** «Sí, vamos» de una subida. Devuelve false si el hábito cambió y la tarjeta ya no aplica. */
@@ -326,7 +326,7 @@ export async function aceptarSubida(
   let aplicada = false;
   await aplicar(async (db) => {
     await borrarTarjeta(db, userId, tarjeta.id);
-    if (!(await sigueIgual(db, tarjeta.habitId, tarjeta.antes.nivel))) return [];
+    if (!(await sigueIgual(db, tarjeta.habitId, tarjeta.antes))) return [];
     aplicada = true;
     return [
       ...(await aplicarNivel(db, userId, tarjeta.habitId, tarjeta.despues)),
@@ -353,16 +353,22 @@ async function sumarSubida(db: SQLiteDatabase, userId: string): Promise<Operacio
   return [{ operacion: 'update', tabla: 'user_settings', clave: userId, payload: cambios }];
 }
 
-/** «Mantenerlo como estaba» de una bajada: regresa los valores anteriores. */
-export async function deshacerBajada(
+/**
+ * «Probar este paso» de una meta intermedia (RF-15): aplica el paso más ligero en un toque, sin
+ * borrar historial. Devuelve false si el hábito cambió y la tarjeta ya no aplica.
+ */
+export async function aceptarBajada(
   userId: string,
   tarjeta: Extract<Tarjeta, { tipo: 'bajar' }>,
-): Promise<void> {
+): Promise<boolean> {
+  let aplicada = false;
   await aplicar(async (db) => {
     await borrarTarjeta(db, userId, tarjeta.id);
-    if (!(await sigueIgual(db, tarjeta.habitId, tarjeta.despues.nivel))) return [];
-    return aplicarNivel(db, userId, tarjeta.habitId, tarjeta.antes);
+    if (!(await sigueIgual(db, tarjeta.habitId, tarjeta.antes))) return [];
+    aplicada = true;
+    return aplicarNivel(db, userId, tarjeta.habitId, tarjeta.despues);
   });
+  return aplicada;
 }
 
 /**

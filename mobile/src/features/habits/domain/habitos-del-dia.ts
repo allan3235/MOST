@@ -13,6 +13,8 @@ export type Habito = {
   usa_duracion_reducida?: boolean;
   /** Fecha del último cambio de nivel (progresión); null si nunca cambió. */
   nivel_desde?: string | null;
+  /** Micro-paso en curso (orden en micro_pasos); null si el hábito no tiene secuencia. */
+  paso_actual?: number | null;
   titulo: string;
   descripcion: string | null;
   duracion_min: number;

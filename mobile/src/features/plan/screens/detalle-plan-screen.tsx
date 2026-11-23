@@ -122,7 +122,6 @@ export default function DetallePlanScreen() {
       ocupado={progresion.ocupado}
       onAceptar={progresion.aceptar}
       onCerrar={progresion.cerrar}
-      onMantener={progresion.mantener}
       onIrAPerfil={progresion.irAPerfil}
     />
   ) : null;

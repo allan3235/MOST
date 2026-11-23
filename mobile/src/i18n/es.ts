@@ -814,17 +814,20 @@ export const es = {
     sinEspacio:
       'Tu día está completo. Si quieres sumar algo, puedes subir tu tiempo diario en Perfil.',
     bajar:
-      'Vamos a hacer «{actual}» más ligero por ahora: «{titulo}». Lo importante es mantener el ritmo.',
-    bajarCorta: 'Probemos una versión más corta de «{titulo}»: {min} min.',
+      'Esta semana «{actual}» costó un poco, y está bien: es parte del proceso. ¿Probamos un paso intermedio: «{titulo}»?',
+    bajarCorta:
+      'Esta semana «{actual}» costó un poco, y está bien. ¿Probamos una versión más corta: «{titulo}»?',
     apoyo: 'Lo importante es seguir con «{titulo}», aunque sea poquito. Aquí seguimos contigo.',
     siVamos: 'Sí, vamos',
     masAdelante: 'Más adelante',
     irAPerfil: 'Ir a Perfil',
     entendido: 'Entendido',
-    mantener: 'Mantenerlo como estaba',
+    probarPaso: 'Probar este paso',
+    seguirComoEsta: 'Seguir como está',
     contador: '{n} de {total}',
     listoSubir: '¡Listo! Ahora es «{titulo}».',
     listoNuevo: 'Sumamos «{titulo}» a tu plan.',
+    listoBajar: 'Listo, ahora es «{titulo}». Hacerlo más ligero también es avanzar.',
     sinLugar: 'Tu plan ya tiene todos los hábitos que caben por ahora.',
     error: 'No pudimos guardar el cambio. Inténtalo de nuevo.',
   },

@@ -16,6 +16,10 @@
     "./motorPlan": {
       "types": "./dist/motorPlan.d.ts",
       "default": "./dist/motorPlan.js"
+    },
+    "./textos": {
+      "types": "./dist/textos.d.ts",
+      "default": "./dist/textos.js"
     }
   },
   "scripts": {

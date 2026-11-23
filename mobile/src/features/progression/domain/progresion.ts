@@ -17,12 +17,23 @@ import {
   type Conteo,
   type OcurrenciaEstadistica,
 } from '@/features/stats/domain/cumplimiento';
+import { ajustarMinutosEnTitulo } from '@most/compartido/textos';
+
 import { diasEntre, sumarDias } from '@/lib/dates';
 import { areaDeObjetivo, OBJETIVOS, type Objetivo, type Respuestas } from '@/schemas/onboarding';
 import type { HabitoPlan, Nivel } from '@/schemas/plan';
 
 // Progresión (SDD 6.3). Funciones puras: reciben lo que ya está en SQLite y deciden qué proponer.
 // Solo entran los hábitos del plan (`objetivo` y `nivel`); los manuales nunca suben ni bajan.
+//
+// most. (Fase 3):
+// - RF-15: con menos de 40 % de cumplimiento en los últimos 7 días se propone una meta intermedia
+//   (el paso anterior de la secuencia, o la versión reducida), aplicable en un toque. Ya no baja
+//   sola: la persona decide. Subir sigue con 85 % en 14 días.
+// - Con micro-pasos (RF-03), subir y bajar se mueven por esa secuencia; sin ella, por los niveles
+//   del catálogo (hábitos de antes de most.).
+// - RR-03 candado mínimo: ningún reajuste deja un hábito con duración en menos de 1 minuto ni en
+//   menos de 1 día por semana.
 //
 // Decisiones del usuario (Entrega 8):
 // - El cumplimiento se mide desde el último cambio de nivel (`nivel_desde`), como mucho en la
@@ -33,10 +44,18 @@ import type { HabitoPlan, Nivel } from '@/schemas/plan';
 // de hábitos del plan alcanzado no se propone ninguno; quien está en su versión corta primero
 // vuelve a la duración normal (salvo con `poco_tiempo`, donde la corta es la normal).
 
+/** RF-15: con menos de este cumplimiento en los últimos DIAS_EVALUADOS se propone bajar. */
+export const UMBRAL_CUMPLIMIENTO = 0.4;
+export const DIAS_EVALUADOS = 7;
+/** RR-03 candado mínimo: ningún reajuste baja de 1 minuto (si tiene duración) ni de 1 día. */
+export const META_MINIMA = 1;
+
 export type ConfigProgresion = {
   umbral_subir: number;
   umbral_bajar: number;
   ventana_dias: number;
+  /** Días que se miran para bajar (RF-15); los de subir son `ventana_dias`. */
+  ventana_dias_bajar: number;
   ventana_dias_baja_frecuencia: number;
   dias_por_semana_baja_frecuencia: number;
   minimo_ocurrencias: number;
@@ -49,8 +68,9 @@ export type ConfigProgresion = {
 /** Los valores de `app_config.progresion`, por si todavía no se descargan. */
 export const PROGRESION_POR_DEFECTO: ConfigProgresion = {
   umbral_subir: 0.85,
-  umbral_bajar: 0.5,
+  umbral_bajar: UMBRAL_CUMPLIMIENTO,
   ventana_dias: 14,
+  ventana_dias_bajar: DIAS_EVALUADOS,
   ventana_dias_baja_frecuencia: 28,
   dias_por_semana_baja_frecuencia: 2,
   minimo_ocurrencias: 4,
@@ -60,9 +80,22 @@ export const PROGRESION_POR_DEFECTO: ConfigProgresion = {
   ventana_desbloqueo_dias: 28,
 };
 
-/** Lo que cambia de un hábito al moverse de nivel (sale del catálogo). */
+/** Un micro-paso guardado en SQLite (tabla micro_pasos). */
+export type MicroPasoLocal = {
+  habit_id: string;
+  orden: number;
+  titulo: string;
+  descripcion: string | null;
+  duracion_min: number;
+  duracion_reducida_min: number;
+  dias_semana: number[];
+};
+
+/** Lo que cambia de un hábito al moverse de paso o de nivel. */
 export type ValoresNivel = {
   nivel: Nivel;
+  /** Micro-paso al que se mueve; null si el hábito no tiene secuencia (niveles del catálogo). */
+  paso_actual: number | null;
   titulo: string;
   descripcion: string | null;
   duracion_min: number;
@@ -99,6 +132,8 @@ export type EntradaProgresion = {
   horarios: readonly Horario[];
   /** Ocurrencias de `historial` (reglas de 6.2). */
   ocurrencias: readonly OcurrenciaEstadistica[];
+  /** Micro-pasos de los hábitos (RF-03). Sin ellos se usan los niveles del catálogo. */
+  microPasos?: readonly MicroPasoLocal[];
   catalogo: readonly FilaCatalogo[];
   respuestas: Respuestas;
   /** Para la hora del hábito nuevo (`habitoParaNivel`). */
@@ -153,7 +188,8 @@ export function tocaEvaluar(
 
 /**
  * Hechos y programados de un hábito en su ventana: desde el cambio de nivel, como mucho los
- * últimos 14 días (28 con 1 o 2 días por semana), hasta ayer. Null si hay muy pocas ocurrencias.
+ * últimos 14 días para subir o 7 para bajar (28 con 1 o 2 días por semana), hasta ayer. Null si
+ * hay muy pocas ocurrencias.
  */
 export function cumplimientoDe(
   habito: Pick<Habito, 'id' | 'nivel_desde'>,
@@ -161,11 +197,13 @@ export function cumplimientoDe(
   ocurrencias: readonly OcurrenciaEstadistica[],
   hoy: string,
   config: ConfigProgresion,
+  para: 'subir' | 'bajar' = 'subir',
 ): Conteo | null {
+  const ventanaNormal = para === 'bajar' ? config.ventana_dias_bajar : config.ventana_dias;
   const dias =
     diasPorSemana <= config.dias_por_semana_baja_frecuencia
       ? config.ventana_dias_baja_frecuencia
-      : config.ventana_dias;
+      : ventanaNormal;
   const inicioVentana = sumarDias(hoy, -dias);
   const desde =
     habito.nivel_desde && habito.nivel_desde > inicioVentana ? habito.nivel_desde : inicioVentana;
@@ -186,20 +224,67 @@ export function valoresDeNivel(
   nivelDesde: string | null,
 ): ValoresNivel {
   const fila = elegirFilaCatalogo(catalogo, objetivo, nivel, respuestas.obstaculo === 'recursos');
-  return {
+  const duracion = reducida ? fila.duracion_reducida_min : fila.duracion_min;
+  return aplicarCandado({
     nivel,
-    titulo: fila.titulo,
+    paso_actual: null,
+    titulo: ajustarMinutosEnTitulo(fila.titulo, fila.duracion_min, duracion),
     descripcion: fila.descripcion,
-    duracion_min: reducida ? fila.duracion_reducida_min : fila.duracion_min,
+    duracion_min: duracion,
     usa_duracion_reducida: reducida,
     dias_semana: [...fila.dias_semana],
     nivel_desde: nivelDesde,
-  };
+  });
+}
+
+/**
+ * Candado mínimo (RR-03): un hábito con duración nunca queda en menos de META_MINIMA minutos, y
+ * nunca en menos de META_MINIMA días por semana.
+ * @param valores Valores propuestos.
+ * @returns Los mismos valores, con el piso aplicado.
+ */
+export function aplicarCandado(valores: ValoresNivel): ValoresNivel {
+  const dias = valores.dias_semana.length >= META_MINIMA ? valores.dias_semana : [1];
+  const duracion =
+    valores.duracion_min > 0 ? Math.max(valores.duracion_min, META_MINIMA) : valores.duracion_min;
+  return { ...valores, dias_semana: dias, duracion_min: duracion };
+}
+
+/** Micro-pasos de un hábito, en orden. */
+export function pasosDe(
+  microPasos: readonly MicroPasoLocal[] | undefined,
+  habitId: string,
+): MicroPasoLocal[] {
+  return (microPasos ?? [])
+    .filter((paso) => paso.habit_id === habitId)
+    .sort((a, b) => a.orden - b.orden);
+}
+
+/** Valores de un micro-paso, con o sin la versión reducida. El nivel del plan no cambia. */
+export function valoresDePaso(
+  paso: MicroPasoLocal,
+  nivel: Nivel,
+  reducida: boolean,
+  nivelDesde: string | null,
+): ValoresNivel {
+  const usarReducida = reducida && paso.duracion_min > 0;
+  const duracion = usarReducida ? paso.duracion_reducida_min : paso.duracion_min;
+  return aplicarCandado({
+    nivel,
+    paso_actual: paso.orden,
+    titulo: ajustarMinutosEnTitulo(paso.titulo, paso.duracion_min, duracion),
+    descripcion: paso.descripcion,
+    duracion_min: duracion,
+    usa_duracion_reducida: usarReducida,
+    dias_semana: [...paso.dias_semana],
+    nivel_desde: nivelDesde,
+  });
 }
 
 function valoresActuales(habito: Habito & { nivel: Nivel }, horario: Horario): ValoresNivel {
   return {
     nivel: habito.nivel,
+    paso_actual: habito.paso_actual ?? null,
     titulo: habito.titulo,
     descripcion: habito.descripcion,
     duracion_min: habito.duracion_min,
@@ -241,13 +326,25 @@ export function sugerenciaNueva(
   return null;
 }
 
-/** Siguiente paso hacia arriba: de la versión corta a la normal, o el siguiente nivel. */
+/**
+ * Siguiente paso hacia arriba: de la versión corta a la normal, o el siguiente micro-paso (o nivel
+ * del catálogo si el hábito no tiene secuencia).
+ */
 function siguiente(
   habito: Habito & { objetivo: Objetivo; nivel: Nivel },
   entrada: EntradaProgresion,
 ): ValoresNivel | null {
   const pocoTiempo = entrada.respuestas.obstaculo === 'poco_tiempo';
   const { catalogo, respuestas, hoy } = entrada;
+  const pasos = pasosDe(entrada.microPasos, habito.id);
+  if (pasos.length > 0) {
+    const actual = pasos.find((p) => p.orden === (habito.paso_actual ?? 1)) ?? pasos[0];
+    if (habito.usa_duracion_reducida && !pocoTiempo) {
+      return valoresDePaso(actual, habito.nivel, false, hoy);
+    }
+    const proximo = pasos.find((p) => p.orden > actual.orden);
+    return proximo ? valoresDePaso(proximo, habito.nivel, pocoTiempo, hoy) : null;
+  }
   if (habito.usa_duracion_reducida && !pocoTiempo) {
     return valoresDeNivel(catalogo, respuestas, habito.objetivo, habito.nivel, false, hoy);
   }
@@ -257,8 +354,9 @@ function siguiente(
 }
 
 /**
- * Paso hacia abajo: el nivel anterior o, en el nivel 1, la versión corta. Null si ya no hay. Lo
- * usan la revisión (bajar) y «Hacerlo más ligero» del detalle del plan.
+ * Paso hacia abajo (meta intermedia, RF-15): el micro-paso anterior (o nivel anterior) o, en el
+ * primero, la versión corta. Null si ya no hay: el paso se hace más pequeño, nunca desaparece, y
+ * nunca baja del candado mínimo. Lo usan la revisión y «Hacerlo más ligero» del detalle del plan.
  */
 export function pasoHaciaAbajo(
   habito: Habito & { objetivo: Objetivo; nivel: Nivel },
@@ -266,6 +364,18 @@ export function pasoHaciaAbajo(
 ): ValoresNivel | null {
   const pocoTiempo = entrada.respuestas.obstaculo === 'poco_tiempo';
   const { catalogo, respuestas, hoy } = entrada;
+  const pasos = pasosDe(entrada.microPasos, habito.id);
+  if (pasos.length > 0) {
+    const actual = pasos.find((p) => p.orden === (habito.paso_actual ?? 1)) ?? pasos[0];
+    const anterior = [...pasos].reverse().find((p) => p.orden < actual.orden);
+    if (anterior) return valoresDePaso(anterior, habito.nivel, pocoTiempo, hoy);
+    const tieneVersionCorta =
+      actual.duracion_min > 0 &&
+      actual.duracion_reducida_min < actual.duracion_min &&
+      actual.duracion_reducida_min >= META_MINIMA;
+    if (habito.usa_duracion_reducida || !tieneVersionCorta) return null;
+    return valoresDePaso(actual, habito.nivel, true, hoy);
+  }
   if (habito.nivel > 1) {
     const nivel = (habito.nivel - 1) as Nivel;
     return valoresDeNivel(catalogo, respuestas, habito.objetivo, nivel, pocoTiempo, hoy);
@@ -303,11 +413,14 @@ export function decidir(entrada: EntradaProgresion): Tarjeta[] {
   let quiereNuevo = false;
 
   for (const { habito, horario } of delPlan) {
-    const conteo = cumplimientoDe(habito, horario.dias_semana.length, ocurrencias, hoy, config);
-    if (conteo === null) continue;
-    const proporcion = conteo.hechos / conteo.total;
+    const diasPorSemana = horario.dias_semana.length;
+    // Primero se mira la semana (RF-15): si costó, se propone una meta intermedia.
+    const semana = cumplimientoDe(habito, diasPorSemana, ocurrencias, hoy, config, 'bajar');
+    const costo = semana !== null && semana.hechos / semana.total < config.umbral_bajar;
+    const conteo = costo ? null : cumplimientoDe(habito, diasPorSemana, ocurrencias, hoy, config);
+    const proporcion = conteo === null ? null : conteo.hechos / conteo.total;
 
-    if (proporcion >= config.umbral_subir) {
+    if (proporcion !== null && proporcion >= config.umbral_subir) {
       const despues = siguiente(habito, entrada);
       if (
         despues &&
@@ -324,7 +437,7 @@ export function decidir(entrada: EntradaProgresion): Tarjeta[] {
       } else {
         quiereNuevo = true;
       }
-    } else if (proporcion < config.umbral_bajar) {
+    } else if (costo) {
       const despues = pasoHaciaAbajo(habito, entrada);
       tarjetas.push(
         despues

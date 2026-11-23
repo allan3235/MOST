@@ -5,8 +5,9 @@
  *   Paquete compartido por la app y el backend.
  * @autor Equipo most. (código heredado de Habit Green; movido por Allan con Claude Code)
  * @fecha 2026-11-23
- * @version 1.0.0
- * @historial 1.0.0 (2026-11-23): se mueve a @most/compartido.
+ * @version 1.1.0
+ * @historial 1.0.0 (2026-11-23): se mueve a @most/compartido. 1.1.0: títulos con los minutos de la
+ *   versión reducida.
  */
 
 import {
@@ -25,6 +26,7 @@ import type {
   Nivel,
   RespuestaIa,
 } from './plan.js';
+import { ajustarMinutosEnTitulo } from './textos.js';
 
 // Motor del plan (SDD 5.4–5.6): convierte las respuestas del formulario en hábitos con nivel,
 // duración, días y hora. Es determinista: los números salen de aquí y del catálogo semilla; la IA
@@ -115,7 +117,10 @@ export function habitoParaNivel(
     categoria: areaDeObjetivo(objetivo),
     nivel,
     variante: fila.variante,
-    titulo: fila.titulo,
+    // Con la versión reducida, el título dice sus minutos reales ("Caminar 2 min", no 5).
+    titulo: reducida
+      ? ajustarMinutosEnTitulo(fila.titulo, fila.duracion_min, fila.duracion_reducida_min)
+      : fila.titulo,
     descripcion: fila.descripcion,
     duracion_min: reducida ? fila.duracion_reducida_min : fila.duracion_min,
     usa_duracion_reducida: reducida,
