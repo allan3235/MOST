@@ -810,15 +810,19 @@ export const es = {
     fueDia: 'el {dia} {n}',
     barreraPregunta: '«{habito}» no salió {cuando}. Pasa. ¿Qué se atravesó?',
     barreras: {
-      tiempo: 'No me alcanzó el tiempo',
-      recursos: 'Me faltó algo que necesitaba',
-      acceso: 'No pude llegar o no tenía dónde',
+      // Cortas: el botón mide un renglón.
+      tiempo: 'Me faltó tiempo',
+      recursos: 'Me faltó algo',
+      acceso: 'No pude llegar',
     },
     prefieroNoDecir: 'Prefiero no decir',
-    alternativasTitulo: {
-      tiempo: 'Pasa. ¿Lo hacemos más corto?',
-      recursos: 'Tiene sentido. ¿Lo pasamos a otro día?',
-      acceso: 'Tiene sentido. ¿Lo pasamos a otro día?',
+    // Título de las alternativas: empatía según la barrera + pregunta según lo que se ofrece primero.
+    empatia: { tiempo: 'Pasa.', recursos: 'Tiene sentido.', acceso: 'Tiene sentido.' },
+    preguntaAlternativa: {
+      ligero: '¿Lo hacemos más corto?',
+      mover: '¿Lo pasamos a otro día?',
+      elegir: '¿Lo pasamos a otro día?',
+      ninguna: 'Lo dejamos así, sin problema.',
     },
     sinContra: 'Ese día no cuenta en contra.',
     probarLigero: 'Probar versión de {duracion}',

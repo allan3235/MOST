@@ -133,7 +133,9 @@ export function TarjetaBarreras({
             </AppText>
           ) : (
             <>
-              <AppText accessibilityRole="header">{t.alternativasTitulo[barrera]}</AppText>
+              <AppText accessibilityRole="header">
+                {`${t.empatia[barrera]} ${t.preguntaAlternativa[alternativas[0]?.tipo ?? 'ninguna']}`}
+              </AppText>
               <AppText variant="small" tone="ink-soft">
                 {t.sinContra}
               </AppText>

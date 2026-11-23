@@ -141,7 +141,7 @@ Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las m
 - [x] Revisar textos con tono TCC/ACT (RNF-09): sin palabras de culpa ni fracaso; «Me desanimo cuando fallo un día» → «Me desanimo cuando un día no sale». Los días sin marcar se ven neutros (sin rojo ni tachas).
 
 ### Fase 4: Lo que falta, en orden de prioridad
-- [ ] RF-17+19 Lista de barreras con alternativa en un toque.
+- [x] RF-17+19 Lista de barreras con alternativa en un toque: al abrir la app, por cada día que no salió se pregunta qué se atravesó (tiempo, recursos, acceso o «Prefiero no decir») y se ofrece en un toque una versión más ligera u otro día. Con causa, el día no cuenta en el cumplimiento (`habit_occurrences.barrera`). Con la estrategia «desánimo» se sigue moviendo en silencio.
 - [ ] RF-13 Aviso motivacional a los 3 días seguidos.
 - [ ] RF-16 Hitos al 50 % y 80 %.
 - [ ] RF-04 Introspección por valores (solo local).

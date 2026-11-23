@@ -49,7 +49,7 @@ describe('TarjetaBarreras', () => {
     const p = props();
     await render(<TarjetaBarreras {...p} />);
     expect(screen.getByText('«Caminar 5 min» no salió ayer. Pasa. ¿Qué se atravesó?')).toBeTruthy();
-    await fireEvent.press(screen.getByText('No me alcanzó el tiempo'));
+    await fireEvent.press(screen.getByText('Me faltó tiempo'));
     expect(p.onBarrera).toHaveBeenCalledWith('tiempo');
     await fireEvent.press(screen.getByText('Prefiero no decir'));
     expect(p.onBarrera).toHaveBeenCalledWith(null);
