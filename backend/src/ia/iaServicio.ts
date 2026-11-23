@@ -9,27 +9,31 @@
  *   (UC-15) por /sync/lote.
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-23
- * @version 1.0.0
- * @historial 1.0.0 (2026-11-23): creación.
+ * @version 1.1.0
+ * @historial 1.0.0 (2026-11-23): creación. 1.1.0: el plan usa el motor compartido y devuelve
+ *   el borrador completo de la app.
  */
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import type { z } from 'zod';
 
 import { PrismaServicio } from '../baseDatos/prismaServicio.js';
 import { leerConfiguracion } from '../comun/configuracion.js';
 import { ErrorConCodigo } from '../comun/errorConCodigo.js';
+import type { Area, Respuestas } from '@most/compartido/encuesta';
 import {
-  buscarAreaDeObjetivo,
-  PRESUPUESTO_POR_TIEMPO,
-  type Area,
-  type Respuestas,
-} from './esquemasEncuesta.js';
+  alternativasDeNivel,
+  generarPlan as calcularPlanMotor,
+  sugerenciasDeHabitos,
+  type ConfigPlan,
+} from '@most/compartido/motorPlan';
+import { borradorPlanSchema, type BorradorPlan, type HabitoPlan } from '@most/compartido/plan';
+import { z } from 'zod';
+
+import { aFilaCatalogo, combinarConMicroPasos } from './combinarPlan.js';
 import {
   esquemaMetaIa,
   esquemaPasoLigeroIa,
   esquemaPlanIa,
-  type BorradorPlan,
   type HabitoPropuesto,
   type MicroPaso,
   type OrigenPropuesta,
@@ -40,7 +44,7 @@ import {
   INSTRUCCIONES_PLAN,
 } from './instruccionesIa.js';
 import type { TareaIa } from './modelosIa.js';
-import { armarHabitoDesdeCatalogo, RESUMEN_CATALOGO } from './planCatalogo.js';
+import { armarHabitoDesdeCatalogo } from './planCatalogo.js';
 import { PROVEEDOR_IA, type ProveedorIa } from './proveedorIa.js';
 import {
   corregirHabito,
@@ -66,7 +70,25 @@ const INTENTOS_MAXIMOS = 2;
 /** Estados que cuentan para el límite diario (sí se llamó a la IA). */
 const ESTADOS_QUE_CUENTAN = ['ok', 'error', 'rechazo', 'invalida'];
 const PRESUPUESTO_POR_DEFECTO = 20;
-const PASO_INICIAL_SI_MANTIENE = 2;
+const LARGO_MAXIMO_RESUMEN = 300;
+
+/** Valores de app_config que usa el motor del plan. */
+const esquemaConfigPlan = z.object({
+  presupuestos: z.object({
+    menos_10: z.number(),
+    '10_20': z.number(),
+    '20_40': z.number(),
+    mas_40: z.number(),
+  }),
+  horas_por_momento: z.object({
+    manana: z.string(),
+    mediodia: z.string(),
+    tarde: z.string(),
+    noche: z.string(),
+    flexible_aviso: z.string(),
+    flexible_segundo_aviso: z.string(),
+  }),
+});
 
 // ===== Principal =====
 
@@ -78,39 +100,37 @@ export class IaServicio {
   ) {}
 
   /**
-   * Borrador del plan desde la encuesta (UC-02): un hábito por objetivo, con micro-pasos.
+   * Borrador del plan desde la encuesta (UC-02). El motor del plan (compartido con la app) calcula
+   * hora, aviso, nivel y ajustes; la IA propone la secuencia de micro-pasos de cada hábito (o el
+   * catálogo, si la IA no responde). Tiene la misma forma que la app ya sabe mostrar y guardar.
    * @param usuarioId Usuario con sesión.
    * @param respuestas Respuestas validadas de la encuesta.
+   * @param minutosOcupados Minutos que ya usan sus otros hábitos (planes siguientes).
    * @returns Borrador; origen "catalogo" si la IA no estuvo disponible.
    */
-  async generarPlan(usuarioId: string, respuestas: Respuestas): Promise<BorradorPlan> {
-    const filas = await this.prisma.habit_catalog.findMany({
-      where: { objetivo: { in: respuestas.objetivos } },
-    });
-    const sinRecursos = respuestas.obstaculo === 'recursos';
-    const respaldos = new Map(
-      respuestas.objetivos.map((objetivo) => [
-        objetivo,
-        armarHabitoDesdeCatalogo(filas, objetivo, sinRecursos),
-      ]),
-    );
+  async generarPlan(
+    usuarioId: string,
+    respuestas: Respuestas,
+    minutosOcupados = 0,
+  ): Promise<BorradorPlan> {
+    const catalogo = (await this.prisma.habit_catalog.findMany()).map(aFilaCatalogo);
+    const { motor: config, ventanaFlexible } = await this.leerConfigPlan();
+    const plan = calcularPlanMotor(respuestas, catalogo, config, minutosOcupados);
 
-    // El tiempo diario se reparte entre los hábitos que tienen duración (definición 5, P4).
-    const conDuracion = [...respaldos.values()].filter(
-      (habito) => (habito?.micro_pasos[0]?.duracion_min ?? 1) > 0,
-    ).length;
-    const presupuesto = PRESUPUESTO_POR_TIEMPO[respuestas.tiempo];
-    const limitesDe = (objetivo: string): LimitesHabito => ({
-      minutosMaximos: Math.floor(presupuesto / Math.max(conDuracion, 1)),
-      categoria: buscarAreaDeObjetivo(objetivo) ?? respuestas.areas[0],
-      objetivo,
-      pasoInicial: respuestas.historial === 'mantiene' ? PASO_INICIAL_SI_MANTIENE : 1,
-      usaDuracionReducida: respuestas.obstaculo === 'poco_tiempo',
+    // El tiempo libre se reparte entre los hábitos con duración (definición 5, P4).
+    const libre = Math.max(0, config.presupuestos[respuestas.tiempo] - minutosOcupados);
+    const conDuracion = plan.habitos.filter((habito) => habito.duracion_min > 0).length;
+    const limitesDe = (habito: HabitoPlan): LimitesHabito => ({
+      minutosMaximos: Math.floor(libre / Math.max(conDuracion, 1)),
+      categoria: habito.categoria,
+      objetivo: habito.objetivo,
+      pasoInicial: habito.nivel,
+      usaDuracionReducida: habito.usa_duracion_reducida,
     });
 
     const mensaje = JSON.stringify({
       respuestas,
-      minutos_maximos_por_habito: limitesDe(respuestas.objetivos[0]).minutosMaximos,
+      minutos_maximos_por_habito: limitesDe(plan.habitos[0]).minutosMaximos,
     });
     const desdeIa = await this.pedirIa(
       usuarioId,
@@ -118,27 +138,40 @@ export class IaServicio {
       INSTRUCCIONES_PLAN,
       mensaje,
       esquemaPlanIa,
-      (plan) => {
-        const habitos = respuestas.objetivos.map((objetivo) => {
-          const propuesto = plan.habitos.find((habito) => habito.objetivo === objetivo);
-          return propuesto ? corregirHabito(propuesto, limitesDe(objetivo)) : null;
+      (propuesta) => {
+        const propuestos = plan.habitos.map((habito) => {
+          const deLaIa = propuesta.habitos.find((h) => h.objetivo === habito.objetivo);
+          return deLaIa ? corregirHabito(deLaIa, limitesDe(habito)) : null;
         });
-        return habitos.every((habito) => habito !== null)
-          ? { resumen: plan.resumen.trim().slice(0, 300), habitos: habitos as HabitoPropuesto[] }
+        return propuestos.every((habito) => habito !== null)
+          ? {
+              resumen: propuesta.resumen.trim().slice(0, LARGO_MAXIMO_RESUMEN),
+              propuestos: propuestos as HabitoPropuesto[],
+            }
           : null;
       },
     );
-    if (desdeIa) {
-      return { origen: 'ia', ...desdeIa };
-    }
 
-    const habitos = respuestas.objetivos
-      .map((objetivo) => {
-        const respaldo = respaldos.get(objetivo);
-        return respaldo ? corregirHabito(respaldo, limitesDe(objetivo)) : null;
-      })
-      .filter((habito): habito is HabitoPropuesto => habito !== null);
-    return { origen: 'catalogo', resumen: RESUMEN_CATALOGO, habitos };
+    const sinRecursos = respuestas.obstaculo === 'recursos';
+    const habitos = plan.habitos.map((habito, indice) => {
+      if (desdeIa) {
+        return combinarConMicroPasos(habito, desdeIa.propuestos[indice], true);
+      }
+      const delCatalogo = armarHabitoDesdeCatalogo(catalogo, habito.objetivo, sinRecursos);
+      const corregido = delCatalogo ? corregirHabito(delCatalogo, limitesDe(habito)) : null;
+      return corregido ? combinarConMicroPasos(habito, corregido, false) : habito;
+    });
+
+    // Se valida con el mismo esquema que usa la app: si algo no cuadra, se nota aquí y no allá.
+    return borradorPlanSchema.parse({
+      origen: desdeIa ? 'ia' : 'catalogo',
+      resumen: desdeIa?.resumen ?? null,
+      habitos,
+      ajustes: plan.ajustes,
+      alternativas: alternativasDeNivel(respuestas, catalogo, config, plan.habitos),
+      sugerencias: sugerenciasDeHabitos(respuestas, catalogo, config),
+      ventana_flexible: ventanaFlexible,
+    });
   }
 
   /**
@@ -248,6 +281,24 @@ export class IaServicio {
     return paso
       ? { origen: 'ia', antes_de: actual.orden, paso }
       : { origen: 'catalogo', antes_de: actual.orden, paso: crearPasoLigeroSinIa(actual) };
+  }
+
+  /** Presupuestos y horas de app_config para el motor del plan. */
+  private async leerConfigPlan(): Promise<{
+    motor: ConfigPlan;
+    ventanaFlexible: BorradorPlan['ventana_flexible'];
+  }> {
+    const filas = await this.prisma.app_config.findMany({
+      where: { clave: { in: ['presupuestos', 'horas_por_momento'] } },
+    });
+    const config = esquemaConfigPlan.parse(
+      Object.fromEntries(filas.map((fila) => [fila.clave, fila.valor])),
+    );
+    const horas = config.horas_por_momento;
+    return {
+      motor: { presupuestos: config.presupuestos, horas },
+      ventanaFlexible: { inicio: horas.flexible_aviso, fin: horas.flexible_segundo_aviso },
+    };
   }
 
   /**

@@ -28,8 +28,6 @@ export type FilaCatalogo = {
 
 const VARIANTE_BASE = 'base';
 const VARIANTE_SIN_RECURSOS = 'sin_recursos';
-export const RESUMEN_CATALOGO =
-  'Empezamos con pasos pequeños para que sea fácil sostenerlos. Cuando quieras más, el plan crece contigo.';
 
 // ===== Principal =====
 

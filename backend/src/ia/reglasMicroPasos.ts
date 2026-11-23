@@ -13,7 +13,8 @@
  * @historial 1.0.0 (2026-11-23): creación.
  */
 
-import type { Area } from './esquemasEncuesta.js';
+import type { Area } from '@most/compartido/encuesta';
+
 import type { HabitoIa, HabitoPropuesto, MicroPaso, PasoIa } from './esquemasIa.js';
 
 // ===== Tipos =====

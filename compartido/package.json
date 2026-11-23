@@ -1,0 +1,32 @@
+{
+  "name": "@most/compartido",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Esquemas de la encuesta y del plan, y motor del plan, que comparten la app y el backend.",
+  "type": "module",
+  "exports": {
+    "./encuesta": {
+      "types": "./dist/encuesta.d.ts",
+      "default": "./dist/encuesta.js"
+    },
+    "./plan": {
+      "types": "./dist/plan.d.ts",
+      "default": "./dist/plan.js"
+    },
+    "./motorPlan": {
+      "types": "./dist/motorPlan.d.ts",
+      "default": "./dist/motorPlan.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepare": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3"
+  }
+}

@@ -71,3 +71,6 @@ yarn-error.*
 
 # Cliente de Prisma: se genera con "prisma generate" (lo corre pnpm install)
 backend/src/generated/
+
+# Compilado de @most/compartido (lo genera pnpm install)
+compartido/dist/

@@ -135,11 +135,26 @@ describe('IA (e2e, simulada)', () => {
 
     expect(respuesta.body.origen).toBe('ia');
     const [habito] = respuesta.body.habitos;
-    expect(habito).toMatchObject({ objetivo: 'leer_mas', categoria: 'trabajo', paso_inicial: 1 });
+    // El hábito toma el título y la duración de su paso actual; la hora la pone el motor (noche).
+    expect(habito).toMatchObject({
+      objetivo: 'leer_mas',
+      categoria: 'trabajo',
+      paso_actual: 1,
+      titulo: 'Leer 5 min',
+      duracion_min: 5,
+      hora: '20:30',
+    });
     // 15 → 5 (primer paso), 30 → 15 (triple), 90 → 20 (tiempo diario "10_20").
     expect(habito.micro_pasos.map((p: { duracion_min: number }) => p.duracion_min)).toEqual([
       5, 15, 20,
     ]);
+    // Trae todo lo que la app necesita para la revisión del plan.
+    expect(respuesta.body).toMatchObject({
+      resumen: 'Empezamos pequeño.',
+      ajustes: { presupuesto_min: 20, estilo_notificaciones: 'recordatorio_suave' },
+      ventana_flexible: { inicio: '17:00', fin: '20:00' },
+    });
+    expect(respuesta.body.sugerencias.length).toBeGreaterThan(0);
     expect(ia.llamadas.map((l) => l.tarea)).toEqual(['plan']);
     // A la IA solo le llegan claves de la encuesta, nunca el correo.
     expect(ia.llamadas[0].mensaje).not.toContain('@most.test');

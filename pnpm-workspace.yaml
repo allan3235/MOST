@@ -1,6 +1,7 @@
 packages:
   - mobile
   - backend
+  - compartido
 
 # React Native y varias librerías nativas esperan encontrar sus dependencias en node_modules
 # "planos" (como npm). Con el modo aislado de pnpm algunas fallan al empaquetar.

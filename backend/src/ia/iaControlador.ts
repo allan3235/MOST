@@ -10,18 +10,23 @@
  */
 
 import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { respuestasSchema } from '@most/compartido/encuesta';
+import type { BorradorPlan } from '@most/compartido/plan';
 import { z } from 'zod';
 
 import type { UsuarioSesion } from '../auth/esquemasAuth.js';
 import { GuardiaSesion, UsuarioActual } from '../auth/guardiaSesion.js';
 import { validar } from '../comun/validar.js';
-import { esquemaRespuestas } from './esquemasEncuesta.js';
-import { esquemaPeticionMeta, esquemaPeticionPasoLigero, type BorradorPlan } from './esquemasIa.js';
+import { esquemaPeticionMeta, esquemaPeticionPasoLigero } from './esquemasIa.js';
 import { IaServicio, type PropuestaMeta, type PropuestaPasoLigero } from './iaServicio.js';
 
 // ===== Constantes =====
 
-const esquemaPeticionPlan = z.object({ respuestas: esquemaRespuestas });
+const esquemaPeticionPlan = z.object({
+  respuestas: respuestasSchema,
+  /** Minutos que ya ocupan sus otros hábitos (para un plan siguiente). */
+  minutos_ocupados: z.number().int().min(0).default(0),
+});
 
 // ===== Principal =====
 
@@ -42,7 +47,8 @@ export class IaControlador {
     @UsuarioActual() usuario: UsuarioSesion,
     @Body() cuerpo: unknown,
   ): Promise<BorradorPlan> {
-    return this.ia.generarPlan(usuario.id, validar(esquemaPeticionPlan, cuerpo).respuestas);
+    const { respuestas, minutos_ocupados } = validar(esquemaPeticionPlan, cuerpo);
+    return this.ia.generarPlan(usuario.id, respuestas, minutos_ocupados);
   }
 
   /**

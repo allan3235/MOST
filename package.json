@@ -2,10 +2,11 @@
   "name": "most",
   "private": true,
   "scripts": {
+    "compartido": "pnpm --filter @most/compartido build",
     "mobile": "pnpm --filter mobile start",
     "backend": "pnpm --filter backend start:dev",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
-    "typecheck": "pnpm --filter mobile typecheck && pnpm --filter backend build"
+    "typecheck": "pnpm compartido && pnpm --filter mobile typecheck && pnpm --filter backend build"
   }
 }

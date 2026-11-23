@@ -7,13 +7,14 @@
  *   de que el modelo los obedezca.
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-23
- * @version 1.0.0
- * @historial 1.0.0 (2026-11-23): creación.
+ * @version 1.1.0
+ * @historial 1.0.0 (2026-11-23): creación. 1.1.0: usa @most/compartido.
  */
 
 import { z } from 'zod';
 
-import { esquemaArea, type Area } from './esquemasEncuesta.js';
+import { areaSchema, type Area } from '@most/compartido/encuesta';
+import type { MicroPaso } from '@most/compartido/plan';
 
 // ===== Esquemas de la IA =====
 
@@ -59,14 +60,7 @@ export type MetaIa = z.infer<typeof esquemaMetaIa>;
 
 // ===== Lo que recibe la app =====
 
-export type MicroPaso = {
-  orden: number;
-  titulo: string;
-  descripcion: string;
-  duracion_min: number;
-  duracion_reducida_min: number;
-  dias_semana: number[];
-};
+export type { MicroPaso };
 
 export type HabitoPropuesto = {
   objetivo: string | null;
@@ -82,12 +76,6 @@ export type HabitoPropuesto = {
 
 export type OrigenPropuesta = 'ia' | 'catalogo';
 
-export type BorradorPlan = {
-  origen: OrigenPropuesta;
-  resumen: string;
-  habitos: HabitoPropuesto[];
-};
-
 // ===== Peticiones a /ia =====
 
 const LARGO_MINIMO_META = 3;
@@ -99,7 +87,7 @@ export const esquemaPeticionMeta = z.object({
     .trim()
     .min(LARGO_MINIMO_META, 'Escribe tu meta (3 caracteres o más)')
     .max(LARGO_MAXIMO_META, `La meta debe tener ${LARGO_MAXIMO_META} caracteres o menos`),
-  categoria: esquemaArea,
+  categoria: areaSchema,
 });
 
 export const esquemaPeticionPasoLigero = z.object({ habit_id: z.uuid('Hábito inválido') });
