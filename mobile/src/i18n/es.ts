@@ -88,11 +88,9 @@ export const es = {
     correoPlaceholder: 'tucorreo@ejemplo.com',
     contrasena: 'Contraseña',
     confirmarContrasena: 'Confirmar contraseña',
-    nuevaContrasena: 'Nueva contraseña',
     login: {
       titulo: '¡Bienvenid@ de vuelta!',
       boton: 'Iniciar sesión',
-      olvidaste: '¿Olvidaste tu contraseña?',
       noTienesCuenta: '¿No tienes una cuenta?',
       registrate: 'Regístrate',
     },
@@ -101,39 +99,6 @@ export const es = {
       boton: 'Crear cuenta',
       yaTienesCuenta: '¿Ya tienes cuenta?',
       iniciaSesion: 'Inicia sesión',
-    },
-    revisaCorreo: {
-      titulo: 'Revisa tu correo',
-      descripcion:
-        'Te enviamos un enlace a {correo}. Ábrelo desde este teléfono para confirmar tu cuenta.',
-      reenviar: 'Reenviar correo',
-      reenviado: 'Listo, te enviamos otro correo.',
-      irALogin: 'Ya confirmé, iniciar sesión',
-    },
-    recuperar: {
-      titulo: 'Recupera tu contraseña',
-      descripcion: 'Escribe tu correo y te enviaremos un código para crear una nueva.',
-      boton: 'Enviar código',
-    },
-    recuperarCodigo: {
-      titulo: 'Escribe el código',
-      descripcion:
-        'Si hay una cuenta con {correo}, te llegará un código. Puede tardar unos minutos; revisa también la carpeta de spam.',
-      codigo: 'Código',
-      boton: 'Continuar',
-      reenviar: 'Reenviar código',
-      reenviado: 'Listo, te enviamos otro código.',
-      invalido: 'El código no es correcto o ya expiró. Revísalo o pide uno nuevo.',
-    },
-    nuevaContrasenaPantalla: {
-      titulo: 'Crea una nueva contraseña',
-      boton: 'Guardar contraseña',
-      exito: 'Listo, tu contraseña quedó actualizada.',
-    },
-    callback: {
-      procesando: 'Abriendo tu cuenta…',
-      error: 'El enlace ya no es válido o expiró. Pide uno nuevo.',
-      irAlInicio: 'Ir al inicio',
     },
     validacion: {
       correoRequerido: 'Escribe tu correo.',
@@ -145,17 +110,12 @@ export const es = {
       // Aviso único al pulsar el botón con campos vacíos (mockups «Login/Registrar #1.2»).
       loginVacios: 'Por favor, ingresa tu correo y contraseña.',
       registroVacios: 'Por favor, llena cada uno de los campos.',
-      codigoRequerido: 'Escribe el código del correo.',
-      codigoInvalido: 'El código solo lleva números, sin espacios.',
     },
     errores: {
       credenciales: 'Tu correo o contraseña son incorrectos.',
-      sinConexion: 'No hay conexión a internet. Inténtalo más tarde.',
-      correoNoConfirmado: 'Confirma tu correo antes de entrar. Revisa tu bandeja de entrada.',
+      sinConexion: 'No pudimos conectar con most. Revisa tu conexión e inténtalo de nuevo.',
       usuarioExiste: 'Ya hay una cuenta con ese correo. Inicia sesión.',
       demasiadosIntentos: 'Hiciste muchos intentos seguidos. Espera unos minutos.',
-      contrasenaDebil: 'Esa contraseña es fácil de adivinar. Prueba con otra más larga.',
-      mismaContrasena: 'La nueva contraseña debe ser distinta de la anterior.',
     },
   },
   onboarding: {

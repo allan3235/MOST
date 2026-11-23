@@ -3,7 +3,6 @@ import { resolveAppZone, type SessionRouteInput } from '../session-route';
 const base: SessionRouteInput = {
   initializing: false,
   hasSession: true,
-  isRecovery: false,
   profileStatus: 'ready',
   mode: 'tradicional',
 };
@@ -15,10 +14,6 @@ describe('resolveAppZone', () => {
 
   it('manda a la zona de cuenta sin sesión', () => {
     expect(resolveAppZone({ ...base, hasSession: false, profileStatus: 'idle' })).toBe('auth');
-  });
-
-  it('prioriza crear la nueva contraseña al recuperar', () => {
-    expect(resolveAppZone({ ...base, isRecovery: true })).toBe('recovery');
   });
 
   it('espera al perfil antes de decidir', () => {

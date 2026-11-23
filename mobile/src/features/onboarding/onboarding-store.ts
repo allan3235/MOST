@@ -87,7 +87,7 @@ export const useOnboardingStore = create<OnboardingState>()(
         set({ borrador: BORRADOR_VACIO, retomar: null, adicional: false, areasOcupadas: [] }),
     }),
     {
-      name: 'habitgreen-onboarding',
+      name: 'most-onboarding',
       version: 1,
       storage: createJSONStorage(() => sqliteStorage),
       partialize: (state) => ({

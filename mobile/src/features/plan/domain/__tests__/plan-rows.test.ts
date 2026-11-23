@@ -107,6 +107,34 @@ describe('filas que se guardan al pulsar «Empezar»', () => {
     });
   });
 
+  it('guarda la secuencia de micro-pasos y en qué paso va cada hábito', () => {
+    const pasos = [1, 2, 3].map((orden) => ({
+      orden,
+      titulo: `Caminar ${orden * 5} min`,
+      descripcion: '',
+      duracion_min: orden * 5,
+      duracion_reducida_min: orden,
+      dias_semana: [1, 3, 5],
+    }));
+    const [primero, segundo] = BORRADOR.habitos;
+    const f = filas({
+      ...BORRADOR,
+      habitos: [{ ...primero, micro_pasos: pasos, paso_actual: 2 }, segundo],
+    });
+    expect(f.habits.map((h) => h.paso_actual)).toEqual([2, null]);
+    expect(f.microPasos).toHaveLength(3);
+    expect(f.microPasos[1]).toEqual({
+      habit_id: 'habito-1',
+      user_id: 'usuario-1',
+      orden: 2,
+      titulo: 'Caminar 10 min',
+      descripcion: '',
+      duracion_min: 10,
+      duracion_reducida_min: 2,
+      dias_semana: [1, 3, 5],
+    });
+  });
+
   it('un hábito quitado en la revisión no se guarda', () => {
     const uno = { ...BORRADOR, habitos: [BORRADOR.habitos[1]!] };
     expect(filas(uno).habits.map((h) => h.id)).toEqual(['habito-2']);

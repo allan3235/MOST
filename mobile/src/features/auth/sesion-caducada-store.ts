@@ -4,8 +4,8 @@ import Storage from 'expo-sqlite/kv-store';
 // sesión caducó sola (para explicarlo en la bienvenida y el inicio de sesión). Se usa la versión
 // síncrona del almacén clave-valor, como el borrador del formulario.
 
-const ULTIMA_CONEXION = 'habitgreen-ultima-conexion';
-const CADUCADA = 'habitgreen-sesion-caducada';
+const ULTIMA_CONEXION = 'most-ultima-conexion';
+const CADUCADA = 'most-sesion-caducada';
 
 function leer(clave: string): string | null {
   try {

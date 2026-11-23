@@ -1,33 +1,42 @@
+/**
+ * @file auth-error-message.ts
+ * @proyecto most.
+ * @descripcion Traduce los errores de cuenta (registro e inicio de sesión) a mensajes amables.
+ *   Nunca se muestra el texto técnico.
+ * @autor Equipo most. (heredado de Habit Green; adaptado por Allan con Claude Code)
+ * @fecha 2026-11-23
+ * @version 2.0.0
+ * @historial 1.0.0: códigos de Supabase Auth. 2.0.0 (2026-11-23): estados del backend de most.
+ */
+
 import { es } from '@/i18n/es';
+import { ErrorApi, ErrorSinRed } from '@/lib/clienteApi';
 
-// Traduce los errores de Supabase Auth a mensajes amables. Nunca se muestra el texto técnico.
-// Códigos: https://supabase.com/docs/guides/auth/debugging/error-codes
+// ===== Constantes =====
 
-type AuthErrorLike = { code?: string; status?: number; message?: string; name?: string };
-
-const MESSAGES_BY_CODE: Record<string, string> = {
-  invalid_credentials: es.auth.errores.credenciales,
-  email_not_confirmed: es.auth.errores.correoNoConfirmado,
-  user_already_exists: es.auth.errores.usuarioExiste,
-  email_exists: es.auth.errores.usuarioExiste,
-  over_email_send_rate_limit: es.auth.errores.demasiadosIntentos,
-  over_request_rate_limit: es.auth.errores.demasiadosIntentos,
-  weak_password: es.auth.errores.contrasenaDebil,
-  same_password: es.auth.errores.mismaContrasena,
-  otp_expired: es.auth.callback.error,
+const MENSAJE_POR_ESTADO: Record<number, string> = {
+  401: es.auth.errores.credenciales,
+  409: es.auth.errores.usuarioExiste,
+  429: es.auth.errores.demasiadosIntentos,
 };
 
-export function authErrorMessage(error: unknown): string {
-  if (error === null || typeof error !== 'object') return es.comun.errorGenerico;
-  const { code, status, name } = error as AuthErrorLike;
+// ===== Principal =====
 
-  if (code && code in MESSAGES_BY_CODE) return MESSAGES_BY_CODE[code];
-  if (status === 429) return es.auth.errores.demasiadosIntentos;
-  // supabase-js marca así los fallos de red (sin respuesta del servidor).
-  if (name === 'AuthRetryableFetchError' || status === 0) return es.auth.errores.sinConexion;
+/**
+ * Mensaje para mostrar a la persona.
+ * @param error Lo que lanzó iniciarSesion o crearCuenta.
+ * @returns Texto amable en español.
+ */
+export function authErrorMessage(error: unknown): string {
+  if (error instanceof ErrorSinRed) {
+    return es.auth.errores.sinConexion;
+  }
+  if (error instanceof ErrorApi && error.status in MENSAJE_POR_ESTADO) {
+    return MENSAJE_POR_ESTADO[error.status];
+  }
   // Error no previsto: en desarrollo se muestra el detalle en la terminal de `expo start`.
   if (__DEV__ && process.env.NODE_ENV !== 'test') {
-    console.warn('[auth] Error no reconocido de Supabase:', error);
+    console.warn('[auth] Error no reconocido:', error);
   }
   return es.comun.errorGenerico;
 }

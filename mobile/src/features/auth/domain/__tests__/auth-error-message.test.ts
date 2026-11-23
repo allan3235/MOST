@@ -1,29 +1,23 @@
 import { es } from '@/i18n/es';
+import { ErrorApi, ErrorSinRed } from '@/lib/clienteApi';
 
 import { authErrorMessage } from '../auth-error-message';
 
-describe('authErrorMessage', () => {
-  it('traduce los códigos conocidos', () => {
-    expect(authErrorMessage({ code: 'invalid_credentials', status: 400 })).toBe(
-      es.auth.errores.credenciales,
-    );
-    expect(authErrorMessage({ code: 'email_not_confirmed' })).toBe(
-      es.auth.errores.correoNoConfirmado,
-    );
-  });
+jest.mock('@/lib/env', () => ({ env: { urlApi: 'http://prueba' } }));
 
-  it('reconoce el límite de intentos por estado 429', () => {
-    expect(authErrorMessage({ status: 429 })).toBe(es.auth.errores.demasiadosIntentos);
+describe('authErrorMessage', () => {
+  it('traduce los estados conocidos del backend', () => {
+    expect(authErrorMessage(new ErrorApi(401, null, 'x'))).toBe(es.auth.errores.credenciales);
+    expect(authErrorMessage(new ErrorApi(409, null, 'x'))).toBe(es.auth.errores.usuarioExiste);
+    expect(authErrorMessage(new ErrorApi(429, null, 'x'))).toBe(es.auth.errores.demasiadosIntentos);
   });
 
   it('reconoce los fallos de red', () => {
-    expect(authErrorMessage({ name: 'AuthRetryableFetchError', status: 0 })).toBe(
-      es.auth.errores.sinConexion,
-    );
+    expect(authErrorMessage(new ErrorSinRed())).toBe(es.auth.errores.sinConexion);
   });
 
   it('nunca muestra el texto técnico', () => {
-    expect(authErrorMessage({ message: 'Database error saving new user', status: 500 })).toBe(
+    expect(authErrorMessage(new ErrorApi(500, null, 'Database error'))).toBe(
       es.comun.errorGenerico,
     );
     expect(authErrorMessage(null)).toBe(es.comun.errorGenerico);

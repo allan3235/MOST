@@ -21,11 +21,12 @@ import {
 // y se vuelven a descargar completas en la siguiente sincronización. La cola de salida (outbox)
 // no se borra, para no perder lo que se hizo sin conexión.
 
-const NOMBRE = 'habitgreen.db';
+const NOMBRE = 'most.db';
 // 3: se agrega onboarding_answers (Entrega 5). 4: habits.nivel_desde (Entrega 8).
 // 5: user_settings.subidas_plan. 6: user_accessories.categorias_equipadas (pulidos antes del APK).
 // 7: plans.area, respuestas, ultima_evaluacion y limite_desbloqueado (un plan por área).
-const ESQUEMA_VERSION = 7;
+// 8: micro_pasos y habits.paso_actual (most.; base nueva most.db con el backend NestJS).
+const ESQUEMA_VERSION = 8;
 
 let abierta: Promise<SQLite.SQLiteDatabase> | null = null;
 

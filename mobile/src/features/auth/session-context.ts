@@ -1,28 +1,38 @@
-import type { Session } from '@supabase/supabase-js';
+/**
+ * @file session-context.ts
+ * @proyecto most.
+ * @descripcion Contexto de sesión: la sesión, el perfil y las acciones de cuenta.
+ * @autor Equipo most. (heredado de Habit Green; adaptado por Allan con Claude Code)
+ * @fecha 2026-11-23
+ * @version 2.0.0
+ * @historial 1.0.0: con Supabase y recuperación por correo. 2.0.0 (2026-11-23): backend de most.;
+ *   sin enlaces de correo ni recuperación de contraseña (fuera del MVP).
+ */
+
 import { createContext, useContext } from 'react';
 
 import type { AppMode, Profile } from '@/db/profile-repository';
+import type { Sesion } from '@/lib/sesionGuardada';
+
+// ===== Tipos =====
 
 export type ProfileStatus = 'idle' | 'loading' | 'error' | 'ready';
-/** Estado del último enlace de correo: none (ninguno), processing, done o error. */
-export type CallbackStatus = 'none' | 'processing' | 'done' | 'error';
 
 export type SessionContextValue = {
   initializing: boolean;
-  session: Session | null;
+  session: Sesion | null;
   profile: Profile | null;
   profileStatus: ProfileStatus;
-  /** Verdadero desde que se valida el código (o enlace) de recuperación hasta guardar la nueva contraseña. */
-  isRecovery: boolean;
-  callbackStatus: CallbackStatus;
   reloadProfile: () => void;
   chooseMode: (mode: AppMode) => Promise<void>;
-  finishRecovery: () => void;
   signOut: () => Promise<void>;
 };
 
+// ===== Principal =====
+
 export const SessionContext = createContext<SessionContextValue | null>(null);
 
+/** Sesión actual. Solo funciona dentro de <SessionProvider>. */
 export function useSession(): SessionContextValue {
   const value = useContext(SessionContext);
   if (value === null) {

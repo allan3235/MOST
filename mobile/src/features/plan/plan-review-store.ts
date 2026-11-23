@@ -99,7 +99,7 @@ export const usePlanReviewStore = create<PlanReviewState>()(
       };
     },
     {
-      name: 'habitgreen-plan-revision',
+      name: 'most-plan-revision',
       version: 1,
       storage: createJSONStorage(() => sqliteStorage),
       partialize: (state) => ({ borrador: state.borrador, ids: state.ids }),

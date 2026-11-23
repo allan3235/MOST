@@ -1,10 +1,9 @@
-import { FunctionsFetchError } from '@supabase/supabase-js';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
 import type { Habito } from '@/features/habits/domain/habitos-del-dia';
 
 import { filasDelPlan, fechaLocal, type IdsPlan } from '@/features/plan/domain/plan-rows';
-import { supabase } from '@/lib/supabase';
+import { ErrorSinRed, pedirApi } from '@/lib/clienteApi';
 import {
   ACOMPANAMIENTOS,
   AREAS,
@@ -20,7 +19,7 @@ import type { OperacionOutbox } from '@/sync/domain/sync-rules';
 import { aplicar } from './aplicar-cambio';
 import { actualizarFila, getDb, leerFilas } from './database';
 
-// Repositorio del plan. Habla directo con Supabase: crear el plan exige conexión (definición 6),
+// Repositorio del plan. Habla directo con el backend: crear el plan exige conexión (definición 6),
 // así que no pasa por la cola de salida. Al llegar a las pestañas, la sincronización lo descarga
 // a SQLite.
 
@@ -28,32 +27,34 @@ export type ResultadoBorrador =
   { ok: true; borrador: BorradorPlan } | { ok: false; motivo: 'sin_conexion' | 'error' };
 
 /**
- * Pide el borrador a la Edge Function generate-plan. No guarda nada (SDD 5.8). Con
+ * Pide el borrador a POST /ia/plan: la IA (Claude) propone los micro-pasos de cada hábito y el
+ * motor del plan calcula hora, aviso y ajustes. No guarda nada (SDD 5.8). Con
  * `minutosOcupados` (planes creados desde la app), el plan se acomoda en el tiempo libre del día.
  */
 export async function generarBorrador(
   respuestas: Respuestas,
   minutosOcupados = 0,
 ): Promise<ResultadoBorrador> {
-  const { data, error } = await supabase.functions.invoke('generate-plan', {
-    body: { respuestas, minutos_ocupados: minutosOcupados },
-  });
-  if (error) {
-    // FunctionsFetchError = la petición no salió del teléfono (sin red o servidor inalcanzable).
-    return { ok: false, motivo: error instanceof FunctionsFetchError ? 'sin_conexion' : 'error' };
+  let datos: unknown;
+  try {
+    datos = await pedirApi('/ia/plan', {
+      metodo: 'POST',
+      cuerpo: { respuestas, minutos_ocupados: minutosOcupados },
+    });
+  } catch (error) {
+    // ErrorSinRed = la petición no salió del teléfono (sin red o servidor inalcanzable).
+    return { ok: false, motivo: error instanceof ErrorSinRed ? 'sin_conexion' : 'error' };
   }
-  const borrador = borradorPlanSchema.safeParse(data);
+  const borrador = borradorPlanSchema.safeParse(datos);
   return borrador.success ? { ok: true, borrador: borrador.data } : { ok: false, motivo: 'error' };
 }
 
 async function categoriasDelSistema(): Promise<Record<Area, string>> {
-  const { data, error } = await supabase
-    .from('categories')
-    .select('id, clave')
-    .is('user_id', null)
-    .returns<{ id: string; clave: string }[]>();
-  if (error) throw error;
-  const porClave = new Map(data.map((c) => [c.clave, c.id]));
+  const { filas } = await pedirApi<{
+    filas: { id: string; clave: string; user_id: string | null }[];
+  }>('/sync/cambios', { consulta: { tabla: 'categories' } });
+  const delSistema = filas.filter((c) => c.user_id === null);
+  const porClave = new Map(delSistema.map((c) => [c.clave, c.id]));
   const categorias = {} as Record<Area, string>;
   for (const area of AREAS) {
     const id = porClave.get(area);
@@ -98,32 +99,50 @@ export async function guardarPlan(
     conRecordatorios,
   });
 
-  // El orden importa: las políticas de RLS revisan que el plan y el hábito ya existan.
-  const pasos = [
-    () => supabase.from('plans').upsert(filas.plans),
-    () => supabase.from('habits').upsert(filas.habits),
-    () => supabase.from('habit_schedules').upsert(filas.schedules),
+  // Todo va en un solo lote: o se guarda el plan completo o nada. El orden importa: las políticas
+  // RLS revisan que el plan y el hábito ya existan.
+  const operaciones = [
+    { operacion: 'upsert', tabla: 'plans', filas: filas.plans },
+    { operacion: 'upsert', tabla: 'habits', filas: filas.habits },
+    { operacion: 'upsert', tabla: 'habit_schedules', filas: filas.schedules },
+    ...(filas.microPasos.length > 0
+      ? [
+          {
+            operacion: 'upsert',
+            tabla: 'micro_pasos',
+            filas: filas.microPasos,
+            enConflicto: ['habit_id', 'orden'],
+          },
+        ]
+      : []),
     ...(guardarAjustes
       ? [
-          () => supabase.from('user_settings').upsert(filas.settings, { onConflict: 'user_id' }),
-          () =>
-            supabase.from('onboarding_answers').upsert(filas.answers, { onConflict: 'user_id' }),
+          {
+            operacion: 'upsert',
+            tabla: 'user_settings',
+            filas: [filas.settings],
+            enConflicto: ['user_id'],
+          },
+          {
+            operacion: 'upsert',
+            tabla: 'onboarding_answers',
+            filas: [filas.answers],
+            enConflicto: ['user_id'],
+          },
         ]
       : []),
     ...(opciones.presupuestoMin !== undefined
       ? [
-          () =>
-            supabase
-              .from('user_settings')
-              .update({ presupuesto_min: opciones.presupuestoMin })
-              .eq('user_id', userId),
+          {
+            operacion: 'update',
+            tabla: 'user_settings',
+            clave: { user_id: userId },
+            cambios: { presupuesto_min: opciones.presupuestoMin },
+          },
         ]
       : []),
   ];
-  for (const paso of pasos) {
-    const { error } = await paso();
-    if (error) throw error;
-  }
+  await pedirApi('/sync/lote', { metodo: 'POST', cuerpo: { operaciones } });
 }
 
 // --- Mis planes (Perfil) ---------------------------------------------------------------------

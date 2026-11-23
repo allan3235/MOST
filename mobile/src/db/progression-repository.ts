@@ -29,7 +29,6 @@ import {
 import { historial } from '@/features/stats/domain/cumplimiento';
 import { rachaDeHabito } from '@/features/stats/domain/rachas';
 import { fechaLocal } from '@/lib/dates';
-import { supabase } from '@/lib/supabase';
 import {
   AREAS,
   respuestasSchema,
@@ -37,7 +36,7 @@ import {
   type Objetivo,
   type Respuestas,
 } from '@/schemas/onboarding';
-import { respuestaAjusteSchema, type HabitoPlan, type PeticionAjuste } from '@/schemas/plan';
+import { type HabitoPlan, type PeticionAjuste } from '@/schemas/plan';
 import type { OperacionOutbox } from '@/sync/domain/sync-rules';
 
 import { aplicar } from './aplicar-cambio';
@@ -50,8 +49,7 @@ import { leerAjustesEn, leerConfigProgresion, leerPresupuestos } from './setting
 // Progresión (SDD 6.3). Cada 7 días, al abrir la app, se revisan los hábitos del plan: las
 // bajadas se aplican solas y las propuestas quedan como tarjetas en Hoy. Todo se escribe en SQLite
 // y se sube con la cola, así que funciona sin conexión. Las tarjetas pendientes viven solo en este
-// teléfono (`progresion_tarjetas`). La IA (`adjust-plan`) redacta después los textos del nivel
-// nuevo; si no responde, se quedan los del catálogo.
+// teléfono (`progresion_tarjetas`).
 // Varios planes por usuario (uno por área): cada plan tiene su propia revisión de 7 días, su
 // desbloqueo de 90 días y sus tarjetas; el tiempo diario y el contador de subidas son del usuario.
 
@@ -613,54 +611,16 @@ export async function cerrarTarjeta(userId: string, id: string): Promise<void> {
 }
 
 /**
- * Pide a `adjust-plan` el título y la descripción del nivel nuevo y los guarda si el hábito sigue
- * en ese nivel con el título del catálogo (nadie lo cambió mientras tanto). Sin conexión, con la
- * IA caída o sin cuota no pasa nada: se quedan los textos del catálogo.
+ * Antes pedía a la IA de Habit Green (`adjust-plan`) nuevos textos al cambiar de nivel. En most.
+ * los textos salen de la secuencia de micro-pasos que la IA genera al crear el plan, así que el
+ * nivel nuevo conserva los del catálogo. Se mantiene la firma para no cambiar a quienes la llaman.
+ * TODO(Allan): Fase 3, el reajuste se moverá dentro de micro_pasos y usará /ia/paso-ligero.
  */
 export async function pedirTextosIa(
-  userId: string,
-  habitId: string,
-  direccion: PeticionAjuste['direccion'],
-  valores: Pick<ValoresNivel, 'nivel' | 'titulo' | 'duracion_min' | 'dias_semana'> & {
+  _userId: string,
+  _habitId: string,
+  _direccion: PeticionAjuste['direccion'],
+  _valores: Pick<ValoresNivel, 'nivel' | 'titulo' | 'duracion_min' | 'dias_semana'> & {
     objetivo: string;
   },
-): Promise<void> {
-  try {
-    const db = await getDb();
-    const globales = await leerRespuestas(db, userId);
-    if (!globales) return;
-    // El historial (P3) es del plan del hábito.
-    const [habitoActual] = await leerFilas<Habito>(db, 'habits', 'id = ?', [habitId]);
-    const plan = (await leerPlanesActivos(db, userId)).find((p) => p.id === habitoActual?.plan_id);
-    const respuestas = plan ? respuestasDelPlan(globales, plan.area, plan.respuestas) : globales;
-    const peticion = {
-      objetivo: valores.objetivo,
-      nivel: valores.nivel,
-      direccion,
-      sin_recursos: respuestas.obstaculo === 'recursos',
-      duracion_min: valores.duracion_min,
-      dias_semana: valores.dias_semana,
-      historial: respuestas.historial,
-      obstaculo: respuestas.obstaculo,
-    };
-    const { data, error } = await supabase.functions.invoke('adjust-plan', { body: peticion });
-    if (error) return;
-    const textos = respuestaAjusteSchema.safeParse((data as { textos?: unknown } | null)?.textos);
-    if (!textos.success) return;
-
-    await aplicar(async (dbEscritura) => {
-      const [habito] = await leerFilas<Habito>(dbEscritura, 'habits', 'id = ?', [habitId]);
-      if (!habito || habito.nivel !== valores.nivel || habito.titulo !== valores.titulo) return [];
-      const cambios = { titulo: textos.data.titulo, descripcion: textos.data.descripcion };
-      await actualizarFila(
-        dbEscritura,
-        'habits',
-        { id: habitId },
-        { ...cambios, updated_at: new Date().toISOString() },
-      );
-      return [{ operacion: 'update', tabla: 'habits', clave: habitId, payload: cambios }];
-    });
-  } catch (causa) {
-    console.warn('adjust-plan: se quedan los textos del catálogo', causa);
-  }
-}
+): Promise<void> {}

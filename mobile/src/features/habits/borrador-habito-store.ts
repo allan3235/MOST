@@ -5,7 +5,7 @@ import { borradorParaHoy, type BorradorHabito } from './domain/borrador-habito';
 // Dónde vive el borrador del asistente: el almacén clave-valor de expo-sqlite, como las respuestas
 // del formulario inicial. Se usa la versión síncrona para tenerlo antes de dibujar la pantalla.
 
-const CLAVE = 'habitgreen-borrador-habito';
+const CLAVE = 'most-borrador-habito';
 
 export function leerBorradorHabito(userId: string, hoy: string): BorradorHabito | null {
   try {

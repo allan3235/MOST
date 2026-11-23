@@ -1,4 +1,4 @@
-// Esquema local de SQLite (SDD 3.4). Cada tabla es un espejo de su tabla en Supabase, con las
+// Esquema local de SQLite (SDD 3.4). Cada tabla es un espejo de su tabla en el backend, con las
 // columnas que usa la app. La misma descripción sirve para crear las tablas, convertir las filas
 // que llegan del servidor y armar la descarga incremental, así que una columna se agrega aquí y
 // nada más.
@@ -109,6 +109,7 @@ export const TABLAS = [
       nivel: N,
       usa_duracion_reducida: B,
       nivel_desde: T,
+      paso_actual: N,
       titulo: T,
       descripcion: T,
       duracion_min: N,
@@ -131,6 +132,23 @@ export const TABLAS = [
       notificar: B,
       vigente_desde: T,
       vigente_hasta: T,
+      updated_at: T,
+    },
+  },
+  {
+    // Secuencia de micro-pasos de un hábito (RF-03); paso_actual en habits dice en cuál va.
+    nombre: 'micro_pasos',
+    clave: ['id'],
+    columnas: {
+      id: T,
+      habit_id: T,
+      user_id: T,
+      orden: N,
+      titulo: T,
+      descripcion: T,
+      duracion_min: N,
+      duracion_reducida_min: N,
+      dias_semana: J,
       updated_at: T,
     },
   },
@@ -243,6 +261,7 @@ CREATE TABLE IF NOT EXISTS progresion_tarjetas (
 );
 CREATE INDEX IF NOT EXISTS habit_logs_fecha_idx ON habit_logs (fecha);
 CREATE INDEX IF NOT EXISTS habit_schedules_habit_idx ON habit_schedules (habit_id);
+CREATE INDEX IF NOT EXISTS micro_pasos_habit_idx ON micro_pasos (habit_id, orden);
 `;
 
 /** Clave de una fila en el formato de outbox.clave: los valores de la clave primaria unidos. */
@@ -252,7 +271,7 @@ export function claveDeFila(tabla: TablaLocal, fila: Record<string, unknown>): s
 
 export type ValorLocal = string | number | null;
 
-/** Un valor de la app (o de Supabase) en el formato de su columna de SQLite. */
+/** Un valor de la app (o del backend) en el formato de su columna de SQLite. */
 export function valorLocal(tipo: TipoColumna, valor: unknown): ValorLocal {
   if (valor === undefined || valor === null) return null;
   switch (tipo) {
@@ -267,7 +286,7 @@ export function valorLocal(tipo: TipoColumna, valor: unknown): ValorLocal {
   }
 }
 
-/** Convierte una fila de Supabase (o armada por la app) al formato de SQLite. */
+/** Convierte una fila del backend (o armada por la app) al formato de SQLite. */
 export function aValoresLocales(tabla: TablaLocal, fila: Record<string, unknown>): ValorLocal[] {
   return Object.entries(tabla.columnas).map(([columna, tipo]) => valorLocal(tipo, fila[columna]));
 }

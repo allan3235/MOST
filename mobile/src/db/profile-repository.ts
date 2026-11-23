@@ -1,8 +1,8 @@
-import { supabase } from '@/lib/supabase';
+import { pedirApi } from '@/lib/clienteApi';
 
 import { getDb, guardarFilas } from './database';
 
-// Repositorio del perfil. Se lee de Supabase y se guarda una copia en SQLite: si no hay conexión
+// Repositorio del perfil. Se lee del backend y se guarda una copia en SQLite: si no hay conexión
 // al abrir la app, se usa la copia local para llegar a las pestañas (SDD 3.4). El modo y el
 // onboarding se guardan con conexión, porque crear el plan ya la necesita.
 
@@ -25,8 +25,6 @@ type ProfileRow = {
   updated_at?: string;
 };
 
-const COLUMNS = 'id, nombre, zona_horaria, modo, onboarding_completo, updated_at';
-
 function toProfile(row: ProfileRow): Profile {
   return {
     id: row.id,
@@ -38,13 +36,11 @@ function toProfile(row: ProfileRow): Profile {
 }
 
 async function fetchProfile(userId: string): Promise<ProfileRow | null> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select(COLUMNS)
-    .eq('id', userId)
-    .maybeSingle<ProfileRow>();
-  if (error) throw error;
-  return data;
+  const { fila } = await pedirApi<{ fila: ProfileRow | null }>('/sync/fila', {
+    metodo: 'POST',
+    cuerpo: { tabla: 'profiles', clave: { id: userId } },
+  });
+  return fila;
 }
 
 async function guardarCopia(row: ProfileRow): Promise<void> {
@@ -76,14 +72,8 @@ export async function getProfile(userId: string): Promise<Profile> {
     return toProfile(row);
   }
 
-  // La cuenta existe pero le falta el perfil (por ejemplo, se borró a mano en pruebas):
-  // la función del servidor lo vuelve a crear junto con su monedero y sus plantas.
-  const { error } = await supabase.rpc('ensure_profile');
-  if (error) throw error;
-  const created = await fetchProfile(userId);
-  if (!created) throw new Error('No se pudo crear el perfil');
-  await guardarCopia(created);
-  return toProfile(created);
+  // El backend crea el perfil al registrar la cuenta; si no está, algo se borró a mano.
+  throw new Error('No se encontró el perfil de esta cuenta');
 }
 
 /** Guarda el modo y cierra la bienvenida: es el último paso del onboarding en los dos modos. */
@@ -92,13 +82,17 @@ export async function saveMode(
   modo: AppMode,
   zonaHoraria: string,
 ): Promise<Profile> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .update({ modo, zona_horaria: zonaHoraria, onboarding_completo: true })
-    .eq('id', userId)
-    .select(COLUMNS)
-    .single<ProfileRow>();
-  if (error) throw error;
+  const { filas } = await pedirApi<{ filas: ProfileRow[] }>('/sync/operacion', {
+    metodo: 'POST',
+    cuerpo: {
+      operacion: 'update',
+      tabla: 'profiles',
+      clave: { id: userId },
+      cambios: { modo, zona_horaria: zonaHoraria, onboarding_completo: true },
+    },
+  });
+  const [data] = filas;
+  if (!data) throw new Error('No se pudo guardar el modo');
   await guardarCopia(data);
   return toProfile(data);
 }

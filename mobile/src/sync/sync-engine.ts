@@ -1,3 +1,22 @@
+/**
+ * @file sync-engine.ts
+ * @proyecto most.
+ * @descripcion Sincronización con el backend de most. (SDD 3.4). Cada vuelta:
+ *   0. Sale si no hay red o no hay sesión.
+ *   1. Comprueba que la base local sea de este usuario (si no, la vacía).
+ *   2. Actualiza la zona horaria del perfil, para que «hoy» nunca llegue como fecha futura.
+ *   3. Sube la cola de salida en orden (POST /sync/operacion). Un rechazo definitivo (respuesta
+ *      con "code") descarta la operación y refresca esa fila; sin red o con un error del servidor
+ *      sin código, la cola se detiene hasta la próxima vuelta.
+ *   4. Descarga lo que cambió desde el último cursor de cada tabla (GET /sync/cambios; la primera
+ *      vez, todo).
+ *   Solo corre una vuelta a la vez; si se pide otra mientras tanto, se hace al terminar.
+ * @autor Equipo most. (heredado de Habit Green; adaptado por Allan con Claude Code)
+ * @fecha 2026-11-23
+ * @version 2.0.0
+ * @historial 1.0.0: con Supabase. 2.0.0 (2026-11-23): con el backend NestJS (rutas /sync).
+ */
+
 import type { SQLiteDatabase } from 'expo-sqlite';
 import * as Network from 'expo-network';
 
@@ -5,8 +24,9 @@ import { avisarCambioLocal } from '@/db/db-version-store';
 import { asegurarDuenoBaseLocal, enTransaccion, getDb, guardarFilas } from '@/db/database';
 import { claveDeFila, TABLAS, tablaLocal, type TablaLocal } from '@/db/local-schema';
 import { leerOutbox, quitarDeOutbox, sumarIntento } from '@/db/outbox';
+import { ErrorApi, ErrorSinRed, pedirApi } from '@/lib/clienteApi';
 import { fechaLocal, sumarDias } from '@/lib/dates';
-import { supabase } from '@/lib/supabase';
+import { leerSesion } from '@/lib/sesionGuardada';
 import { deviceTimeZone } from '@/lib/time-zone';
 
 import {
@@ -19,22 +39,28 @@ import {
 } from './domain/sync-rules';
 import { useSyncStore } from './sync-store';
 
-// Sincronización con Supabase (SDD 3.4). Cada vuelta:
-//   0. Sale si no hay red o no se pudo renovar el token.
-//   1. Comprueba que la base local sea de este usuario (si no, la vacía).
-//   2. Actualiza la zona horaria del perfil, para que «hoy» nunca llegue como fecha futura.
-//   3. Sube la cola de salida en orden. Un rechazo del servidor descarta la operación y
-//      refresca esa fila; un error de red detiene la cola hasta la próxima vuelta.
-//   4. Descarga lo que cambió desde el último cursor de cada tabla (la primera vez, todo).
-// Solo corre una vuelta a la vez; si se pide otra mientras tanto, se hace al terminar.
+// ===== Tipos =====
+
+type Fila = Record<string, unknown>;
+
+/** Resultado de enviar una operación: null si salió bien. code null = se puede reintentar. */
+type FalloEnvio = { code: string | null; message: string } | null;
+
+// ===== Constantes =====
 
 const PAGINA = 1000;
 const DIAS_DE_HISTORIAL = 365;
+/** Tablas de recompensas que se vuelven a bajar completas tras rechazar un check-in. */
+const TABLAS_RECOMPENSAS = ['wallets', 'plant_progress'] as const;
+
+// ===== Estado =====
 
 let usuario: string | null = null;
 let enCurso: Promise<void> | null = null;
 let otraVuelta = false;
 let temporizador: ReturnType<typeof setTimeout> | null = null;
+
+// ===== Principal =====
 
 /** Activa la sincronización para el usuario con sesión (o la apaga con null). */
 export function configurarSync(userId: string | null): void {
@@ -67,6 +93,8 @@ export function sincronizarAhora(): Promise<void> {
   return enCurso;
 }
 
+// ===== Funciones auxiliares =====
+
 class SinRed extends Error {}
 
 async function hayRed(): Promise<boolean> {
@@ -78,25 +106,13 @@ async function hayRed(): Promise<boolean> {
   }
 }
 
-/**
- * getSession renueva el token si venció. Si no se pudo (sin red de verdad), no se envía nada:
- * sin token el servidor rechazaría las operaciones y se descartarían de la cola.
- */
-async function hayTokenValido(): Promise<boolean> {
-  try {
-    const { data } = await supabase.auth.getSession();
-    return data.session !== null;
-  } catch {
-    return false;
-  }
-}
-
 async function unaVuelta(userId: string): Promise<void> {
   const db = await getDb();
   // Si la base era de otra cuenta y se vació, las pantallas se actualizan ya, sin esperar la vuelta.
   if (await asegurarDuenoBaseLocal(userId)) avisarCambioLocal();
   if (!(await hayRed())) return;
-  if (!(await hayTokenValido())) return;
+  // Sin sesión el servidor rechazaría las operaciones y se descartarían de la cola.
+  if (leerSesion() === null) return;
 
   useSyncStore.setState({ sincronizando: true });
   try {
@@ -116,11 +132,17 @@ async function unaVuelta(userId: string): Promise<void> {
   }
 }
 
-/** Lanza SinRed si la petición no llegó al servidor, o el error si el servidor respondió con uno. */
-function revisar(error: { message: string; code?: string | null } | null): void {
-  if (!error) return;
-  if (!esRechazoDefinitivo(error)) throw new SinRed(error.message);
-  throw new Error(`${error.code}: ${error.message}`);
+/**
+ * Petición a la API dentro de la sincronización: un rechazo definitivo se lanza tal cual; sin red
+ * o con un error sin código se lanza SinRed (se reintenta en la siguiente vuelta).
+ */
+async function pedirSync<T>(ruta: string, opciones: Parameters<typeof pedirApi>[1]): Promise<T> {
+  try {
+    return await pedirApi<T>(ruta, opciones);
+  } catch (error) {
+    if (error instanceof ErrorApi && esRechazoDefinitivo(error)) throw error;
+    throw new SinRed(error instanceof Error ? error.message : String(error));
+  }
 }
 
 async function actualizarZonaHoraria(db: SQLiteDatabase, userId: string): Promise<void> {
@@ -130,49 +152,64 @@ async function actualizarZonaHoraria(db: SQLiteDatabase, userId: string): Promis
     [userId],
   );
   if (perfil?.zona_horaria === zona) return;
-  const { data, error } = await supabase
-    .from('profiles')
-    .update({ zona_horaria: zona })
-    .eq('id', userId)
-    .select(columnas(tablaLocal('profiles')))
-    .single<Record<string, unknown>>();
-  revisar(error);
-  if (data) await guardarFilas(db, 'profiles', [data]);
+  const { filas } = await pedirSync<{ filas: Fila[] }>('/sync/operacion', {
+    metodo: 'POST',
+    cuerpo: {
+      operacion: 'update',
+      tabla: 'profiles',
+      clave: { id: userId },
+      cambios: { zona_horaria: zona },
+    },
+  });
+  if (filas.length > 0) await guardarFilas(db, 'profiles', filas);
 }
 
-async function enviar(entrada: EntradaOutbox) {
+/** Cuerpo de POST /sync/operacion para una entrada de la cola. */
+function cuerpoDeOperacion(entrada: EntradaOutbox): Record<string, unknown> {
   switch (entrada.operacion) {
     case 'upsert':
-      return (await supabase.from(entrada.tabla).upsert(entrada.payload)).error;
+      return {
+        operacion: 'upsert',
+        tabla: entrada.tabla,
+        filas: Array.isArray(entrada.payload) ? entrada.payload : [entrada.payload],
+      };
     case 'update':
-      return (
-        await supabase
-          .from(entrada.tabla)
-          .update(entrada.payload)
-          .match(claveComoFiltro(tablaLocal(entrada.tabla), entrada.clave))
-      ).error;
+      return {
+        operacion: 'update',
+        tabla: entrada.tabla,
+        clave: claveComoFiltro(tablaLocal(entrada.tabla), entrada.clave),
+        cambios: entrada.payload,
+      };
     case 'archive':
-      return (
-        await supabase.rpc('archivar_habito', {
-          p_habit_id: entrada.payload.habit_id,
-          p_fecha: entrada.payload.fecha,
-        })
-      ).error;
+      return {
+        operacion: 'archive',
+        habit_id: entrada.payload.habit_id,
+        fecha: entrada.payload.fecha,
+      };
     case 'complete':
-      return (
-        await supabase.rpc('complete_habit', {
-          p_log_id: entrada.payload.log_id,
-          p_habit_id: entrada.payload.habit_id,
-          p_fecha: entrada.payload.fecha,
-        })
-      ).error;
+      return {
+        operacion: 'complete',
+        log_id: entrada.payload.log_id,
+        habit_id: entrada.payload.habit_id,
+        fecha: entrada.payload.fecha,
+      };
     case 'uncomplete':
-      return (
-        await supabase.rpc('uncomplete_habit', {
-          p_habit_id: entrada.payload.habit_id,
-          p_fecha: entrada.payload.fecha,
-        })
-      ).error;
+      return {
+        operacion: 'uncomplete',
+        habit_id: entrada.payload.habit_id,
+        fecha: entrada.payload.fecha,
+      };
+  }
+}
+
+async function enviar(entrada: EntradaOutbox): Promise<FalloEnvio> {
+  try {
+    await pedirApi('/sync/operacion', { metodo: 'POST', cuerpo: cuerpoDeOperacion(entrada) });
+    return null;
+  } catch (error) {
+    if (error instanceof ErrorApi) return { code: error.code, message: error.message };
+    if (error instanceof ErrorSinRed) return { code: null, message: error.message };
+    return { code: null, message: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -218,14 +255,12 @@ function claveComoFiltro(tabla: TablaLocal, clave: string): Record<string, strin
 async function refrescarFila(db: SQLiteDatabase, entrada: EntradaOutbox): Promise<void> {
   const tabla = tablaLocal(entrada.tabla);
   const valores = entrada.clave.split('|');
-  const { data, error } = await supabase
-    .from(tabla.nombre)
-    .select(columnas(tabla))
-    .match(claveComoFiltro(tabla, entrada.clave))
-    .maybeSingle<Record<string, unknown>>();
-  revisar(error);
-  if (data) {
-    await guardarFilas(db, entrada.tabla, [data]);
+  const { fila } = await pedirSync<{ fila: Fila | null }>('/sync/fila', {
+    metodo: 'POST',
+    cuerpo: { tabla: tabla.nombre, clave: claveComoFiltro(tabla, entrada.clave) },
+  });
+  if (fila) {
+    await guardarFilas(db, entrada.tabla, [fila]);
   } else {
     const condicion = tabla.clave.map((c) => `${c} = ?`).join(' AND ');
     await db.runAsync(`DELETE FROM ${tabla.nombre} WHERE ${condicion}`, valores);
@@ -237,19 +272,12 @@ async function refrescarFila(db: SQLiteDatabase, entrada: EntradaOutbox): Promis
  * el servidor nunca aplicó; como no cambiaron allá, la descarga incremental no los corregiría.
  */
 async function refrescarRecompensas(db: SQLiteDatabase): Promise<void> {
-  for (const nombre of ['wallets', 'plant_progress'] as const) {
-    const tabla = tablaLocal(nombre);
-    const { data, error } = await supabase
-      .from(nombre)
-      .select(columnas(tabla))
-      .returns<Record<string, unknown>[]>();
-    revisar(error);
-    if (data) await guardarFilas(db, nombre, data);
+  for (const nombre of TABLAS_RECOMPENSAS) {
+    const { filas } = await pedirSync<{ filas: Fila[] }>('/sync/cambios', {
+      consulta: { tabla: nombre },
+    });
+    await guardarFilas(db, nombre, filas);
   }
-}
-
-function columnas(tabla: TablaLocal): string {
-  return Object.keys(tabla.columnas).join(', ');
 }
 
 async function descargar(db: SQLiteDatabase): Promise<void> {
@@ -263,21 +291,19 @@ async function descargar(db: SQLiteDatabase): Promise<void> {
     const cursor = guardado?.cursor ?? null;
     let nuevoCursor = cursor;
 
-    for (let desde = 0; ; desde += PAGINA) {
-      let consulta = supabase
-        .from(tabla.nombre)
-        .select(columnas(tabla))
-        .order('updated_at')
-        .order(tabla.clave[0])
-        .range(desde, desde + PAGINA - 1);
-      if (cursor !== null) {
-        consulta = consulta.gt('updated_at', cursor);
-      } else if (tabla.filtroFecha) {
-        consulta = consulta.gte(tabla.filtroFecha, sumarDias(fechaLocal(), -DIAS_DE_HISTORIAL));
-      }
-      const { data, error } = await consulta.returns<Record<string, unknown>[]>();
-      revisar(error);
-      const filas = data ?? [];
+    for (let pagina = 0; ; pagina++) {
+      const { filas } = await pedirSync<{ filas: Fila[] }>('/sync/cambios', {
+        consulta: {
+          tabla: tabla.nombre,
+          desde: cursor ?? undefined,
+          desdeFecha:
+            cursor === null && tabla.filtroFecha
+              ? sumarDias(fechaLocal(), -DIAS_DE_HISTORIAL)
+              : undefined,
+          pagina,
+          tamano: PAGINA,
+        },
+      });
 
       const aplicables = filasAplicables(
         tabla.nombre,

@@ -13,7 +13,7 @@ import {
   PROGRESION_POR_DEFECTO,
   type ConfigProgresion,
 } from '@/features/progression/domain/progresion';
-import { supabase } from '@/lib/supabase';
+import { pedirApi } from '@/lib/clienteApi';
 import {
   ACOMPANAMIENTOS,
   OBSTACULOS,
@@ -30,18 +30,18 @@ import { leerHabitos } from './habits-repository';
 import { encolar } from './outbox';
 
 // Ajustes del usuario (`user_settings`). Los por defecto del modo tradicional se guardan directo
-// en Supabase porque elegir el modo ya requiere conexión; al llegar a las pestañas, la
+// en el backend porque elegir el modo ya requiere conexión; al llegar a las pestañas, la
 // sincronización los descarga a SQLite junto con `app_config`, y desde ahí se leen. Lo que se
 // cambia en Perfil se guarda en el teléfono y se sube con la cola, así que funciona sin conexión.
 
 async function presupuestoTradicional(): Promise<number> {
-  const { data, error } = await supabase
-    .from('app_config')
-    .select('valor')
-    .eq('clave', 'presupuestos')
-    .single<{ valor: { tradicional_por_defecto?: number } }>();
-  if (error) throw error;
-  const valor = data.valor.tradicional_por_defecto;
+  const { fila } = await pedirApi<{
+    fila: { valor: { tradicional_por_defecto?: number } } | null;
+  }>('/sync/fila', {
+    metodo: 'POST',
+    cuerpo: { tabla: 'app_config', clave: { clave: 'presupuestos' } },
+  });
+  const valor = fila?.valor.tradicional_por_defecto;
   if (typeof valor !== 'number') throw new Error('Falta presupuestos.tradicional_por_defecto');
   return valor;
 }
@@ -248,6 +248,8 @@ export async function leerAjustesLocales(userId: string): Promise<AjustesLocales
 /** Ajustes por defecto al elegir el modo tradicional (SDD 6.5). */
 export async function guardarAjustesTradicionales(userId: string): Promise<void> {
   const ajustes = ajustesTradicionales(userId, await presupuestoTradicional());
-  const { error } = await supabase.from('user_settings').upsert(ajustes, { onConflict: 'user_id' });
-  if (error) throw error;
+  await pedirApi('/sync/operacion', {
+    metodo: 'POST',
+    cuerpo: { operacion: 'upsert', tabla: 'user_settings', filas: [ajustes] },
+  });
 }

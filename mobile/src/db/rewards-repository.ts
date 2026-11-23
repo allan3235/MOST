@@ -5,9 +5,8 @@ import {
   plantaParaEquipar,
   type TipoAccesorio,
 } from '@/features/rewards/domain/equipar';
-import { supabase } from '@/lib/supabase';
+import { ErrorApi, pedirApi } from '@/lib/clienteApi';
 import { AREAS, type Area } from '@/schemas/onboarding';
-import { esRechazoDefinitivo } from '@/sync/domain/sync-rules';
 import { pedirSincronizacion, sincronizarAhora } from '@/sync/sync-engine';
 
 import { actualizarFila, enTransaccion, getDb, leerFilas } from './database';
@@ -195,9 +194,10 @@ export type ResultadoCompra = 'comprado' | 'sin_conexion' | 'saldo_insuficiente'
 
 /** Compra en el servidor (necesita conexión) y después descarga el saldo y el accesorio. */
 export async function comprarAccesorio(accessoryId: string): Promise<ResultadoCompra> {
-  const { error } = await supabase.rpc('comprar_accesorio', { p_accessory_id: accessoryId });
-  if (error) {
-    if (!esRechazoDefinitivo(error)) return 'sin_conexion';
+  try {
+    await pedirApi('/tienda/comprar', { metodo: 'POST', cuerpo: { accessory_id: accessoryId } });
+  } catch (error) {
+    if (!(error instanceof ErrorApi)) return 'sin_conexion';
     return error.message === 'saldo_insuficiente' ? 'saldo_insuficiente' : 'error';
   }
   await sincronizarAhora().catch(() => {});

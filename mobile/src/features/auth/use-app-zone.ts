@@ -8,7 +8,6 @@ export function useAppZone(): AppZone {
   return resolveAppZone({
     initializing: session.initializing,
     hasSession: session.session !== null,
-    isRecovery: session.isRecovery,
     profileStatus: session.profileStatus,
     mode: session.profile?.modo ?? null,
   });
@@ -17,7 +16,6 @@ export function useAppZone(): AppZone {
 /** Primera pantalla de cada zona. */
 export const ZONE_HOME: Record<Exclude<AppZone, 'loading' | 'profile-error'>, Href> = {
   auth: '/bienvenida',
-  recovery: '/nueva-contrasena',
   onboarding: '/empezar',
   tabs: '/hoy',
 };

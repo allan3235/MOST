@@ -10,6 +10,7 @@ import { Field } from '@/components/ui/field';
 import { Screen } from '@/components/ui/screen';
 import { AuthHeader } from '@/features/auth/components/auth-header';
 import { SessionExpiredNotice } from '@/features/auth/components/session-expired-notice';
+import { iniciarSesion } from '@/features/auth/cuentaApi';
 import { authErrorMessage } from '@/features/auth/domain/auth-error-message';
 import { avisoDeFormulario } from '@/features/auth/domain/form-aviso';
 import {
@@ -19,7 +20,6 @@ import {
   type LoginValues,
 } from '@/features/auth/domain/auth-schemas';
 import { es } from '@/i18n/es';
-import { supabase } from '@/lib/supabase';
 import { navegar } from '@/lib/navegar';
 
 export default function LoginScreen() {
@@ -56,9 +56,13 @@ export default function LoginScreen() {
   const submit = handleSubmit(async ({ email, password }) => {
     // El aviso anterior se queda mientras se espera la respuesta: quitarlo y volver a ponerlo
     // movía el botón y se veía como un parpadeo.
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
     // Si todo sale bien, la sesión cambia y el layout raíz lleva a la pantalla que toca.
-    setServerError(error ? authErrorMessage(error) : null);
+    try {
+      await iniciarSesion(email, password);
+      setServerError(null);
+    } catch (error) {
+      setServerError(authErrorMessage(error));
+    }
   });
 
   return (
@@ -87,34 +91,24 @@ export default function LoginScreen() {
             />
           )}
         />
-        <View className="gap-1">
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Field
-                label={t.contrasena}
-                password
-                value={value}
-                onChangeText={(texto) => escribir(onChange, texto)}
-                onBlur={onBlur}
-                invalido={Boolean(errors.password) || errorServidor}
-                autoComplete="current-password"
-                textContentType="password"
-                returnKeyType="done"
-                onSubmitEditing={onSubmit}
-              />
-            )}
-          />
-          <View className="items-start">
-            <Button
-              variant="tertiary"
-              label={t.login.olvidaste}
-              onPress={() => navegar.push('/recuperar')}
-              className="px-0"
+        <Controller
+          control={control}
+          name="password"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Field
+              label={t.contrasena}
+              password
+              value={value}
+              onChangeText={(texto) => escribir(onChange, texto)}
+              onBlur={onBlur}
+              invalido={Boolean(errors.password) || errorServidor}
+              autoComplete="current-password"
+              textContentType="password"
+              returnKeyType="done"
+              onSubmitEditing={onSubmit}
             />
-          </View>
-        </View>
+          )}
+        />
 
         {aviso ? <Alert variant="error" message={aviso} /> : null}
 

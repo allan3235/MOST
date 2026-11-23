@@ -1,12 +1,6 @@
 import { es, formatear } from '@/i18n/es';
 
-import {
-  EMAIL_MAX,
-  loginSchema,
-  newPasswordSchema,
-  recoveryCodeSchema,
-  registerSchema,
-} from '../auth-schemas';
+import { EMAIL_MAX, loginSchema, registerSchema } from '../auth-schemas';
 
 const v = es.auth.validacion;
 
@@ -72,31 +66,5 @@ describe('registerSchema', () => {
       message: v.contrasenasDistintas,
       path: ['confirmPassword'],
     });
-  });
-});
-
-describe('recoveryCodeSchema', () => {
-  it('acepta códigos de 6 a 10 dígitos y quita los espacios', () => {
-    expect(recoveryCodeSchema.parse({ code: '123456' }).code).toBe('123456');
-    expect(recoveryCodeSchema.parse({ code: ' 1234 5678 ' }).code).toBe('12345678');
-  });
-
-  it('pide el código', () => {
-    expect(firstError(recoveryCodeSchema.safeParse({ code: '  ' }))).toBe(v.codigoRequerido);
-  });
-
-  it('rechaza letras o códigos incompletos', () => {
-    expect(firstError(recoveryCodeSchema.safeParse({ code: '12ab56' }))).toBe(v.codigoInvalido);
-    expect(firstError(recoveryCodeSchema.safeParse({ code: '1234' }))).toBe(v.codigoInvalido);
-  });
-});
-
-describe('newPasswordSchema', () => {
-  it('pide que las dos contraseñas coincidan', () => {
-    const result = newPasswordSchema.safeParse({
-      password: 'nueva1234',
-      confirmPassword: 'nueva12',
-    });
-    expect(firstError(result)).toBe(v.contrasenasDistintas);
   });
 });

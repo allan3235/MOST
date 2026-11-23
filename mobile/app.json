@@ -3,7 +3,7 @@
     "name": "most.",
     "slug": "HabitGreen",
     "owner": "nueve_36",
-    "scheme": "habitgreen",
+    "scheme": "most",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,7 +12,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.habitgreen.app",
+      "package": "com.most.app",
       "adaptiveIcon": {
         "backgroundColor": "#DFF2E4",
         "foregroundImage": "./assets/android-icon-foreground.png",

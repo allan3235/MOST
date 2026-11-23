@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
 import { Screen } from '@/components/ui/screen';
 import { AuthHeader } from '@/features/auth/components/auth-header';
-import { authRedirectUrl } from '@/features/auth/auth-redirect';
+import { crearCuenta } from '@/features/auth/cuentaApi';
 import { authErrorMessage } from '@/features/auth/domain/auth-error-message';
 import { avisoDeFormulario } from '@/features/auth/domain/form-aviso';
 import {
@@ -19,7 +19,6 @@ import {
   type RegisterValues,
 } from '@/features/auth/domain/auth-schemas';
 import { es } from '@/i18n/es';
-import { supabase } from '@/lib/supabase';
 import { navegar } from '@/lib/navegar';
 
 export default function RegistroScreen() {
@@ -62,24 +61,13 @@ export default function RegistroScreen() {
   const submit = handleSubmit(async ({ email, password }) => {
     // El aviso anterior se queda mientras se espera la respuesta: quitarlo y volver a ponerlo
     // movía el botón y se veía como un parpadeo.
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: authRedirectUrl() },
-    });
-    if (error) {
+    // Sin confirmación de correo en el MVP: la cuenta se crea y se entra de una vez; el layout
+    // raíz lleva a la bienvenida.
+    try {
+      await crearCuenta(email, password);
+      setServerError(null);
+    } catch (error) {
       setServerError(authErrorMessage(error));
-      return;
-    }
-    // Con la confirmación de correo activa, Supabase no abre sesión hasta confirmar.
-    // Si el correo ya existía, devuelve un usuario sin identidades (sin revelar si existe).
-    if (data.user && data.user.identities?.length === 0) {
-      setServerError(t.errores.usuarioExiste);
-      return;
-    }
-    setServerError(null);
-    if (!data.session) {
-      navegar.replace({ pathname: '/revisa-tu-correo', params: { correo: email } });
     }
   });
 

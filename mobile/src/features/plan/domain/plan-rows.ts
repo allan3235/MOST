@@ -54,6 +54,22 @@ export type FilasPlan = {
     titulo: string;
     descripcion: string | null;
     duracion_min: number;
+    /** Micro-paso en curso; null si el hábito no trae secuencia. */
+    paso_actual: number | null;
+  }[];
+  /**
+   * Secuencia de micro-pasos de cada hábito (RF-03). Sin id: se guardan con conflicto en
+   * (habit_id, orden), así que reintentar no los duplica.
+   */
+  microPasos: {
+    habit_id: string;
+    user_id: string;
+    orden: number;
+    titulo: string;
+    descripcion: string;
+    duracion_min: number;
+    duracion_reducida_min: number;
+    dias_semana: number[];
   }[];
   schedules: {
     id: string;
@@ -123,7 +139,20 @@ export function filasDelPlan(input: {
       titulo: h.titulo,
       descripcion: h.descripcion,
       duracion_min: h.duracion_min,
+      paso_actual: h.micro_pasos?.length ? (h.paso_actual ?? 1) : null,
     })),
+    microPasos: conIds.flatMap(({ habito: h, habitId }) =>
+      (h.micro_pasos ?? []).map((paso) => ({
+        habit_id: habitId,
+        user_id: userId,
+        orden: paso.orden,
+        titulo: paso.titulo,
+        descripcion: paso.descripcion,
+        duracion_min: paso.duracion_min,
+        duracion_reducida_min: paso.duracion_reducida_min,
+        dias_semana: paso.dias_semana,
+      })),
+    ),
     schedules: conIds.map(({ habito: h, habitId, scheduleId }) => ({
       id: scheduleId,
       habit_id: habitId,
