@@ -461,6 +461,24 @@ describe('micro-pasos (RF-03)', () => {
     expect(tipos(enPaso(3, 13, 14))).not.toContain('subir');
   });
 
+  it('sin paso más ligero en la secuencia, ofrece pedírselo a la IA (modelo pequeño)', () => {
+    const t = decidir(
+      entrada({
+        habitos: [
+          habito('a', {
+            paso_actual: 1,
+            usa_duracion_reducida: true,
+            titulo: 'Leer 3 min',
+            duracion_min: 3,
+          }),
+        ],
+        microPasos: PASOS,
+        ocurrencias: ocurrencias('a', 2, 7),
+      }),
+    );
+    expect(t[0]).toMatchObject({ tipo: 'ligero_ia', habitId: 'a', antes: { duracion_min: 3 } });
+  });
+
   it('candado mínimo: un paso de 1 minuto no tiene versión más corta, solo apoyo', () => {
     const minimos = PASOS.map((p, i) =>
       i === 0 ? { ...p, titulo: 'Leer 1 min', duracion_min: 1, duracion_reducida_min: 1 } : p,

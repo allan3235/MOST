@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useDbVersion } from '@/db/db-version-store';
 import {
   aceptarBajada,
+  aplicarPasoLigeroIa,
   aceptarNuevo,
   aceptarSubida,
   cerrarTarjeta,
@@ -12,6 +13,7 @@ import {
 } from '@/db/progression-repository';
 import { useLocalQuery } from '@/db/use-local-query';
 import { es, formatear } from '@/i18n/es';
+import { ErrorSinRed } from '@/lib/clienteApi';
 import { fechaLocal } from '@/lib/dates';
 import { useSyncStore } from '@/sync/sync-store';
 import { navegar } from '@/lib/navegar';
@@ -70,7 +72,7 @@ export function useProgresion(userId: string, opciones: OpcionesProgresion = {})
       setResueltas((previas) => new Set(previas).add(tarjeta.id));
     } catch (causa) {
       console.warn('No se pudo guardar la progresión', causa);
-      setError(t.error);
+      setError(causa instanceof ErrorSinRed ? t.sinConexionIa : t.error);
     } finally {
       setOcupado(false);
     }
@@ -86,7 +88,12 @@ export function useProgresion(userId: string, opciones: OpcionesProgresion = {})
     /** «Sí, vamos» o «Probar este paso»: sube, aplica la meta intermedia o suma el hábito nuevo. */
     aceptar: () => {
       if (!actual) return;
-      if (actual.tipo === 'bajar') {
+      if (actual.tipo === 'ligero_ia') {
+        void resolver(actual, async () => {
+          const titulo = await aplicarPasoLigeroIa(userId, actual);
+          if (titulo) setAviso(formatear(t.listoBajar, { titulo }));
+        });
+      } else if (actual.tipo === 'bajar') {
         void resolver(actual, async () => {
           if (await aceptarBajada(userId, actual)) {
             setAviso(formatear(t.listoBajar, { titulo: actual.despues.titulo }));

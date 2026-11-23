@@ -17,6 +17,7 @@ import {
   decidir,
   esDelPlan,
   llegoAlLimiteTotal,
+  aplicarCandado,
   pasoHaciaAbajo,
   pasosDe,
   cumplimientoDe,
@@ -30,6 +31,7 @@ import {
 } from '@/features/progression/domain/progresion';
 import { historial, type Pausa } from '@/features/stats/domain/cumplimiento';
 import { rachaDeHabito } from '@/features/stats/domain/rachas';
+import { pedirApi } from '@/lib/clienteApi';
 import { fechaLocal } from '@/lib/dates';
 import {
   AREAS,
@@ -371,6 +373,50 @@ export async function aceptarBajada(
     return aplicarNivel(db, userId, tarjeta.habitId, tarjeta.despues);
   });
   return aplicada;
+}
+
+type RespuestaPasoLigero = {
+  origen: 'ia' | 'catalogo';
+  paso: {
+    titulo: string;
+    descripcion: string;
+    duracion_min: number;
+    duracion_reducida_min: number;
+    dias_semana: number[];
+  };
+};
+
+/**
+ * «Sí, propónmela» de una tarjeta ligero_ia: pide al modelo pequeño (POST /ia/paso-ligero) una
+ * versión aún más ligera del paso en que va y la aplica en un toque. Queda como su versión
+ * reducida: al volver a subir, regresa al paso normal. Necesita conexión (lanza ErrorSinRed).
+ * @returns El título nuevo, o null si el hábito cambió y la tarjeta ya no aplica.
+ */
+export async function aplicarPasoLigeroIa(
+  userId: string,
+  tarjeta: Extract<Tarjeta, { tipo: 'ligero_ia' }>,
+): Promise<string | null> {
+  const { paso } = await pedirApi<RespuestaPasoLigero>('/ia/paso-ligero', {
+    metodo: 'POST',
+    cuerpo: { habit_id: tarjeta.habitId },
+  });
+  let titulo: string | null = null;
+  await aplicar(async (db) => {
+    await borrarTarjeta(db, userId, tarjeta.id);
+    if (!(await sigueIgual(db, tarjeta.habitId, tarjeta.antes))) return [];
+    const valores = aplicarCandado({
+      ...tarjeta.antes,
+      titulo: paso.titulo,
+      descripcion: paso.descripcion === '' ? null : paso.descripcion,
+      duracion_min: paso.duracion_min,
+      usa_duracion_reducida: true,
+      dias_semana: paso.dias_semana,
+      nivel_desde: fechaLocal(),
+    });
+    titulo = valores.titulo;
+    return aplicarNivel(db, userId, tarjeta.habitId, valores);
+  });
+  return titulo;
 }
 
 /**

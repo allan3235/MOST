@@ -100,6 +100,13 @@ export function ProgressionCard({
           secundario: { label: t.seguirComoEsta, onPress: onCerrar },
         };
       }
+      case 'ligero_ia':
+        return {
+          icono: Feather,
+          mensaje: formatear(t.ligeroIa, { titulo: tarjeta.titulo }),
+          principal: { label: t.proponerLigero, onPress: onAceptar },
+          secundario: { label: t.seguirComoEsta, onPress: onCerrar },
+        };
       case 'apoyo':
         return {
           icono: HeartHandshake,

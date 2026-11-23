@@ -239,7 +239,12 @@ export class IaServicio {
   async proponerPasoLigero(usuarioId: string, habitId: string): Promise<PropuestaPasoLigero> {
     const habito = await this.prisma.habits.findFirst({
       where: { id: habitId, user_id: usuarioId, archivado_en: null },
-      select: { titulo: true, paso_actual: true, micro_pasos: { orderBy: { orden: 'asc' } } },
+      select: {
+        titulo: true,
+        duracion_min: true,
+        paso_actual: true,
+        micro_pasos: { orderBy: { orden: 'asc' } },
+      },
     });
     if (!habito) {
       throw new ErrorConCodigo(
@@ -256,7 +261,11 @@ export class IaServicio {
       duracion_reducida_min: paso.duracion_reducida_min,
       dias_semana: paso.dias_semana,
     }));
-    const actual = pasos.find((paso) => paso.orden === (habito.paso_actual ?? 1)) ?? pasos[0];
+    const delPaso = pasos.find((paso) => paso.orden === (habito.paso_actual ?? 1)) ?? pasos[0];
+    // Se aligera lo que hace hoy (puede ser ya su versión reducida), no el paso completo.
+    const actual = delPaso
+      ? { ...delPaso, titulo: habito.titulo, duracion_min: habito.duracion_min }
+      : undefined;
     if (!actual) {
       throw new ErrorConCodigo(
         HttpStatus.CONFLICT,

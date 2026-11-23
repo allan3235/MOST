@@ -855,6 +855,10 @@ export const es = {
     masAdelante: 'Más adelante',
     irAPerfil: 'Ir a Perfil',
     entendido: 'Entendido',
+    ligeroIa:
+      'Esta semana «{titulo}» costó un poco, y está bien. ¿Te propongo una versión aún más ligera?',
+    proponerLigero: 'Sí, propónmela',
+    sinConexionIa: 'Necesitas conexión para que te propongamos una versión más ligera.',
     probarPaso: 'Probar este paso',
     seguirComoEsta: 'Seguir como está',
     contador: '{n} de {total}',

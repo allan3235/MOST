@@ -122,6 +122,17 @@ export type Tarjeta =
       despues: ValoresNivel;
     }
   | { id: string; tipo: 'apoyo'; habitId: string; titulo: string }
+  | {
+      /**
+       * La secuencia ya no tiene un paso más ligero, pero todavía cabe uno sin pasar del candado
+       * mínimo: se ofrece pedírselo a la IA (modelo pequeño, /ia/paso-ligero).
+       */
+      id: string;
+      tipo: 'ligero_ia';
+      habitId: string;
+      titulo: string;
+      antes: ValoresNivel;
+    }
   | { id: string; tipo: 'nuevo'; habito: HabitoPlan }
   | { id: string; tipo: 'sin_espacio' };
 
@@ -385,6 +396,17 @@ export function pasoHaciaAbajo(
   return valoresDeNivel(catalogo, respuestas, habito.objetivo, 1, true, hoy);
 }
 
+/**
+ * Todavía cabe una versión más ligera sin pasar del candado mínimo (RR-03): más de 1 minuto o, si
+ * no tiene duración, más de 1 día por semana.
+ * @param duracion Minutos actuales.
+ * @param diasPorSemana Días actuales.
+ * @returns true si se puede aligerar.
+ */
+export function puedeAligerarse(duracion: number, diasPorSemana: number): boolean {
+  return duracion > META_MINIMA || (duracion === 0 && diasPorSemana > META_MINIMA);
+}
+
 /** Las tarjetas de una revisión, en el orden de los hábitos. */
 export function decidir(entrada: EntradaProgresion): Tarjeta[] {
   const { hoy, habitos, horarios, ocurrencias, config, presupuestoMin } = entrada;
@@ -449,7 +471,21 @@ export function decidir(entrada: EntradaProgresion): Tarjeta[] {
               antes: valoresActuales(habito, horario),
               despues,
             }
-          : { id: `apoyo-${habito.id}`, tipo: 'apoyo', habitId: habito.id, titulo: habito.titulo },
+          : pasosDe(entrada.microPasos, habito.id).length > 0 &&
+              puedeAligerarse(habito.duracion_min, horario.dias_semana.length)
+            ? {
+                id: `ligero_ia-${habito.id}`,
+                tipo: 'ligero_ia',
+                habitId: habito.id,
+                titulo: habito.titulo,
+                antes: valoresActuales(habito, horario),
+              }
+            : {
+                id: `apoyo-${habito.id}`,
+                tipo: 'apoyo',
+                habitId: habito.id,
+                titulo: habito.titulo,
+              },
       );
     }
   }
