@@ -116,13 +116,16 @@ Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las m
 - [ ] Probar con Claude de verdad: poner `ANTHROPIC_API_KEY` en `backend/.env` (lo hace Allan; cada plan cuesta centavos).
 
 ### Fase 2: Conectar la app con NestJS
-- [ ] Cambiar `lib/supabase.ts` por un cliente HTTP (`lib/api.ts`) con el token en SecureStore.
-- [ ] Ajustar `sync-engine.ts` y los 5 repositorios que hoy llaman a Supabase.
-- [ ] Simplificar las pantallas de auth (quitar confirmación de correo y recuperación por código del MVP).
-- [ ] El onboarding pide el borrador a `POST /ia/plan` y muestra la revisión; sin conexión: «Necesitas conexión para crear tu plan».
-- [ ] Modelo local de micro-pasos: un hábito guarda su secuencia completa y el paso actual (hoy guarda solo el nivel).
-- [ ] Borrar `supabase/`.
-- [ ] Probar en Expo Go: registro → encuesta → plan generado por la IA → marcar → planta y monedas.
+- [x] Paquete `compartido/` (`@most/compartido`): esquemas de la encuesta y del plan y motor del plan, que usan la app y el backend. `/ia/plan` devuelve el borrador completo de la app más los micro-pasos.
+- [x] Cliente HTTP (`lib/clienteApi.ts`) y sesión con el token en SecureStore (`lib/sesionGuardada.ts`); se quitó `@supabase/supabase-js`.
+- [x] `sync-engine.ts` y los 5 repositorios hablan con `/sync`, `/ia` y `/tienda`. El plan confirmado se guarda en un solo `/sync/lote`.
+- [x] Pantallas de cuenta simplificadas: crear cuenta entra de una vez; sin confirmación de correo ni recuperación de contraseña (fuera del MVP).
+- [x] Tabla local `micro_pasos` y `habits.paso_actual` (SQLite versión 8, base `most.db`).
+- [x] Nombre técnico: scheme `most`, paquete Android `com.most.app`, claves locales `most-*`. El slug y el proyecto de EAS siguen ligados a la cuenta Expo `nueve_36`: se decide en la Fase 6.
+- [x] Token de 60 días, igual que el límite sin conexión de la app.
+- [x] Verificado sin teléfono: 359 pruebas de la app, 30 unitarias y 19 e2e del backend, Metro empaqueta y un script repitió el flujo de la app contra el backend real.
+- [ ] **Probar en Expo Go (Allan):** registro → encuesta → plan → «Empezar» → marcar → planta y monedas.
+- [ ] Mostrar la secuencia de micro-pasos en la revisión del plan y en el detalle del hábito (va con RF-03 en la Fase 3).
 
 ### Fase 3: Alinear los flujos existentes con el SRS
 - [ ] Umbrales de reajuste: < 40 % en 7 días (RF-15), con constantes con nombre.

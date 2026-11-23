@@ -26,7 +26,8 @@ const esquemaConfiguracion = z.object({
   JWT_SECRETO: z
     .string()
     .min(LARGO_MINIMO_SECRETO, `JWT_SECRETO debe tener ${LARGO_MINIMO_SECRETO} caracteres o más`),
-  JWT_EXPIRA: z.string().default('30d'),
+  /** Igual que el límite de 60 días sin conexión de la app (sesion-caducada.ts). */
+  JWT_EXPIRA: z.string().default('60d'),
   PUERTO: z.coerce.number().int().positive().default(PUERTO_POR_DEFECTO),
   /** Modelo para crear planes y descomponer metas (trabajo creativo). */
   IA_MODELO_GRANDE: z.string().default('claude-opus-5-5'),
