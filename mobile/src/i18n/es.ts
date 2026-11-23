@@ -10,6 +10,8 @@ export const es = {
   },
   avisos: {
     canal: 'Recordatorios de hábitos',
+    // RI-04: botón en el aviso de un hábito.
+    accionCompletar: 'Hecho ✓',
     // RF-13: aviso a los 3, 6, 9… días seguidos. Solo suma; nunca habla de perder nada.
     motivacionTitulo: '{n} días seguidos dando pasos 🌱',
     motivacionCuerpo: [

@@ -145,7 +145,7 @@ Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las m
 - [x] RF-13 Aviso motivacional a los 3 días seguidos: al marcar un paso, si se llega a 3, 6, 9… días seguidos con algo hecho, llega al momento una notificación de ánimo que abre Progreso; máximo una al día (tabla local `avisos_motivacionales`), nada con el estilo «Lo mínimo». Abrir Progreso desde el aviso queda por confirmar en build de desarrollo (Expo Go abre su inicio).
 - [x] RF-16 Hitos al 50 % y 80 %: decisión del equipo, se miden sobre la meta del micro-paso en curso (10 veces desde que empezó el paso). A los 5 y 8 de 10 sale una celebración con barra, vibración y sonido opcional (Perfil → Avisos y horas → Logros); una sola vez por paso. El detalle del plan muestra «5 de 10 hacia el siguiente paso».
 - [x] RF-04 Introspección por valores (solo local): 3 preguntas por valores con escala 1–5 (se puede saltar cualquiera), sin lenguaje clínico. Tarjeta «Un momento para ti» en Hoy cada 7 días (si no hay otra tarjeta) y al pausar un hábito (UC-11). Respuestas en la tabla local `introspecciones`, nunca se sincronizan (RR-04).
-- [ ] RI-04 «Completado» desde la notificación.
+- [x] RI-04 «Completado» desde la notificación: los avisos de un hábito traen el botón «Hecho ✓» (categoría `habito`); al tocarlo abre la app, marca el hábito con su recompensa y muestra Hoy. Visto el botón en el emulador; el toque llega a la app solo en build de desarrollo (Expo Go no lo entrega).
 - [ ] RF-02 Agenda sin traslapes (cuando se defina cómo se registra).
 - [ ] RF-14 Modo enfoque.
 

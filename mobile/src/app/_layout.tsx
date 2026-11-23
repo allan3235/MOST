@@ -18,7 +18,8 @@ import { SessionProvider } from '@/features/auth/session-provider';
 import type { AppZone } from '@/features/auth/domain/session-route';
 import { useAppZone } from '@/features/auth/use-app-zone';
 import { prepararAvisos } from '@/features/reminders/avisos';
-import { useAbrirDesdeAviso } from '@/features/reminders/use-abrir-desde-aviso';
+import { useRespuestaAviso } from '@/features/reminders/use-respuesta-aviso';
+import { useSession } from '@/features/auth/session-context';
 
 SplashScreen.preventAutoHideAsync().catch(() => {
   // En recargas rápidas la pantalla de carga ya puede estar oculta.
@@ -35,8 +36,9 @@ export default function RootLayout() {
   const fontsReady = fontsLoaded || fontError !== null;
 
   useEffect(() => {
-    prepararAvisos().catch(() => {
-      // Sin canal la app funciona igual; solo no llegarían los avisos.
+    prepararAvisos().catch((causa: unknown) => {
+      // Sin canal la app funciona igual; solo no llegarían los avisos (o no tendrían «Hecho»).
+      console.warn('No se pudieron preparar los avisos', causa);
     });
   }, []);
 
@@ -60,8 +62,9 @@ function RootNavigator() {
   const [ultimaZona, setUltimaZona] = useState<ZonaVisible | null>(null);
   if (zonaActual !== 'loading' && zonaActual !== ultimaZona) setUltimaZona(zonaActual);
   const zone = zonaActual === 'loading' ? ultimaZona : zonaActual;
-  // RF-13: tocar el aviso motivacional abre Progreso.
-  useAbrirDesdeAviso(zone === 'tabs');
+  // RI-04 «Hecho» desde el aviso de un hábito y RF-13 abrir Progreso desde el aviso motivacional.
+  const { session } = useSession();
+  useRespuestaAviso(session?.user.id ?? null, zone === 'tabs');
 
   useEffect(() => {
     if (zone !== null) {

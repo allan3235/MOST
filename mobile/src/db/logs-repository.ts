@@ -211,3 +211,35 @@ export async function deshacerHabito(
   avisarCambioLocal();
   pedirSincronizacion();
 }
+
+/** Resultado de «Hecho» en un aviso (RI-04). */
+export type ResultadoDesdeAviso = 'hecho' | 'ya_estaba' | 'otro_dia' | 'sin_habito';
+
+/**
+ * «Hecho» desde la notificación de un hábito (RI-04): lo marca igual que en Hoy (recompensas y
+ * cola incluidas). Un aviso de otro día no marca nada: solo se puede marcar el día de hoy.
+ * @param userId Usuario con sesión.
+ * @param habitId Hábito del aviso.
+ * @param fechaAviso Fecha "YYYY-MM-DD" para la que era el aviso.
+ * @returns Qué pasó.
+ */
+export async function completarDesdeAviso(
+  userId: string,
+  habitId: string,
+  fechaAviso: string,
+): Promise<ResultadoDesdeAviso> {
+  const hoy = fechaLocal();
+  if (fechaAviso !== hoy) {
+    return 'otro_dia';
+  }
+  const db = await getDb();
+  const habito = await db.getFirstAsync<{ id: string; category_id: string }>(
+    'SELECT id, category_id FROM habits WHERE id = ? AND user_id = ? AND archivado_en IS NULL',
+    [habitId, userId],
+  );
+  if (!habito) {
+    return 'sin_habito';
+  }
+  const resultado = await completarHabito(userId, habito, hoy);
+  return resultado === null ? 'ya_estaba' : 'hecho';
+}

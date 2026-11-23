@@ -5,12 +5,14 @@ import {
   requestPermissionsAsync,
   SchedulableTriggerInputTypes,
   scheduleNotificationAsync,
+  setNotificationCategoryAsync,
   setNotificationChannelAsync,
   setNotificationHandler,
 } from 'expo-notifications';
 
 import { leerDatosAvisos, revisarAvisoMotivacional } from '@/db/reminders-repository';
 import { es, formatear } from '@/i18n/es';
+import { fechaLocal } from '@/lib/dates';
 import { colors } from '@/theme';
 
 import { DIAS_PARA_AVISO } from './domain/aviso-motivacional';
@@ -23,6 +25,11 @@ import { planificarAvisos, type AvisoPlaneado } from './domain/planificar-avisos
 
 export const CANAL_RECORDATORIOS = 'recordatorios';
 
+/** Categoría de los avisos de un hábito: llevan el botón «Hecho» (RI-04). */
+export const CATEGORIA_HABITO = 'habito';
+/** Acción del botón «Hecho». */
+export const ACCION_COMPLETAR = 'completar';
+
 /** Se llama al abrir la app: sin un canal creado, Android 13 no muestra la pregunta del permiso. */
 export async function prepararAvisos(): Promise<void> {
   setNotificationHandler({
@@ -34,12 +41,29 @@ export async function prepararAvisos(): Promise<void> {
       shouldSetBadge: false,
     }),
   });
-  await setNotificationChannelAsync(CANAL_RECORDATORIOS, {
-    name: es.avisos.canal,
-    // Android no deja cambiarla una vez creado el canal.
-    importance: AndroidImportance.DEFAULT,
-    lightColor: colors.accent,
-  });
+  // El canal y la categoría van por separado: si uno falla (en Expo Go crear el canal puede
+  // rechazarse), el otro igual se registra.
+  const resultados = await Promise.allSettled([
+    setNotificationChannelAsync(CANAL_RECORDATORIOS, {
+      name: es.avisos.canal,
+      // Android no deja cambiarla una vez creado el canal.
+      importance: AndroidImportance.DEFAULT,
+      lightColor: colors.accent,
+    }),
+    // RI-04: «Hecho» abre la app y marca el hábito. Abrirla es lo que asegura que la respuesta
+    // llegue aunque la app estuviera cerrada, y así se ve la recompensa al momento.
+    setNotificationCategoryAsync(CATEGORIA_HABITO, [
+      {
+        identifier: ACCION_COMPLETAR,
+        buttonTitle: es.avisos.accionCompletar,
+        options: { opensAppToForeground: true },
+      },
+    ]),
+  ]);
+  const fallo = resultados.find((r): r is PromiseRejectedResult => r.status === 'rejected');
+  if (fallo) {
+    throw fallo.reason;
+  }
 }
 
 /** Si el permiso está dado y, si no, qué se puede hacer (preguntar o mandar a Ajustes). */
@@ -79,7 +103,13 @@ async function programar(userId: string): Promise<void> {
   for (const aviso of avisos) {
     await scheduleNotificationAsync({
       identifier: aviso.id,
-      content: { title: aviso.titulo, body: aviso.cuerpo, data: { habitId: aviso.habitId } },
+      content: {
+        title: aviso.titulo,
+        body: aviso.cuerpo,
+        data: { habitId: aviso.habitId, fecha: fechaLocal(aviso.fecha) },
+        // Solo los avisos de un hábito llevan «Hecho»; el resumen y el apoyo no.
+        ...(aviso.habitId ? { categoryIdentifier: CATEGORIA_HABITO } : {}),
+      },
       trigger: {
         type: SchedulableTriggerInputTypes.DATE,
         date: aviso.fecha,
