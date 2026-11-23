@@ -5,33 +5,31 @@
  *   de la base crea el perfil, el monedero y las 5 plantas del usuario.
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-22
- * @version 1.0.0
- * @historial 1.0.0 (2026-11-22): creación.
+ * @version 1.1.0
+ * @historial 1.0.0 (2026-11-22): creación. 1.1.0 (2026-11-23): consultas con Prisma.
  */
 
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { BaseDatosServicio } from '../baseDatos/baseDatosServicio.js';
+import { PrismaServicio } from '../baseDatos/prismaServicio.js';
+import { Prisma } from '../generated/prisma/client.js';
 import { crearHashContrasena, esContrasenaCorrecta } from './contrasena.js';
 import type { Credenciales, RespuestaSesion, UsuarioSesion } from './esquemasAuth.js';
 
-// ===== Tipos =====
-
-type FilaUsuario = UsuarioSesion & { hash_contrasena: string };
-
 // ===== Constantes =====
 
-/** Código de PostgreSQL para "valor duplicado" en un índice único. */
-const CODIGO_DUPLICADO = '23505';
+/** Código de Prisma para "valor duplicado" en un campo único. */
+const CODIGO_DUPLICADO = 'P2002';
 const MENSAJE_CREDENCIALES = 'Correo o contraseña incorrectos';
+const CAMPOS_SESION = { id: true, correo: true } as const;
 
 // ===== Principal =====
 
 @Injectable()
 export class AuthServicio {
   constructor(
-    private readonly baseDatos: BaseDatosServicio,
+    private readonly prisma: PrismaServicio,
     private readonly jwt: JwtService,
   ) {}
 
@@ -43,13 +41,15 @@ export class AuthServicio {
   async registrar(credenciales: Credenciales): Promise<RespuestaSesion> {
     const hash = await crearHashContrasena(credenciales.contrasena);
     try {
-      const [usuario] = await this.baseDatos.consultar<UsuarioSesion>(
-        'insert into auth.usuarios (correo, hash_contrasena) values ($1, $2) returning id, correo',
-        [credenciales.correo, hash],
-      );
+      const usuario = await this.prisma.usuarios.create({
+        data: { correo: credenciales.correo, hash_contrasena: hash },
+        select: CAMPOS_SESION,
+      });
       return this.crearSesion(usuario);
     } catch (error) {
-      if ((error as { code?: string }).code === CODIGO_DUPLICADO) {
+      const esDuplicado =
+        error instanceof Prisma.PrismaClientKnownRequestError && error.code === CODIGO_DUPLICADO;
+      if (esDuplicado) {
         throw new ConflictException('Ese correo ya tiene una cuenta. Inicia sesión.');
       }
       throw error;
@@ -63,17 +63,17 @@ export class AuthServicio {
    * @returns Token de sesión y datos del usuario.
    */
   async iniciarSesion(credenciales: Credenciales): Promise<RespuestaSesion> {
-    const [fila] = await this.baseDatos.consultar<FilaUsuario>(
-      'select id, correo, hash_contrasena from auth.usuarios where correo = $1',
-      [credenciales.correo],
-    );
+    const usuario = await this.prisma.usuarios.findUnique({
+      where: { correo: credenciales.correo },
+      select: { ...CAMPOS_SESION, hash_contrasena: true },
+    });
     const esValida =
-      fila !== undefined &&
-      (await esContrasenaCorrecta(credenciales.contrasena, fila.hash_contrasena));
+      usuario !== null &&
+      (await esContrasenaCorrecta(credenciales.contrasena, usuario.hash_contrasena));
     if (!esValida) {
       throw new UnauthorizedException(MENSAJE_CREDENCIALES);
     }
-    return this.crearSesion({ id: fila.id, correo: fila.correo });
+    return this.crearSesion({ id: usuario.id, correo: usuario.correo });
   }
 
   /**

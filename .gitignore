@@ -68,3 +68,6 @@ yarn-error.*
 **/.impeccable/live/deferred-svelte-component-accepts.json
 **/.impeccable/live/*.png
 # impeccable-ignore-end
+
+# Cliente de Prisma: se genera con "prisma generate" (lo corre pnpm install)
+backend/src/generated/

@@ -9,3 +9,5 @@ nodeLinker: hoisted
 # pnpm bloquea los scripts de instalación de las dependencias; aquí van los aprobados.
 allowBuilds:
   '@parcel/watcher': true
+  '@prisma/engines': true
+  prisma: true

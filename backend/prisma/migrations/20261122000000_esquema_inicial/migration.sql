@@ -6,7 +6,7 @@
 --   - Esquema auth con la tabla de usuarios (auth.usuarios) y auth.uid(), que devuelve el usuario
 --     de la petición (el backend lo fija con set_config('app.usuario_id', ...)).
 
-set local check_function_bodies = false;
+set check_function_bodies = false;
 
 do $$ begin create role anon nologin; exception when duplicate_object then null; end $$;
 do $$ begin create role authenticated nologin; exception when duplicate_object then null; end $$;

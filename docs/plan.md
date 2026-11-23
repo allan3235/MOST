@@ -53,7 +53,7 @@ Decisiones del 22-nov:
 ```
 MOST/
   mobile/       # app Expo
-  backend/      # API NestJS + PostgreSQL (Docker) con migraciones SQL
+  backend/      # API NestJS + PostgreSQL (Docker) + Prisma 7
   compartido/   # tipos y esquemas Zod que usan mobile y backend (se crea en la Fase 1)
   docs/         # MOST_CONTEXTO.md (requisitos) y este plan
   legado/       # documentos y supabase/ de Habit Green, solo como referencia
@@ -98,10 +98,10 @@ Gestor: **pnpm** con workspaces (`node-linker=hoisted` para que Expo funcione).
 - [x] Nuevo `CLAUDE.md`; `AGENTS.md` con comandos de pnpm.
 
 ### Fase 1: Backend NestJS mínimo (sin esto la app no inicia sesión)
-Decisión técnica (22-nov): **`pg` + migraciones SQL en lugar de Prisma.** El esquema de Habit Green ya trae en SQL sus reglas de monedas y XP (`complete_habit`, `uncomplete_habit`…), sus disparadores y 34 políticas RLS. Se conservan tal cual: en cada petición, NestJS abre una transacción con el rol `authenticated` y el id del usuario (`BaseDatosServicio.comoUsuario`), y Postgres aplica las mismas reglas que ya funcionaban. Prisma no maneja funciones ni políticas, y su versión «latest» era una candidata (8.0.0-rc).
+Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las migraciones y el historial, conservando el SQL que ya funcionaba.** `prisma/schema.prisma` es el mapa de la base (generado con `prisma db pull`) y `prisma/migrations` el historial. Las reglas de monedas y XP (`complete_habit`, `uncomplete_habit`…), los disparadores y las 34 políticas RLS siguen como SQL dentro de la migración inicial: Prisma no los dibuja en el mapa, pero los aplica. Las consultas normales usan el cliente de Prisma con tipos (`PrismaServicio`). La sincronización genérica usa `pg` (`BaseDatosServicio.comoUsuario`) porque arma SQL dinámico y necesita las marcas de tiempo con microsegundos. En cada petición abre una transacción con el rol `authenticated` y el id del usuario, para que Postgres aplique las mismas reglas RLS que con Supabase. (El 22-nov se usó `pg` + SQL sin Prisma; se cambió a petición de Allan para tener mapa, historial y tipos.)
 
-- [x] PostgreSQL en Docker (`backend/docker-compose.yml`, puerto 5433) y migraciones SQL (`backend/db/migraciones`, `pnpm db:migrar`). Las 16 migraciones de Supabase quedaron consolidadas en `0001_esquema.sql`.
-- [x] Datos de referencia: categorías, catálogo de micro-pasos, accesorios y configuración (`0002_datos_referencia.sql`).
+- [x] PostgreSQL en Docker (`backend/docker-compose.yml`, puerto 5433) y Prisma Migrate (`pnpm db:migrar`). Las 16 migraciones de Supabase quedaron consolidadas en `prisma/migrations/20261122000000_esquema_inicial`.
+- [x] Datos de referencia: categorías, catálogo de micro-pasos, accesorios y configuración (`20261122000001_datos_referencia`).
 - [x] Módulo **auth**: registro, login y `GET /auth/yo`; JWT y contraseña con scrypt. Pruebas unitarias y de punta a punta (incluyen que RLS impide darse monedas).
 - [x] Módulo **sync**: `POST /sync/operacion` (upsert, update, complete, uncomplete, archive), `POST /sync/lote` (atómico, para guardar un plan), `GET /sync/cambios` (descarga por cursor) y `POST /sync/fila`. Hábitos, horarios, ajustes y planes se escriben por aquí, protegidos por RLS. Las recompensas usan las funciones SQL de siempre.
 - [x] `POST /tienda/comprar`.

@@ -5,13 +5,13 @@
  *   desde el navegador del teléfono que llega a la computadora.
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-22
- * @version 1.0.0
- * @historial 1.0.0 (2026-11-22): creación.
+ * @version 1.1.0
+ * @historial 1.0.0 (2026-11-22): creación. 1.1.0 (2026-11-23): con Prisma.
  */
 
 import { Controller, Get } from '@nestjs/common';
 
-import { BaseDatosServicio } from '../baseDatos/baseDatosServicio.js';
+import { PrismaServicio } from '../baseDatos/prismaServicio.js';
 
 // ===== Tipos =====
 
@@ -21,7 +21,7 @@ type EstadoSalud = { estado: 'ok'; baseDatos: boolean };
 
 @Controller('salud')
 export class SaludControlador {
-  constructor(private readonly baseDatos: BaseDatosServicio) {}
+  constructor(private readonly prisma: PrismaServicio) {}
 
   /**
    * Responde el estado del servidor.
@@ -30,7 +30,7 @@ export class SaludControlador {
   @Get()
   async revisar(): Promise<EstadoSalud> {
     try {
-      await this.baseDatos.consultar('select 1');
+      await this.prisma.$queryRaw`select 1`;
       return { estado: 'ok', baseDatos: true };
     } catch {
       return { estado: 'ok', baseDatos: false };

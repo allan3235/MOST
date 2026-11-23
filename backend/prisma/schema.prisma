@@ -1,0 +1,372 @@
+// Mapa de la base de most. Las funciones SQL (recompensas), los disparadores, las restricciones
+// CHECK y las políticas RLS no se dibujan aquí: viven en el SQL de prisma/migrations.
+// Cómo cambiar la base: edita este archivo → pnpm db:nueva-migracion --name <nombre> → revisa y
+// completa el SQL generado → pnpm db:migrar. (Si "prisma db pull" reescribe el archivo, vuelve a
+// poner este comentario.)
+
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["partialIndexes"]
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["auth", "public"]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model usuarios {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  correo          String       @unique
+  hash_contrasena String
+  created_at      DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime     @default(now()) @db.Timestamptz(6)
+  categories      categories[]
+  profiles        profiles?
+
+  @@schema("auth")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model accessories {
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tipo             String
+  nombre           String
+  precio           Int
+  orden            Int                @db.SmallInt
+  imagen           String
+  created_at       DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime           @default(now()) @db.Timestamptz(6)
+  user_accessories user_accessories[]
+
+  @@unique([tipo, orden])
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model ai_requests {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id   String   @db.Uuid
+  funcion   String
+  estado    String
+  tokens    Int?
+  creado_en DateTime @default(now()) @db.Timestamptz(6)
+  profiles  profiles @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id, creado_en], map: "ai_requests_user_idx")
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model app_config {
+  clave      String   @id
+  valor      Json
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model categories {
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clave          String           @unique(map: "categories_clave_sistema_idx", where: raw("(user_id IS NULL)"))
+  nombre         String
+  es_sistema     Boolean          @default(false)
+  user_id        String?          @db.Uuid
+  created_at     DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime         @default(now()) @db.Timestamptz(6)
+  usuarios       usuarios?        @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  habit_logs     habit_logs[]
+  habits         habits[]
+  plant_progress plant_progress[]
+
+  @@unique([user_id, clave], map: "categories_clave_usuario_idx", where: raw("(user_id IS NOT NULL)"))
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model coin_transactions {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id   String   @db.Uuid
+  monto     Int
+  motivo    String
+  ref_id    String?  @db.Uuid
+  creado_en DateTime @default(now()) @db.Timestamptz(6)
+  profiles  profiles @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id, creado_en], map: "coin_transactions_user_idx")
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model habit_catalog {
+  id                    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  objetivo              String
+  categoria             String
+  nivel                 Int      @db.SmallInt
+  variante              String   @default("base")
+  titulo                String
+  descripcion           String?
+  duracion_min          Int
+  duracion_reducida_min Int
+  dias_semana           Int[]    @db.SmallInt
+  momento_fijo          String?
+  sin_recursos          Boolean  @default(true)
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([objetivo, nivel, variante])
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model habit_logs {
+  id                   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  habit_id             String     @db.Uuid
+  user_id              String     @db.Uuid
+  category_id          String     @db.Uuid
+  fecha                DateTime   @db.Date
+  estado               String     @default("hecho")
+  completado_en        DateTime   @default(now()) @db.Timestamptz(6)
+  xp_otorgado          Boolean    @default(false)
+  monedas_otorgadas    Boolean    @default(false)
+  created_at           DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime   @default(now()) @db.Timestamptz(6)
+  eliminado_en         DateTime?  @db.Timestamptz(6)
+  monedas_sin_devolver Boolean    @default(false)
+  categories           categories @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  habits               habits     @relation(fields: [habit_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profiles             profiles   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([habit_id, fecha])
+  @@index([user_id, fecha], map: "habit_logs_user_fecha_idx")
+  @@index([user_id, updated_at], map: "habit_logs_user_updated_idx")
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model habit_occurrences {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  habit_id       String    @db.Uuid
+  user_id        String    @db.Uuid
+  fecha_original DateTime  @db.Date
+  fecha_nueva    DateTime? @db.Date
+  estado         String
+  creado_en      DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime  @default(now()) @db.Timestamptz(6)
+  habits         habits    @relation(fields: [habit_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profiles       profiles  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([habit_id, fecha_original])
+  @@index([user_id, updated_at], map: "habit_occurrences_user_updated_idx")
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model habit_places {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  habit_id     String    @db.Uuid
+  user_id      String    @db.Uuid
+  nombre       String
+  lat          Float
+  lng          Float
+  radio_m      Int
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime  @default(now()) @db.Timestamptz(6)
+  eliminado_en DateTime? @db.Timestamptz(6)
+  habits       habits    @relation(fields: [habit_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profiles     profiles  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([habit_id], map: "habit_places_habit_idx")
+  @@index([user_id, updated_at], map: "habit_places_user_updated_idx")
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model habit_schedules {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  habit_id      String    @db.Uuid
+  user_id       String    @db.Uuid
+  dias_semana   Int[]     @db.SmallInt
+  hora          DateTime? @db.Time(6)
+  flexible      Boolean   @default(false)
+  notificar     Boolean   @default(true)
+  vigente_desde DateTime  @db.Date
+  vigente_hasta DateTime? @db.Date
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime  @default(now()) @db.Timestamptz(6)
+  habits        habits    @relation(fields: [habit_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profiles      profiles  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([habit_id], map: "habit_schedules_habit_idx")
+  @@index([user_id, updated_at], map: "habit_schedules_user_updated_idx")
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model habits {
+  id                    String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id               String              @db.Uuid
+  category_id           String              @db.Uuid
+  plan_id               String?             @db.Uuid
+  objetivo              String?
+  nivel                 Int?                @db.SmallInt
+  usa_duracion_reducida Boolean             @default(false)
+  titulo                String
+  descripcion           String?
+  duracion_min          Int
+  activo                Boolean             @default(true)
+  archivado_en          DateTime?           @db.Timestamptz(6)
+  created_at            DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime            @default(now()) @db.Timestamptz(6)
+  nivel_desde           DateTime?           @db.Date
+  habit_logs            habit_logs[]
+  habit_occurrences     habit_occurrences[]
+  habit_places          habit_places[]
+  habit_schedules       habit_schedules[]
+  categories            categories          @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  plans                 plans?              @relation(fields: [plan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profiles              profiles            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id], map: "habits_user_idx")
+  @@index([user_id, updated_at], map: "habits_user_updated_idx")
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model onboarding_answers {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id            String   @unique @db.Uuid
+  respuestas         Json
+  version_formulario Int
+  created_at         DateTime @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime @default(now()) @db.Timestamptz(6)
+  profiles           profiles @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model plans {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id             String    @db.Uuid
+  origen              String
+  json_plan           Json
+  activo              Boolean   @default(true)
+  creado_en           DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime  @default(now()) @db.Timestamptz(6)
+  area                String?
+  respuestas          Json?
+  ultima_evaluacion   DateTime? @db.Date
+  limite_desbloqueado Boolean   @default(false)
+  habits              habits[]
+  profiles            profiles  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([user_id, area], map: "plans_un_plan_por_area", where: raw("(activo AND (area IS NOT NULL))"))
+  @@index([user_id], map: "plans_user_idx")
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model plant_progress {
+  user_id     String     @db.Uuid
+  category_id String     @db.Uuid
+  xp          Int        @default(0)
+  nivel       Int        @default(0) @db.SmallInt
+  fase        Int        @default(1) @db.SmallInt
+  created_at  DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime   @default(now()) @db.Timestamptz(6)
+  categories  categories @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profiles    profiles   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([user_id, category_id])
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model profiles {
+  id                  String              @id @db.Uuid
+  nombre              String?
+  zona_horaria        String              @default("UTC")
+  modo                String?
+  onboarding_completo Boolean             @default(false)
+  created_at          DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime            @default(now()) @db.Timestamptz(6)
+  ai_requests         ai_requests[]
+  coin_transactions   coin_transactions[]
+  habit_logs          habit_logs[]
+  habit_occurrences   habit_occurrences[]
+  habit_places        habit_places[]
+  habit_schedules     habit_schedules[]
+  habits              habits[]
+  onboarding_answers  onboarding_answers?
+  plans               plans[]
+  plant_progress      plant_progress[]
+  usuarios            usuarios            @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user_accessories    user_accessories[]
+  user_settings       user_settings?
+  wallets             wallets?
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model user_accessories {
+  id                   String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id              String      @db.Uuid
+  accessory_id         String      @db.Uuid
+  created_at           DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime    @default(now()) @db.Timestamptz(6)
+  eliminado_en         DateTime?   @db.Timestamptz(6)
+  categorias_equipadas String[]    @default([]) @db.Uuid
+  accessories          accessories @relation(fields: [accessory_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profiles             profiles    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([user_id, accessory_id])
+  @@index([user_id, updated_at], map: "user_accessories_user_updated_idx")
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model user_settings {
+  user_id                  String    @id @db.Uuid
+  presupuesto_min          Int
+  estilo_notificaciones    String
+  estrategias              String[]  @default([])
+  horas_por_momento        Json?
+  segundo_aviso            Boolean   @default(false)
+  ultima_evaluacion        DateTime? @db.Date
+  limite_plan_desbloqueado Boolean   @default(false)
+  created_at               DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime  @default(now()) @db.Timestamptz(6)
+  subidas_plan             Int       @default(0)
+  profiles                 profiles  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model wallets {
+  user_id    String   @id @db.Uuid
+  saldo      Int      @default(0)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  profiles   profiles @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
+}
