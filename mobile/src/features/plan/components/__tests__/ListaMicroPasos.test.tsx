@@ -47,6 +47,14 @@ describe('ListaMicroPasos', () => {
     expect(screen.getByText('Paso 1 · 2 min · Vas aquí, versión ligera')).toBeTruthy();
   });
 
+  it('RF-16: el paso en curso muestra cuántas veces lleva de 10', async () => {
+    await render(<ListaMicroPasos pasos={PASOS} pasoActual={2} avance={{ hechos: 5, meta: 10 }} />);
+    expect(screen.getByText('5 de 10 hacia el siguiente paso')).toBeTruthy();
+    expect(
+      screen.getByLabelText('Paso 2 de 3: Leer 10 min. Vas aquí, 5 de 10 hacia el siguiente paso.'),
+    ).toBeTruthy();
+  });
+
   it('sin secuencia no muestra nada', async () => {
     await render(<ListaMicroPasos pasos={[]} pasoActual={null} />);
     expect(screen.queryByText('Tus micro-pasos')).toBeNull();

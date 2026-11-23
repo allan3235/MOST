@@ -30,7 +30,8 @@ const NOMBRE = 'most.db';
 // 10: user_settings.resumen_nocturno (interruptor propio, RF-18).
 // 11: habit_occurrences.barrera (lista de barreras, RF-17 + RF-19).
 // 12: tabla propia avisos_motivacionales (máximo un aviso al día, RF-13).
-const ESQUEMA_VERSION = 12;
+// 13: tablas propias hitos_celebrados y preferencias_locales (hitos 50/80 %, RF-16).
+const ESQUEMA_VERSION = 13;
 
 let abierta: Promise<SQLite.SQLiteDatabase> | null = null;
 

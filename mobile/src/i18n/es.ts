@@ -785,6 +785,17 @@ export const es = {
     errorGuardar: 'No pudimos guardar el cambio. Inténtalo de nuevo.',
   },
   // Reprogramación (SDD 6.2): tarjeta arriba de la lista de Hoy. Tono neutro, sin culpa.
+  // Hitos del micro-paso (RF-16): 5 y 8 de 10. Solo celebran.
+  hitos: {
+    titulo: { 50: '¡Vas a la mitad de este paso!', 80: '¡Ya casi dominas este paso!' },
+    cuerpo: 'Cada vez que haces «{habito}» se vuelve más tuyo.',
+    contador: '{n} de {meta} hacia el siguiente paso',
+    a11y: '{n} de {meta} veces hacia el siguiente paso',
+    genial: '¡Genial!',
+    seccion: 'Logros',
+    sonido: 'Sonido en los logros',
+    sonidoAyuda: 'Un sonido corto al llegar a la mitad y casi al final de cada paso.',
+  },
   reprogramar: {
     propuesta: 'Movimos «{habito}» {destino}. Puedes cambiarlo.',
     sinDia: 'Esta semana está completa para «{habito}». La dejamos para la próxima.',

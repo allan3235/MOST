@@ -18,6 +18,7 @@ import { useCheckIn } from '@/features/habits/use-check-in';
 import { CoinBalance } from '@/features/rewards/components/coin-balance';
 import { CoinBurst } from '@/features/rewards/components/coin-burst';
 import { PhaseCelebration } from '@/features/rewards/components/phase-celebration';
+import { CelebracionHito } from '@/features/progression/components/CelebracionHito';
 import { ProgressionCard } from '@/features/progression/components/progression-card';
 import { useProgresion } from '@/features/progression/use-progresion';
 import { DayDialog } from '@/features/reschedule/components/day-dialog';
@@ -216,6 +217,7 @@ export default function HoyScreen() {
   const celebracion = (
     <>
       <PhaseCelebration celebracion={checkIn.celebracion} onCerrar={checkIn.cerrarCelebracion} />
+      <CelebracionHito hito={checkIn.hito} onCerrar={checkIn.cerrarHito} />
       {reprogramar.eligiendo && reprogramar.actual ? (
         <DayDialog
           dias={reprogramar.actual.diasLibres}

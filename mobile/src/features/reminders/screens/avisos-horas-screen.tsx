@@ -10,6 +10,7 @@ import { Screen } from '@/components/ui/screen';
 import { SettingsRow } from '@/components/ui/settings-row';
 import { SwitchRow } from '@/components/ui/switch-row';
 import { Snackbar } from '@/components/ui/snackbar';
+import { guardarSonidoHitos, leerSonidoHitos } from '@/db/hitos-repository';
 import { guardarAjustes, leerAjustesPerfil, type CambiosAjustes } from '@/db/settings-repository';
 import { useLocalQuery } from '@/db/use-local-query';
 import { useSession } from '@/features/auth/session-context';
@@ -58,6 +59,7 @@ export default function AvisosHorasScreen() {
   const { session } = useSession();
   const userId = session?.user.id ?? '';
   const perfil = useLocalQuery(`perfil-${userId}`, () => leerAjustesPerfil(userId));
+  const sonido = useLocalQuery(`sonido-hitos-${userId}`, () => leerSonidoHitos(userId));
   const avisosActivos = useAvisosActivos();
   const [eligiendoEstilo, setEligiendoEstilo] = useState(false);
   const [errorGuardar, setErrorGuardar] = useState(false);
@@ -161,6 +163,22 @@ export default function AvisosHorasScreen() {
               <AppText variant="small" tone="ink-soft">
                 {t.horasNota}
               </AppText>
+            </Seccion>
+
+            {/* RI-03: el sonido de los hitos (RF-16) es opcional; se guarda en este teléfono. */}
+            <Seccion titulo={es.hitos.seccion}>
+              <Grupo>
+                <View className="px-4 py-2">
+                  <SwitchRow
+                    label={es.hitos.sonido}
+                    help={es.hitos.sonidoAyuda}
+                    value={sonido.data ?? true}
+                    onChange={(activo) => {
+                      guardarSonidoHitos(userId, activo).catch(() => setErrorGuardar(true));
+                    }}
+                  />
+                </View>
+              </Grupo>
             </Seccion>
           </>
         )}

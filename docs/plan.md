@@ -143,7 +143,7 @@ Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las m
 ### Fase 4: Lo que falta, en orden de prioridad
 - [x] RF-17+19 Lista de barreras con alternativa en un toque: al abrir la app, por cada día que no salió se pregunta qué se atravesó (tiempo, recursos, acceso o «Prefiero no decir») y se ofrece en un toque una versión más ligera u otro día. Con causa, el día no cuenta en el cumplimiento (`habit_occurrences.barrera`). Con la estrategia «desánimo» se sigue moviendo en silencio.
 - [x] RF-13 Aviso motivacional a los 3 días seguidos: al marcar un paso, si se llega a 3, 6, 9… días seguidos con algo hecho, llega al momento una notificación de ánimo que abre Progreso; máximo una al día (tabla local `avisos_motivacionales`), nada con el estilo «Lo mínimo». Abrir Progreso desde el aviso queda por confirmar en build de desarrollo (Expo Go abre su inicio).
-- [ ] RF-16 Hitos al 50 % y 80 %.
+- [x] RF-16 Hitos al 50 % y 80 %: decisión del equipo, se miden sobre la meta del micro-paso en curso (10 veces desde que empezó el paso). A los 5 y 8 de 10 sale una celebración con barra, vibración y sonido opcional (Perfil → Avisos y horas → Logros); una sola vez por paso. El detalle del plan muestra «5 de 10 hacia el siguiente paso».
 - [ ] RF-04 Introspección por valores (solo local).
 - [ ] RI-04 «Completado» desde la notificación.
 - [ ] RF-02 Agenda sin traslapes (cuando se defina cómo se registra).

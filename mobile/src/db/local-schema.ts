@@ -254,7 +254,8 @@ export function sqlTablasEspejo(): string {
 
 /**
  * Tablas propias de la app: cola de salida, cursores de sincronización, las tarjetas pendientes
- * de la progresión (SDD 6.3) y la fecha del último aviso motivacional (RF-13). Solo viven en este
+ * de la progresión (SDD 6.3), la fecha del último aviso motivacional (RF-13), los hitos ya
+ * celebrados (RF-16) y preferencias de este teléfono (sonido de logros). Solo viven en este
  * teléfono, no se sincronizan.
  */
 export const SQL_TABLAS_PROPIAS = `
@@ -278,6 +279,17 @@ CREATE TABLE IF NOT EXISTS progresion_tarjetas (
 CREATE TABLE IF NOT EXISTS avisos_motivacionales (
   user_id TEXT PRIMARY KEY,
   ultima_fecha TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS hitos_celebrados (
+  user_id TEXT NOT NULL,
+  clave TEXT NOT NULL,
+  PRIMARY KEY (user_id, clave)
+);
+CREATE TABLE IF NOT EXISTS preferencias_locales (
+  user_id TEXT NOT NULL,
+  clave TEXT NOT NULL,
+  valor TEXT NOT NULL,
+  PRIMARY KEY (user_id, clave)
 );
 CREATE INDEX IF NOT EXISTS habit_logs_fecha_idx ON habit_logs (fecha);
 CREATE INDEX IF NOT EXISTS habit_schedules_habit_idx ON habit_schedules (habit_id);

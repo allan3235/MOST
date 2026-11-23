@@ -31,6 +31,7 @@ import {
 } from '@/features/progression/domain/progresion';
 import type { Barrera, PasoLigero } from '@/features/reschedule/domain/barreras';
 import type { Propuesta } from '@/features/reschedule/domain/reprogramar';
+import { avanceDelPaso, type AvancePaso } from '@/features/progression/domain/hitos';
 import { historial, type Pausa } from '@/features/stats/domain/cumplimiento';
 import { rachaDeHabito } from '@/features/stats/domain/rachas';
 import { pedirApi } from '@/lib/clienteApi';
@@ -49,6 +50,7 @@ import { aplicar } from './aplicar-cambio';
 import { actualizarFila, getDb, guardarFilas, leerFilas } from './database';
 import { avisarCambioLocal } from './db-version-store';
 import { categoriasPorId, guardarVersionHorario, idCategoria } from './habits-repository';
+import { leerAvancesDePasos } from './hitos-repository';
 import { descartarMovidasDelPatron, filasDe, guardarOcurrencias } from './occurrences-repository';
 import { leerAjustesEn, leerConfigProgresion, leerPresupuestos } from './settings-repository';
 
@@ -522,6 +524,8 @@ export type HabitoDelDetalle = {
   masLigero: ValoresNivel | null;
   /** Va por debajo del 40 % en los últimos 7 días (RF-15): la fila sugiere hacerlo más ligero. */
   sugerirMasLigero: boolean;
+  /** Veces hechas del paso en curso, de 10 (RF-16). */
+  avancePaso: AvancePaso;
 };
 
 export type DetallePlan = {
@@ -548,6 +552,7 @@ export async function leerDetallePlan(userId: string, planId: string): Promise<D
   const entrada = entradaDelPlan(comunes, plan);
 
   const suyos = entrada.habitos.filter((h) => h.plan_id === plan.id && h.archivado_en === null);
+  const avances = await leerAvancesDePasos(db, suyos);
   const ids = new Set(suyos.map((h) => h.id));
   const habitos = suyos.map((habito): HabitoDelDetalle => {
     const horarios = entrada.horarios.filter((x) => x.habit_id === habito.id);
@@ -570,6 +575,7 @@ export async function leerDetallePlan(userId: string, planId: string): Promise<D
       horario,
       racha: rachaDeHabito(ocurrencias).actual,
       pasos: pasosDe(entrada.microPasos, habito.id),
+      avancePaso: avances[habito.id] ?? avanceDelPaso(0),
       masLigero,
       sugerirMasLigero:
         masLigero !== null &&

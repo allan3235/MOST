@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { AccessibilityInfo } from 'react-native';
 
 import { completarHabito, deshacerHabito, RelojAtrasadoError } from '@/db/logs-repository';
+import { leerSonidoHitos, revisarHito } from '@/db/hitos-repository';
+import type { HitoParaCelebrar } from '@/features/progression/components/CelebracionHito';
 import { mandarAvisoMotivacional } from '@/features/reminders/avisos';
 import { es, formatear } from '@/i18n/es';
 import { fechaLocal } from '@/lib/dates';
@@ -25,6 +27,7 @@ export function useCheckIn(userId: string) {
   const [aviso, setAviso] = useState<string | null>(null);
   const [premio, setPremio] = useState<{ clave: number; monedas: number } | null>(null);
   const [celebracion, setCelebracion] = useState<Celebracion | null>(null);
+  const [hito, setHito] = useState<HitoParaCelebrar | null>(null);
 
   // La moneda animada se quita sola al terminar.
   useEffect(() => {
@@ -69,6 +72,12 @@ export function useCheckIn(userId: string) {
       if (r.cambioFase !== null && r.cambioFase > 1) {
         setCelebracion({ area: habito.categoria, fase: r.cambioFase });
       }
+      // RF-16: hito del micro-paso (5 y 8 de 10). Se anota aunque haya cambio de fase, pero solo
+      // se muestra sin ella para no encimar dos celebraciones.
+      const alcanzado = await revisarHito(userId, habito.id);
+      if (alcanzado && !(r.cambioFase !== null && r.cambioFase > 1)) {
+        setHito({ ...alcanzado, sonido: await leerSonidoHitos(userId) });
+      }
       // RF-13: a los 3, 6, 9… días seguidos, un aviso de ánimo (máximo uno al día).
       mandarAvisoMotivacional(userId).catch((causa: unknown) => {
         console.warn('No se pudo mandar el aviso motivacional', causa);
@@ -89,6 +98,8 @@ export function useCheckIn(userId: string) {
     premio,
     celebracion,
     cerrarCelebracion: () => setCelebracion(null),
+    hito,
+    cerrarHito: () => setHito(null),
     cerrarAvisos: () => {
       setError(null);
       setAviso(null);

@@ -48,6 +48,14 @@
           "color": "#2E7D4F",
           "defaultChannel": "recordatorios"
         }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "enableBackgroundPlayback": false
+        }
       ]
     ],
     "experiments": {

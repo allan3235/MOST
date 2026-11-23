@@ -13,6 +13,7 @@ import { es, formatear } from '@/i18n/es';
 import { useFechaHoy } from '@/lib/fecha-hoy';
 import { navegar } from '@/lib/navegar';
 
+import { CelebracionHito } from '../progression/components/CelebracionHito';
 import { PhaseCelebration } from '../rewards/components/phase-celebration';
 import type { HabitCheckCardProps } from './components/habit-check-card';
 import { HabitMenu, type Ancla, type HabitMenuProps } from './components/habit-menu';
@@ -142,6 +143,7 @@ export function useHabitActions(
       <LimiteHabitosDialog motivo="reanudar" limite={limite} onCerrar={() => setLimite(null)} />
 
       <PhaseCelebration celebracion={checkIn.celebracion} onCerrar={checkIn.cerrarCelebracion} />
+      <CelebracionHito hito={checkIn.hito} onCerrar={checkIn.cerrarHito} />
     </>
   );
 

@@ -7,9 +7,9 @@
  *   más ligera que su paso, el paso en curso muestra lo que de verdad toca hoy.
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-23
- * @version 1.1.0
+ * @version 1.2.0
  * @historial 1.0.0 (2026-11-23): creación. 1.1.0 (2026-11-23): versión ligera en el paso en
- *   curso y título opcional.
+ *   curso y título opcional. 1.2.0 (2026-11-23): avance «5 de 10» del paso en curso (RF-16).
  */
 
 import { Circle, CircleCheck, Footprints, type LucideIcon } from 'lucide-react-native';
@@ -17,6 +17,7 @@ import { View } from 'react-native';
 
 import { AppText, type TextTone } from '@/components/ui/app-text';
 import { textoDuracion } from '@/features/habits/domain/formato';
+import type { AvancePaso } from '@/features/progression/domain/hitos';
 import { es, formatear } from '@/i18n/es';
 import { colors } from '@/theme';
 
@@ -38,6 +39,8 @@ export type ListaMicroPasosProps = {
   enCurso?: { titulo: string; duracion_min: number };
   /** false cuando la pantalla ya pone el título «Tus micro-pasos». */
   conTitulo?: boolean;
+  /** Veces hechas del paso en curso (RF-16): se muestra «5 de 10» en ese paso. */
+  avance?: AvancePaso;
 };
 
 // ===== Constantes =====
@@ -74,6 +77,7 @@ export function ListaMicroPasos({
   pasoActual,
   enCurso,
   conTitulo = true,
+  avance,
 }: ListaMicroPasosProps) {
   const t = es.microPasos;
   if (pasos.length === 0) {
@@ -103,6 +107,10 @@ export function ListaMicroPasos({
         const Icono = estilo.icono;
         const duracion = paso.duracion_min > 0 ? textoDuracion(paso.duracion_min) : null;
         const etiqueta = esLigera ? `${t.estados[estado]}, ${t.ligera}` : t.estados[estado];
+        const conteo =
+          estado === 'actual' && avance
+            ? formatear(es.hitos.contador, { n: avance.hechos, meta: avance.meta })
+            : null;
         return (
           <View
             key={paso.orden}
@@ -111,7 +119,7 @@ export function ListaMicroPasos({
               n: paso.orden,
               total: ordenados.length,
               titulo: paso.titulo,
-              estado: etiqueta,
+              estado: conteo ? `${etiqueta}, ${conteo}` : etiqueta,
             })}
             className="min-h-12 flex-row items-center gap-3"
           >
@@ -129,6 +137,11 @@ export function ListaMicroPasos({
                   .filter(Boolean)
                   .join(' · ')}
               </AppText>
+              {conteo ? (
+                <AppText variant="small" weight="bold" tone="ink">
+                  {conteo}
+                </AppText>
+              ) : null}
             </View>
           </View>
         );
