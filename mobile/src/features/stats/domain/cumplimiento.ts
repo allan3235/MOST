@@ -17,7 +17,7 @@ import { rachaDeHabito, type Racha } from './rachas';
 //
 // - Una ocurrencia es un día del patrón vigente o un día al que llegó por reprogramación; el día
 //   original de una movida no cuenta, y una descartada cuenta como no hecha.
-// - Hoy solo suma lo que ya se hizo: lo pendiente de hoy no baja el resultado ni rompe la racha.
+// - Hoy solo suma lo que ya se hizo: lo pendiente de hoy no baja el resultado ni resta del avance.
 // - Archivados: cuentan hasta el día anterior a archivarlos. En pausa: hasta su último registro
 //   (la app no guarda desde cuándo están en pausa; decisión del usuario).
 // - Los topes de XP y monedas no importan: un registro hecho cuenta igual.
@@ -142,7 +142,7 @@ function recorrer(
   }
   const incluir = cuentaEn(ultimoRegistro);
   const registrosPorDia = agrupar(datos.registros, (r) => [r.fecha]);
-  // Solo las movidas: una descartada se queda en su día y cuenta como no hecha (rompe la racha).
+  // Solo las movidas: una descartada se queda en su día y cuenta como no hecha.
   const movidas = datos.ocurrencias.filter((o) => o.estado === 'movida');
   const ocurrenciasPorDia = agrupar(movidas, (o) => [o.fecha_original, o.fecha_nueva]);
 

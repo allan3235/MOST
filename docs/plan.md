@@ -130,7 +130,7 @@ Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las m
 ### Fase 3: Alinear los flujos existentes con el SRS
 - [x] Umbrales de reajuste: < 40 % en 7 días (RF-15) con `UMBRAL_CUMPLIMIENTO` y `DIAS_EVALUADOS`; la meta intermedia es una tarjeta «Probar este paso» (ya no baja sola). Migración `20261123120000_progresion_rf15` para `app_config`.
 - [x] `META_MINIMA = 1` (RR-03): ningún reajuste deja menos de 1 minuto ni menos de 1 día; un paso de 1 minuto no tiene versión más corta (solo apoyo).
-- [ ] Quitar las rachas que se reinician; progreso solo acumulado (RNF-07).
+- [x] Sin rachas que se reinician (RNF-07): se muestra el total de veces completado, que nunca baja, con un brote en lugar de la llama.
 - [ ] Resumen nocturno como interruptor (RF-18).
 - [ ] La pausa no cuenta como fallo (RF-09).
 - [ ] Pantalla «Crear meta» (RF-03): escribir meta → la IA la descompone → revisar, editar y confirmar.

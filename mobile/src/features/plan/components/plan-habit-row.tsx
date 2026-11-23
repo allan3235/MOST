@@ -1,4 +1,4 @@
-import { EllipsisVertical, Feather, Flame } from 'lucide-react-native';
+import { EllipsisVertical, Feather, Sprout } from 'lucide-react-native';
 import { useRef } from 'react';
 import { Pressable, View, type HostInstance } from 'react-native';
 
@@ -10,7 +10,7 @@ import { useAccionUnica } from '@/lib/use-accion-unica';
 import { colors } from '@/theme';
 
 // Fila de un hábito en el detalle del plan: título, días, hora y duración («Sin duración fija» si
-// es un recordatorio), su racha y «En pausa» si lo está. Tocarla abre la edición del hábito; el ⋮
+// es un recordatorio), sus veces completadas (nunca bajan) y «En pausa» si lo está. Tocarla abre la edición del hábito; el ⋮
 // abre sus acciones (más ligero, sacar del plan, pausar, eliminar).
 
 export type PlanHabitRowProps = {
@@ -88,7 +88,7 @@ export function PlanHabitRow({
               ) : null}
               {racha > 0 ? (
                 <View className="flex-row items-center gap-1">
-                  <Flame size={14} color={colors.accent} />
+                  <Sprout size={14} color={colors.accent} />
                   <AppText variant="small" weight="semibold" tone="acento">
                     {formatear(t.racha, { n: String(racha) })}
                   </AppText>

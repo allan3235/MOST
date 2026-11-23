@@ -524,10 +524,8 @@ export const es = {
     },
     conteo: '{n} de {total}',
     sinDias: 'Sin días en este periodo',
-    rachaActual: 'Racha actual: {n}',
-    mejorRacha: 'Tu mejor racha: {n}',
-    rachaRota: 'Tu mejor racha fue de {n}. ¿Empezamos otra?',
-    mejorCorta: 'Mejor: {n}',
+    // Avance acumulado: nunca baja (most. no tiene rachas que se borren).
+    rachaActual: 'Veces completado: {n}',
     estados: {
       hecho: 'Hecho',
       sin_marcar: 'Sin marcar',
@@ -695,8 +693,8 @@ export const es = {
       sinHabitos: 'Este plan ya no tiene hábitos activos.',
       sinDuracion: 'Sin duración fija',
       enPausa: 'En pausa',
-      racha: '{n} seguidos',
-      rachaA11y: 'Racha de {n}',
+      racha: 'Completado: {n}',
+      rachaA11y: 'Veces completado: {n}',
       abrir: 'Abrir {titulo}',
       agregar: 'Agregar un hábito al plan',
       noActivo: 'Este plan ya no está activo.',

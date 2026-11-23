@@ -1,49 +1,58 @@
-// Rachas por hábito (SDD 8): ocurrencias programadas seguidas que se completaron. Los días no
-// programados no la rompen porque no son ocurrencias; una no hecha (o descartada) sí. Nunca se
-// dice «perdiste tu racha»: al romperse se destaca la mejor con una invitación a retomar.
+/**
+ * @file rachas.ts
+ * @proyecto most.
+ * @descripcion Avance acumulado de un hábito: cuántas veces se ha completado en total. Reemplaza a
+ *   las rachas de Habit Green (días seguidos que volvían a 0 al fallar): most. no tiene rachas que
+ *   se borren ni indicadores negativos (RNF-07, reglas de tono). El número solo crece.
+ *   Se conservan los nombres (Racha, rachaDeHabito…) para no cambiar las pantallas que lo usan.
+ * @autor Equipo most. (heredado de Habit Green; adaptado por Allan con Claude Code)
+ * @fecha 2026-11-23
+ * @version 2.0.0
+ * @historial 1.0.0: rachas de ocurrencias seguidas. 2.0.0 (2026-11-23): total acumulado.
+ */
 
+// ===== Tipos =====
+
+/** `actual` y `mejor` valen lo mismo: el total de veces completado (nunca baja). */
 export type Racha = { actual: number; mejor: number };
-
-/** `ocurrencias` de un solo hábito, en orden de fecha. */
-export function rachaDeHabito(ocurrencias: readonly { hecho: boolean }[]): Racha {
-  let actual = 0;
-  let mejor = 0;
-  for (const o of ocurrencias) {
-    actual = o.hecho ? actual + 1 : 0;
-    mejor = Math.max(mejor, actual);
-  }
-  return { actual, mejor };
-}
 
 export type TextosRacha = {
   rachaActual: string;
-  mejorRacha: string;
-  rachaRota: string;
 };
 
 export type LineaRacha = { texto: keyof TextosRacha; n: number }[];
 
+export type PildoraRacha = { tipo: 'actual'; n: number };
+
+// ===== Principal =====
+
 /**
- * Qué decir de la racha. Con `desanimo`, solo la mejor. Si la actual va en curso, se dice, y la
- * mejor solo si es mayor. Si se rompió, la mejor con invitación. Sin ninguna, nada.
+ * Veces que se completó el hábito. Un día sin hacerlo no resta nada.
+ * @param ocurrencias Ocurrencias de un solo hábito.
+ * @returns El total acumulado.
  */
-export function lineaDeRacha(racha: Racha, desanimo: boolean): LineaRacha {
-  if (racha.mejor === 0) return [];
-  if (desanimo) return [{ texto: 'mejorRacha', n: racha.mejor }];
-  if (racha.actual === 0) return [{ texto: 'rachaRota', n: racha.mejor }];
-  const linea: LineaRacha = [{ texto: 'rachaActual', n: racha.actual }];
-  if (racha.mejor > racha.actual) linea.push({ texto: 'mejorRacha', n: racha.mejor });
-  return linea;
+export function rachaDeHabito(ocurrencias: readonly { hecho: boolean }[]): Racha {
+  const completados = ocurrencias.filter((o) => o.hecho).length;
+  return { actual: completados, mejor: completados };
 }
 
-export type PildoraRacha = { tipo: 'actual' | 'mejor'; n: number };
+/**
+ * Qué decir del avance: «Veces completado: n», o nada si todavía no hay ninguna. Es igual para
+ * todos (antes, con `desanimo` se ocultaba la racha actual; ya no hace falta porque nunca baja).
+ * @param racha Avance del hábito.
+ * @param _desanimo Se conserva por compatibilidad; ya no cambia el texto.
+ * @returns Partes del texto.
+ */
+export function lineaDeRacha(racha: Racha, _desanimo: boolean): LineaRacha {
+  return racha.actual > 0 ? [{ texto: 'rachaActual', n: racha.actual }] : [];
+}
 
 /**
- * La píldora con la llama: la racha en curso, o «Mejor: n» si se rompió. Con `desanimo`, siempre
- * la mejor. Sin ninguna racha todavía, no hay píldora.
+ * La píldora con el brote: el total de veces completado. Sin ninguna todavía, no hay píldora.
+ * @param racha Avance del hábito.
+ * @param _desanimo Se conserva por compatibilidad; ya no cambia la píldora.
+ * @returns Lo que muestra la píldora, o null.
  */
-export function pildoraDeRacha(racha: Racha, desanimo: boolean): PildoraRacha | null {
-  if (racha.mejor === 0) return null;
-  if (desanimo || racha.actual === 0) return { tipo: 'mejor', n: racha.mejor };
-  return { tipo: 'actual', n: racha.actual };
+export function pildoraDeRacha(racha: Racha, _desanimo: boolean): PildoraRacha | null {
+  return racha.actual > 0 ? { tipo: 'actual', n: racha.actual } : null;
 }
