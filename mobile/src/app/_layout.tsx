@@ -79,6 +79,7 @@ function RootNavigator() {
       <Stack.Protected guard={zone === 'tabs'}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="habit/nuevo" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="crear-meta" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="habit/[id]" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="tienda" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="planta/[categoria]" options={{ animation: 'slide_from_right' }} />

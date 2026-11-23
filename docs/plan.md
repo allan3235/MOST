@@ -133,7 +133,8 @@ Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las m
 - [x] Sin rachas que se reinician (RNF-07): se muestra el total de veces completado, que nunca baja, con un brote en lugar de la llama.
 - [x] Resumen nocturno como interruptor (RF-18): `user_settings.resumen_nocturno` (migración `20261123140000_resumen_nocturno`); se suma a cualquier estilo desde «Avisos y horas».
 - [x] La pausa no cuenta como fallo (RF-09): tabla `habit_pausas` (migración `20261123130000_habit_pausas`); estadísticas y progresión saltan esos días, también después de reanudar.
-- [ ] Pantalla «Crear meta» (RF-03): escribir meta → la IA la descompone → revisar, editar y confirmar.
+- [x] Pantalla «Crear meta» (RF-03, CP-01/02): Hábitos → «Crear meta con micro-pasos» → escribir la meta y elegir área → `/ia/meta` → ver la secuencia → «Usar estos micro-pasos» crea el hábito en el paso 1 (respeta el límite de hábitos). Una meta vacía no se envía.
+- [ ] Editar cada micro-paso antes de confirmar (propuesta del plan; hoy se acepta o se pide otra).
 - [x] Secuencia de micro-pasos visible (RF-03): en la revisión del plan antes de «Empezar» y en el detalle del plan («Tus micro-pasos»), con estado por icono y texto (Superado / Vas aquí / Después).
 - [x] El reajuste (subir o bajar) se mueve dentro de la secuencia de micro-pasos; sin secuencia, por los niveles del catálogo. Los títulos dicen los minutos reales de la versión reducida.
 - [ ] Cuando ya no hay paso más ligero en la secuencia, pedir uno intermedio a la IA (`/ia/paso-ligero`) respetando el candado mínimo.

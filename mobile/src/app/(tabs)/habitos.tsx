@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react-native';
+import { Plus, Sparkles } from 'lucide-react-native';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 
 import { ActionSquare } from '@/components/ui/action-square';
@@ -45,6 +45,14 @@ export default function HabitosScreen() {
           <AppText variant="h1">{es.tabs.habitos}</AppText>
           <ActionSquare label={t.agregar} icon={Plus} onPress={() => void agregar.abrir()} />
         </View>
+
+        {/* RF-03: escribir una meta y que la IA la divida en micro-pasos. */}
+        <Button
+          variant="secondary"
+          label={es.crearMeta.abrir}
+          icon={<Sparkles size={20} color={colors.ink} />}
+          onPress={() => void agregar.abrirMeta()}
+        />
 
         {/* Márgenes negativos: la sombra de las tarjetas no se corta en los bordes de la lista. */}
         <ScrollView

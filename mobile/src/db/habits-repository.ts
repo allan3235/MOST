@@ -225,9 +225,24 @@ export async function guardarVersionHorario(
 export type ResultadoGuardar = { presupuestoNuevo: number | null };
 
 /** Crea un hábito manual (sin plan ni progresión, SDD 6.5) con su primer horario. */
+/** Un micro-paso para crear junto con el hábito («Crear meta», RF-03). */
+export type MicroPasoNuevo = {
+  orden: number;
+  titulo: string;
+  descripcion: string;
+  duracion_min: number;
+  duracion_reducida_min: number;
+  dias_semana: number[];
+};
+
+/**
+ * Crea un hábito propio con su horario. Con `microPasos` (de «Crear meta») guarda también su
+ * secuencia y empieza en el paso 1.
+ */
 export async function crearHabito(
   userId: string,
   valores: HabitoFormValues,
+  microPasos: readonly MicroPasoNuevo[] = [],
 ): Promise<ResultadoGuardar> {
   let presupuestoNuevo: number | null = null;
   await aplicar(async (db) => {
@@ -243,6 +258,7 @@ export async function crearHabito(
       titulo: valores.nombre,
       descripcion: valores.descripcion,
       duracion_min: valores.duracion,
+      paso_actual: microPasos.length > 0 ? 1 : null,
       activo: true,
       archivado_en: null,
     };
@@ -259,6 +275,19 @@ export async function crearHabito(
     };
     await guardarFilas(db, 'habits', [{ ...habito, created_at: ahora, updated_at: ahora }]);
     await guardarFilas(db, 'habit_schedules', [{ ...horario, updated_at: ahora }]);
+    const pasos = microPasos.map((paso) => ({
+      id: randomUUID(),
+      habit_id: habito.id,
+      user_id: userId,
+      ...paso,
+    }));
+    if (pasos.length > 0) {
+      await guardarFilas(
+        db,
+        'micro_pasos',
+        pasos.map((paso) => ({ ...paso, updated_at: ahora })),
+      );
+    }
 
     const presupuesto = await subirPresupuestoSiHaceFalta(db, userId, {
       habitId: habito.id,
@@ -271,6 +300,12 @@ export async function crearHabito(
     return [
       { operacion: 'upsert', tabla: 'habits', clave: habito.id, payload: habito },
       { operacion: 'upsert', tabla: 'habit_schedules', clave: horario.id, payload: horario },
+      ...pasos.map((paso): OperacionOutbox => ({
+        operacion: 'upsert',
+        tabla: 'micro_pasos',
+        clave: paso.id,
+        payload: paso,
+      })),
       ...(presupuesto ? [presupuesto.operacion] : []),
     ];
   });

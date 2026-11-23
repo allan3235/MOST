@@ -807,6 +807,31 @@ export const es = {
     error: 'No pudimos guardar el cambio. Inténtalo de nuevo.',
   },
   // Progresión (SDD 6.3, docs/textos.md 5): tarjetas en Hoy cada 7 días.
+  crearMeta: {
+    abrir: 'Crear meta con micro-pasos',
+    titulo: 'Crear una meta',
+    subtitulo:
+      'Escribe con tus palabras lo que quieres lograr. La dividimos en micro-pasos pequeños para empezar fácil.',
+    campo: '¿Qué te gustaría lograr?',
+    placeholder: 'Ej.: leer más por las noches',
+    area: '¿De qué área es?',
+    descomponer: 'Descomponer en micro-pasos',
+    pensando: 'Armando tus micro-pasos…',
+    propuestaAyuda:
+      'Empiezas con el paso 1. Cuando te salga bien, te proponemos el siguiente; si cuesta, lo hacemos más pequeño.',
+    usar: 'Usar estos micro-pasos',
+    otra: 'Probar con otra meta',
+    privacidad:
+      'Hasta {n} caracteres. Solo enviamos el texto de tu meta para armar los pasos, nunca tu nombre ni tu correo.',
+    errores: {
+      vacia: 'Escribe tu meta para poder dividirla en pasos.',
+      corta: 'Cuéntanos un poco más (3 letras o más).',
+      area: 'Elige el área de tu meta.',
+      sinConexion: 'Necesitas conexión para crear tu meta. Inténtalo cuando tengas internet.',
+      error: 'No pudimos armar tus micro-pasos. Inténtalo de nuevo en un momento.',
+      guardar: 'No pudimos guardar el hábito. Inténtalo de nuevo.',
+    },
+  },
   microPasos: {
     titulo: 'Tus micro-pasos',
     paso: 'Paso {n}',
