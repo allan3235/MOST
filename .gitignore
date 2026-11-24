@@ -75,3 +75,6 @@ backend/src/generated/
 
 # Compilado de @most/compartido (lo genera pnpm install)
 compartido/dist/
+
+# Salida de compilación de los módulos nativos locales
+/mobile/modules/*/android/build/
