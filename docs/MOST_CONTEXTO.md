@@ -31,7 +31,7 @@
 Estado al 15-nov: M1 y M4 concluidos (vibecoding), M2 y M3 iniciados (manual), M5 sin iniciar. (M2/M3/M5 siguen "en proceso" en la Retro 11.)
 
 **M1 Plan de hábitos y micro-pasos**
-- RF-03 (Must): descomponer meta en secuencia ordenada de micro-pasos de bajo esfuerzo (propuesto ≤ 5 min c/u; definir quién los crea, sistema o persona).
+- RF-03 (Must): descomponer meta en secuencia ordenada de micro-pasos de bajo esfuerzo (decisión 23-nov: el primero ≤ 5 min y cada uno a lo mucho el triple del anterior; los crea la IA y la persona confirma).
 
 **M2 Recordatorios y horarios**
 - RF-01 (Must): asignar hora y frecuencia a un hábito → notificación local.
@@ -151,4 +151,4 @@ Colócalo como `CLAUDE.md` (o `docs/CONTEXTO.md` y referenciarlo desde `CLAUDE.m
 
 Futuros (Won't v1): RF-05 temporizador 25/5 con descanso obligatorio · RF-06 micro-hábitos sin horario · RF-07 presencia "hay N personas completando este hábito" con privacidad · RF-10/RF-12 recordatorios simples (integrar en RF-01) · RF-11 mensaje empático tras 48 h sin actividad.
 
-Mejoras de redacción pendientes en el SRS (ISO 29148): fijar ≤ 5 min por micro-paso (RF-03), "inmediato" = ≤ 1.5 s (RF-08), un aviso/día (RF-13), unir RF-17+RF-19, separar RF-09 en manual y automático, quitar la dependencia de RF-07 en RNF-03.
+Mejoras de redacción pendientes en el SRS (ISO 29148): fijar en RF-03 «primer micro-paso ≤ 5 min y cada uno ≤ triple del anterior», "inmediato" = ≤ 1.5 s (RF-08), un aviso/día (RF-13), unir RF-17+RF-19, separar RF-09 en manual y automático, quitar la dependencia de RF-07 en RNF-03.

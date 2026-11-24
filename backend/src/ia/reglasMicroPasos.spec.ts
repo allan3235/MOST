@@ -13,6 +13,7 @@ import {
   corregirHabito,
   corregirPasoLigero,
   crearPasoLigeroSinIa,
+  FACTOR_MAXIMO_ENTRE_PASOS,
   limpiarDias,
   type LimitesHabito,
 } from './reglasMicroPasos.js';
@@ -156,7 +157,7 @@ describe('corregirHabito', () => {
 });
 
 describe('CP-01 (RF-03): «Leer 20 minutos al día»', () => {
-  it('queda en 3 a 5 pasos ordenados de menor a mayor esfuerzo y el primero dura 5 min o menos', () => {
+  it('queda en 3 a 5 pasos ordenados, el primero de 5 min o menos y cada uno ≤ triple del anterior', () => {
     // La IA propone un primer paso largo y sin orden de esfuerzo: las reglas lo corrigen.
     const habito = corregirHabito(
       crearHabito([crearPaso(8), crearPaso(4), crearPaso(15), crearPaso(20)]),
@@ -167,6 +168,10 @@ describe('CP-01 (RF-03): «Leer 20 minutos al día»', () => {
     expect(minutos.length).toBeLessThanOrEqual(5);
     expect(minutos[0]).toBeLessThanOrEqual(5);
     expect(minutos).toEqual([...minutos].sort((a, b) => a - b));
+    // Esperado corregido de CP-01 (decisión del 23-nov): cada paso a lo mucho el triple del anterior.
+    minutos.slice(1).forEach((m, i) => {
+      expect(m).toBeLessThanOrEqual((minutos[i] ?? 0) * FACTOR_MAXIMO_ENTRE_PASOS);
+    });
     expect(habito?.micro_pasos.map((p) => p.orden)).toEqual(minutos.map((_m, i) => i + 1));
   });
 });

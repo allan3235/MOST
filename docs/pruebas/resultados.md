@@ -23,7 +23,7 @@ Proyecto **most.** · rama `feat/fase-4` · formato según `docs/pruebas/instruc
 
 | CP | RF | Tipo | Estado | Evidencia (comando + salida resumida) | Defecto |
 |---|---|---|---|---|---|
-| CP-01 | RF-03 | auto | **Fallida** | `pnpm vitest run -t "CP-01"` → ✓ «queda en 3 a 5 pasos ordenados de menor a mayor esfuerzo y el primero dura 5 min o menos». `pnpm jest src/features/metas` → ✓ «CP-01: descompone la meta en una lista ordenada y guarda la secuencia desde el paso 1». Comprobación estricta temporal «cada micro-paso dura 5 min o menos» → ✕ `expected false to be true`: para «Leer 20 minutos al día» los pasos quedan en 5 → 10 → 20 min. | D-01 (Media) |
+| CP-01 | RF-03 | auto | **Aprobada** (corrida 2) | **Corrida 1 — Fallida:** una comprobación estricta temporal de «cada micro-paso dura 5 min o menos» dio ✕ `expected false to be true`, porque los pasos quedan en 5 → 10 → 20 min. **Corrida 2 — Aprobada**, con el esperado corregido por la decisión del 23-nov: `pnpm vitest run -t "CP-01"` → ✓ «queda en 3 a 5 pasos ordenados, el primero de 5 min o menos y cada uno ≤ triple del anterior», y `pnpm jest src/features/metas` → ✓ «CP-01: descompone la meta en una lista ordenada y guarda la secuencia desde el paso 1». | D-01 (Media, cerrado: se cambió el esperado del caso) |
 | CP-02 | RF-03 | auto | **Aprobada** | `pnpm jest src/features/metas` → ✓ «CP-02: con la meta vacía no pide micro-pasos, avisa con tono neutro y conserva lo capturado». No llama a la IA ni guarda; muestra «Escribe tu meta para poder dividirla en pasos.»; el área elegida sigue seleccionada. | — |
 | CP-03 | RF-01 | auto + disp. | **Pendiente-dispositivo** | `planificar-avisos.test.ts` → ✓ «CP-03: «Tomar agua» a las 10:00 diario avisa a las 10:00 cada uno de los 7 días». Falta ver la notificación real a las 10:00 con la app en segundo plano. | — |
 | CP-04 | RF-02 | auto | **Aprobada** | `agenda.test.ts` → ✓ «CP-04: 10:00 en la franja 10:00–11:00 se rechaza y se sugiere 11:00», más 5 pruebas de apoyo: otro día, empezar justo antes, bloques seguidos, sin hueco y validación. Probado también en el emulador: el diálogo ofrece «Usar las 11:00». | D-04 (Media), postcondición fuera de este flujo |
@@ -44,14 +44,14 @@ Proyecto **most.** · rama `feat/fase-4` · formato según `docs/pruebas/instruc
 
 | Estado | Casos | Cuáles |
 |---|---|---|
-| Aprobada | 6 | CP-02, CP-04, CP-05, CP-12, CP-13, CP-14 |
-| Fallida | 2 | CP-01, CP-10 |
+| Aprobada | 7 | CP-01, CP-02, CP-04, CP-05, CP-12, CP-13, CP-14 |
+| Fallida | 1 | CP-10 |
 | Bloqueada | 1 | CP-15 |
 | Pendiente-dispositivo | 7 | CP-03, CP-06, CP-07, CP-08, CP-09, CP-11, CP-16 |
 
-- **Alta (14 casos):** 6 aprobados = **42.9 %** (meta 100 %). ✗
+- **Alta (14 casos):** 7 aprobados = **50 %** (meta 100 %). ✗
 - **Media (2 casos: CP-06, CP-09):** 0 aprobados = **0 %** (meta ≥ 90 %). ✗ Los dos pasan su parte automática y solo esperan dispositivo.
-- **Criterio de aceptación: todavía no se cumple.** La mayoría de lo pendiente es la prueba en un dispositivo real con build de desarrollo. Además hay tres defectos que corregir: D-01, D-02 y D-03.
+- **Criterio de aceptación: todavía no se cumple.** La mayoría de lo pendiente es la prueba en un dispositivo real con build de desarrollo. Además quedan dos defectos de severidad Alta, D-02 y D-03, y uno de severidad Media, D-04.
 
 ### Matriz RF ↔ CP
 
@@ -61,7 +61,7 @@ Un RF queda verificado solo si **todos** sus CP están aprobados.
 |---|---|---|---|
 | RF-01 | CP-03, CP-05 | Pendiente-disp., Aprobada | No |
 | RF-02 | CP-04 | Aprobada | **Sí** |
-| RF-03 | CP-01, CP-02 | Fallida, Aprobada | No |
+| RF-03 | CP-01, CP-02 | Aprobada, Aprobada | **Sí** |
 | RF-04 | CP-10 | Fallida | No |
 | RF-08 | CP-07 | Pendiente-disp. | No |
 | RF-09 | CP-12, CP-14 | Aprobada, Aprobada | **Sí** |
@@ -77,12 +77,12 @@ Un RF queda verificado solo si **todos** sus CP están aprobados.
 
 | ID | Caso | Descripción | Severidad |
 |---|---|---|---|
-| D-01 | CP-01 | Solo el primer micro-paso tiene tope de 5 min. Los demás crecen hasta el tiempo diario del hábito: para «Leer 20 minutos al día» quedan 5 → 10 → 20 min. CP-01 pide «cada uno ≤ 5 min», mientras el SRS dice «propuesto ≤ 5 min». **Necesita decisión del equipo:** si se exige ≤ 5 min a todos, una meta de 20 min nunca llega a 20; la otra salida es cambiar el esperado del caso a «el primero ≤ 5 min y cada uno a lo mucho el triple del anterior». | Media |
+| D-01 | CP-01 | Solo el primer micro-paso tiene tope de 5 min. Los demás crecen hasta el tiempo diario del hábito: para «Leer 20 minutos al día» quedan 5 → 10 → 20 min. CP-01 pide «cada uno ≤ 5 min», mientras el SRS dice «propuesto ≤ 5 min». **Cerrado el 23-nov por decisión de producto:** se queda la progresión y el esperado de CP-01 pasa a «el primero ≤ 5 min y cada uno a lo mucho el triple del anterior». El cambio está en `docs/pruebas/instrucciones.md` y en `docs/MOST_CONTEXTO.md` (RF-03); falta pasarlo al SRS del Drive. | Media (cerrado) |
 | D-02 | CP-10 | La base local (expo-sqlite) no está cifrada, así que las respuestas de introspección quedan en claro en el teléfono. Incumple RNF-05 (AES-256). Propuesta, por confirmar en la documentación de expo-sqlite SDK 58: activar SQLCipher en `app.json` y guardar la clave en SecureStore. Necesita build de desarrollo y migrar la base existente. | Alta |
 | D-03 | CP-15 | Modo enfoque: en Android con el permiso «Acceso a No molestar», la app no activa No Molestar ni lo restaura después. Solo silencia sus propios avisos y abre el ajuste del sistema. Para hacerlo hace falta un módulo nativo (`NotificationManager.setInterruptionFilter`) y una build de desarrollo. En iOS no se intenta, como pide el SRS. | Alta |
 | D-04 | CP-04 | Si se agrega un bloque ocupado nuevo, los recordatorios que ya caían en esa franja no se revisan ni se avisan. La revisión solo ocurre al elegir la hora de un hábito. No afecta al flujo de CP-04, pero sí a su postcondición general («ningún recordatorio dentro de un bloque ocupado»). | Media |
 
-**Por qué ningún defecto se corrigió en esta corrida:** D-01 necesita una decisión de producto. D-02 y D-03 necesitan módulos nativos y una build de desarrollo. D-04 se puede corregir sin esperar a nadie: queda como el siguiente paso.
+**Estado de los defectos:** D-01 quedó cerrado al cambiar el esperado de CP-01. D-02 y D-03 necesitan módulos nativos y una build de desarrollo. D-04 se puede corregir sin esperar a nadie: queda como el siguiente paso.
 
 ### Pasos manuales pendientes en dispositivo real
 

@@ -41,7 +41,7 @@ CP-01 · RF-03 · Éxito · Alta · Auto
 Precondición: no existe una meta con el mismo nombre.
 Pasos: Nueva meta → nombre → "Descomponer en micro-pasos" → confirmar → abrir plan y registrar el primer micro-paso.
 Entrada: meta "Leer 20 minutos al día".
-Esperado: lista ordenada de micro-pasos, cada uno ≤ 5 min; cada uno se marca individualmente.
+Esperado: lista ordenada de 3 a 5 micro-pasos de menor a mayor esfuerzo; el primero ≤ 5 min y cada uno a lo mucho el triple del anterior (decisión del 23-nov-2026; antes decía «cada uno ≤ 5 min»); cada uno se marca individualmente.
 Postcondición: meta guardada con su secuencia; primer micro-paso completado, el resto pendientes.
 
 CP-02 · RF-03 · Fallo · Alta · Auto
