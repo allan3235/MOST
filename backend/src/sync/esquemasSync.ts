@@ -4,8 +4,9 @@
  * @descripcion Tablas que se pueden sincronizar y forma de las peticiones de /sync.
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-22
- * @version 1.2.0
- * @historial 1.0.0 (2026-11-22): creación. 1.1.0 (2026-11-23): micro_pasos. 1.2.0: habit_pausas.
+ * @version 1.3.0
+ * @historial 1.0.0 (2026-11-22): creación. 1.1.0 (2026-11-23): micro_pasos. 1.2.0: habit_pausas. 1.3.0
+ *   (2026-11-24): agenda_bloques (RF-02).
  */
 
 import { z } from 'zod';
@@ -25,6 +26,7 @@ export const TABLAS_LECTURA = [
   'habit_schedules',
   'micro_pasos',
   'habit_pausas',
+  'agenda_bloques',
   'habit_occurrences',
   'habit_logs',
   'plant_progress',
@@ -46,6 +48,7 @@ export const TABLAS_ESCRITURA = [
   'habit_schedules',
   'micro_pasos',
   'habit_pausas',
+  'agenda_bloques',
   'habit_occurrences',
   'user_accessories',
 ] as const satisfies readonly (typeof TABLAS_LECTURA)[number][];

@@ -9,6 +9,7 @@ import { AppText } from '@/components/ui/app-text';
 import { Button } from '@/components/ui/button';
 import { ChoicePill } from '@/components/ui/choice-pill';
 import { Field } from '@/components/ui/field';
+import { useRevisarAgenda } from '@/features/agenda/use-revisar-agenda';
 import { es, formatear } from '@/i18n/es';
 import { NOMBRE_MAX, NOMBRE_MIN, TODOS_LOS_DIAS } from '@/schemas/habit';
 import type { HabitoPlan } from '@/schemas/plan';
@@ -44,6 +45,7 @@ export function EditPlanHabitSheet({
   const [hora, setHora] = useState<string | null>(null);
   const [notificar, setNotificar] = useState(habito.notificar);
   const [intentado, setIntentado] = useState(false);
+  const agenda = useRevisarAgenda();
 
   const nombre = titulo.trim();
   const errorNombre =
@@ -62,7 +64,15 @@ export function EditPlanHabitSheet({
       value: fechaDesdeHora(horaVisible ?? horaPorDefecto),
       mode: 'time',
       is24Hour: true,
-      onValueChange: (_evento, fecha) => setHora(horaDesdeFecha(fecha)),
+      // RF-02: si la hora choca con un bloque de la agenda, se sugiere la primera libre.
+      onValueChange: (_evento, fecha) =>
+        agenda.revisar(
+          horaDesdeFecha(fecha),
+          todos ? TODOS_LOS_DIAS : dias,
+          habito.duracion_min,
+          setHora,
+          elegirHora,
+        ),
     });
   };
 
@@ -162,6 +172,7 @@ export function EditPlanHabitSheet({
 
         <Button label={t.guardar} onPress={guardar} className="mt-2" />
       </View>
+      {agenda.dialogo}
     </Modal>
   );
 }

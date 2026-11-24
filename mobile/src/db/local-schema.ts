@@ -167,6 +167,21 @@ export const TABLAS = [
     },
   },
   {
+    // Agenda de bloques ocupados (RF-02).
+    nombre: 'agenda_bloques',
+    clave: ['id'],
+    columnas: {
+      id: T,
+      user_id: T,
+      nombre: T,
+      dias_semana: J,
+      hora_inicio: T,
+      hora_fin: T,
+      eliminado_en: T,
+      updated_at: T,
+    },
+  },
+  {
     nombre: 'habit_occurrences',
     clave: ['id'],
     columnas: {

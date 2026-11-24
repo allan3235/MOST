@@ -787,6 +787,40 @@ export const es = {
     errorGuardar: 'No pudimos guardar el cambio. Inténtalo de nuevo.',
   },
   // Reprogramación (SDD 6.2): tarjeta arriba de la lista de Hoy. Tono neutro, sin culpa.
+  // Agenda de bloques ocupados (RF-02): tono neutro, solo acomoda; nunca regaña.
+  agenda: {
+    titulo: 'Mi agenda',
+    menu: 'Mi agenda',
+    explicacion:
+      'Agrega tus horarios fijos, como clases o trabajo. Así tus recordatorios siempre caen en un momento libre.',
+    vacia: 'Todavía no tienes bloques. Puedes agregar los que quieras, cuando quieras.',
+    agregar: 'Agregar bloque ocupado',
+    nuevo: 'Nuevo bloque',
+    editar: 'Editar bloque',
+    nombre: '¿Qué es?',
+    nombrePlaceholder: 'Ej.: Clases',
+    dias: '¿Qué días?',
+    inicio: 'Empieza',
+    fin: 'Termina',
+    horaBoton: '{cual}: {hora}',
+    guardar: 'Guardar',
+    eliminar: 'Eliminar bloque',
+    cancelar: 'Cancelar',
+    filaA11y: '{nombre}, {dias}, de {inicio} a {fin}',
+    errores: {
+      sin_nombre: 'Escribe un nombre corto.',
+      sin_dias: 'Elige al menos un día.',
+      horas: 'La hora de fin debe ser después de la de inicio.',
+    },
+    // Choque de un recordatorio con un bloque (CP-04).
+    choque: 'A esa hora tienes «{bloque}». ¿Te queda bien a las {hora}?',
+    choqueSinHora:
+      'A esa hora tienes «{bloque}» y ese día ya no queda espacio después. Elige otra hora.',
+    usarHora: 'Usar las {hora}',
+    otraHora: 'Elegir otra hora',
+    entendido: 'Entendido',
+    error: 'No pudimos guardar tu agenda. Inténtalo de nuevo.',
+  },
   // Modo enfoque (RF-14): la app silencia sus avisos y guía a silenciar el teléfono a mano.
   enfoque: {
     titulo: 'Modo enfoque',

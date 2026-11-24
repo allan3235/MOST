@@ -95,6 +95,7 @@ function RootNavigator() {
         <Stack.Screen name="mis-planes" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="avisos-horas" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="enfoque" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="agenda" options={{ animation: 'slide_from_right' }} />
       </Stack.Protected>
       <Stack.Protected guard={zone === 'onboarding'}>
         <Stack.Screen name="(onboarding)" />

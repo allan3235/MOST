@@ -1,0 +1,128 @@
+/**
+ * @file agenda.ts
+ * @proyecto most.
+ * @descripcion Agenda de bloques ocupados (RF-02, CP-04). La persona registra sus horarios fijos
+ *   (ej. «Clases, L-M-V 10:00–11:00»); un recordatorio no puede quedar encima de uno: se rechaza
+ *   y se sugiere la primera hora libre (10:00–11:00 ocupado → 11:00). El hábito ocupa su duración
+ *   desde la hora del recordatorio, así que tampoco puede empezar justo antes y meterse al bloque.
+ *   Funciones puras sobre minutos del día.
+ * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
+ * @fecha 2026-11-24
+ * @version 1.0.0
+ * @historial 1.0.0 (2026-11-24): creación.
+ */
+
+// ===== Tipos =====
+
+export type BloqueAgenda = {
+  id: string;
+  nombre: string;
+  /** Días ISO: 1 = lunes … 7 = domingo. */
+  dias_semana: number[];
+  /** "HH:MM" o "HH:MM:SS". */
+  hora_inicio: string;
+  hora_fin: string;
+};
+
+export type ErrorBloque = 'sin_nombre' | 'sin_dias' | 'horas';
+
+// ===== Constantes =====
+
+const MINUTOS_POR_HORA = 60;
+const MINUTOS_DEL_DIA = 24 * MINUTOS_POR_HORA;
+const DIGITOS = 2;
+export const LARGO_MAXIMO_NOMBRE = 60;
+
+// ===== Funciones auxiliares =====
+
+/** "HH:MM[:SS]" → minutos desde la medianoche. */
+export function aMinutos(hora: string): number {
+  const [hh = 0, mm = 0] = hora.split(':').map(Number);
+  return hh * MINUTOS_POR_HORA + mm;
+}
+
+/** Minutos desde la medianoche → "HH:MM". */
+export function aHora(minutos: number): string {
+  const hh = Math.floor(minutos / MINUTOS_POR_HORA);
+  const mm = minutos % MINUTOS_POR_HORA;
+  return `${String(hh).padStart(DIGITOS, '0')}:${String(mm).padStart(DIGITOS, '0')}`;
+}
+
+function compartenDia(a: readonly number[], b: readonly number[]): boolean {
+  return a.some((d) => b.includes(d));
+}
+
+/** [inicio, inicio + duración) se cruza con el bloque. Sin duración cuenta como 1 minuto. */
+function seCruza(inicio: number, duracionMin: number, bloque: BloqueAgenda): boolean {
+  const fin = inicio + Math.max(duracionMin, 1);
+  return inicio < aMinutos(bloque.hora_fin) && fin > aMinutos(bloque.hora_inicio);
+}
+
+// ===== Principal =====
+
+/**
+ * Bloque con el que choca un recordatorio, o null si cae en tiempo libre.
+ * @param bloques Agenda de la persona.
+ * @param dias Días del hábito.
+ * @param hora Hora del recordatorio "HH:MM".
+ * @param duracionMin Minutos del hábito.
+ * @returns El primer bloque que se cruza, o null.
+ */
+export function bloqueQueChoca(
+  bloques: readonly BloqueAgenda[],
+  dias: readonly number[],
+  hora: string,
+  duracionMin: number,
+): BloqueAgenda | null {
+  const inicio = aMinutos(hora);
+  return (
+    bloques.find((b) => compartenDia(b.dias_semana, dias) && seCruza(inicio, duracionMin, b)) ??
+    null
+  );
+}
+
+/**
+ * Primera hora libre desde `hora` en adelante, saltando al final de cada bloque con el que choca
+ * (CP-04: 10:30 con 10:00–11:00 ocupado → 11:00). Null si ya no cabe ese día.
+ * @param bloques Agenda de la persona.
+ * @param dias Días del hábito.
+ * @param hora Hora elegida "HH:MM".
+ * @param duracionMin Minutos del hábito.
+ * @returns "HH:MM" libre, o null.
+ */
+export function primeraHoraLibre(
+  bloques: readonly BloqueAgenda[],
+  dias: readonly number[],
+  hora: string,
+  duracionMin: number,
+): string | null {
+  let inicio = aMinutos(hora);
+  for (let vuelta = 0; vuelta <= bloques.length; vuelta++) {
+    const choque = bloqueQueChoca(bloques, dias, aHora(inicio), duracionMin);
+    if (!choque) {
+      return inicio + Math.max(duracionMin, 1) <= MINUTOS_DEL_DIA ? aHora(inicio) : null;
+    }
+    inicio = aMinutos(choque.hora_fin);
+  }
+  return null;
+}
+
+/**
+ * Revisa un bloque antes de guardarlo.
+ * @param bloque Nombre, días y horas.
+ * @returns El primer problema, o null si está bien.
+ */
+export function validarBloque(
+  bloque: Pick<BloqueAgenda, 'nombre' | 'dias_semana' | 'hora_inicio' | 'hora_fin'>,
+): ErrorBloque | null {
+  if (bloque.nombre.trim().length === 0) {
+    return 'sin_nombre';
+  }
+  if (bloque.dias_semana.length === 0) {
+    return 'sin_dias';
+  }
+  if (aMinutos(bloque.hora_fin) <= aMinutos(bloque.hora_inicio)) {
+    return 'horas';
+  }
+  return null;
+}

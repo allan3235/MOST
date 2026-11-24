@@ -4,7 +4,13 @@
 export type OperacionOutbox =
   | {
       operacion: 'upsert';
-      tabla: 'habits' | 'habit_schedules' | 'habit_occurrences' | 'habit_pausas' | 'micro_pasos';
+      tabla:
+        | 'habits'
+        | 'habit_schedules'
+        | 'habit_occurrences'
+        | 'habit_pausas'
+        | 'micro_pasos'
+        | 'agenda_bloques';
       clave: string;
       payload: Record<string, unknown>;
     }
@@ -19,7 +25,8 @@ export type OperacionOutbox =
         | 'user_accessories'
         | 'plans'
         | 'habit_pausas'
-        | 'micro_pasos';
+        | 'micro_pasos'
+        | 'agenda_bloques';
       clave: string;
       payload: Record<string, unknown>;
     }

@@ -27,6 +27,7 @@ import { cardShadow, colors } from '@/theme';
 
 import { usePermisoAvisos } from '@/features/reminders/use-permiso-avisos';
 
+import { useRevisarAgenda } from '../../agenda/use-revisar-agenda';
 import { ICONO_CATEGORIA } from '../categoria-icono';
 import type { PasoAsistente } from '../domain/borrador-habito';
 import { textoFecha } from '../domain/fechas';
@@ -123,6 +124,7 @@ export function HabitWizard({
     defaultValues: valoresIniciales,
   });
   const valores = useWatch({ control }) as HabitoFormInput;
+  const agenda = useRevisarAgenda();
   const isDirty = cambiado || conCambios;
 
   // Borrador: se guarda un momento después del último cambio, con el paso en que vas.
@@ -337,16 +339,26 @@ export function HabitWizard({
           hora={valores.hora}
           horaInicial={horaInicial}
           antesDeElegir={(abrir) => void permiso.conPermiso(abrir, 'exigir')}
-          onElegir={(hora) => {
-            setValue('hora', hora, MARCAR);
-            setValue('notificar', true, MARCAR);
-            setValue('flexible', false, MARCAR);
-          }}
+          // RF-02: si la hora choca con un bloque de la agenda, se sugiere la primera libre.
+          onElegir={(hora) =>
+            agenda.revisar(
+              hora,
+              valores.dias ?? [],
+              valores.duracion ?? 0,
+              (final) => {
+                setValue('hora', final, MARCAR);
+                setValue('notificar', true, MARCAR);
+                setValue('flexible', false, MARCAR);
+              },
+              () => setDialogo('hora'),
+            )
+          }
           onSinRecordatorio={() => setValue('notificar', false, MARCAR)}
           onCerrar={() => setDialogo(null)}
         />
       ) : null}
       {permiso.dialogo}
+      {agenda.dialogo}
       {dialogo === 'duracion' ? (
         <DurationDialog
           valor={valores.duracion}

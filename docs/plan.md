@@ -146,7 +146,7 @@ Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las m
 - [x] RF-16 Hitos al 50 % y 80 %: decisión del equipo, se miden sobre la meta del micro-paso en curso (10 veces desde que empezó el paso). A los 5 y 8 de 10 sale una celebración con barra, vibración y sonido opcional (Perfil → Avisos y horas → Logros); una sola vez por paso. El detalle del plan muestra «5 de 10 hacia el siguiente paso».
 - [x] RF-04 Introspección por valores (solo local): 3 preguntas por valores con escala 1–5 (se puede saltar cualquiera), sin lenguaje clínico. Tarjeta «Un momento para ti» en Hoy cada 7 días (si no hay otra tarjeta) y al pausar un hábito (UC-11). Respuestas en la tabla local `introspecciones`, nunca se sincronizan (RR-04).
 - [x] RI-04 «Completado» desde la notificación: los avisos de un hábito traen el botón «Hecho ✓» (categoría `habito`); al tocarlo abre la app, marca el hábito con su recompensa y muestra Hoy. Visto el botón en el emulador; el toque llega a la app solo en build de desarrollo (Expo Go no lo entrega).
-- [ ] RF-02 Agenda sin traslapes (cuando se defina cómo se registra).
+- [x] RF-02 Agenda sin traslapes: decisión del 24-nov, bloques ocupados. Perfil → Mi agenda registra horarios fijos (nombre, días, inicio y fin; tabla `agenda_bloques`, sincronizada). Al elegir la hora de un recordatorio (crear/editar hábito y revisión del plan), si choca con un bloque se rechaza y se sugiere en un toque la primera hora libre (CP-04: 10:00–11:00 → 11:00). Los recordatorios que ya existían no se mueven solos.
 - [x] RF-14 Modo enfoque (Perfil → Modo enfoque): sesiones de 15, 25 o 45 min con contador. Mientras dura, most. no programa ni muestra sus avisos y al final llega uno de cierre; al terminar o cancelar vuelven solos. Android: botón que abre los ajustes de No Molestar; iOS: solo instrucciones (no se intenta activarlo). Pendiente: activar No Molestar automáticamente con permiso especial en Android (CP-15) necesita un módulo nativo y build de desarrollo.
 
 ### Fase 5: Pruebas
@@ -172,8 +172,8 @@ Expo Go sirve para desarrollar, pero **no basta para todas las pruebas**:
 1. **Calendario:** las pruebas son del 18 al 27-nov. La migración completa no cabe antes del 27; hay que pedir prórroga o ejecutar los CP por partes.
 2. **Coordinación con Naín:** él tenía el backend asignado. Acordar quién hace cada módulo para no duplicar trabajo.
 3. Valor de `META_MINIMA` (RR-03).
-4. Cómo se registra la agenda o los tiempos libres (RF-02).
-5. Hitos: 50/80 (RF-16) o 50/100 (RI-03).
+4. ~~Cómo se registra la agenda (RF-02)~~ → decidido el 24-nov: bloques ocupados.
+5. ~~Hitos: 50/80 (RF-16) o 50/100 (RI-03)~~ → decidido el 23-nov: 50/80 sobre la meta del micro-paso (10 veces).
 6. Estándar ECM-TS: completo en el código nuevo; encabezados por script en el existente.
 7. ~~Proveedor de IA~~ → decidido el 23-nov: Claude, con modelo grande para crear y pequeño para ajustar.
 8. Cuántos micro-pasos por meta (propuesta: 3 a 5) y si el usuario puede editar cada uno antes de confirmar (propuesta: sí).

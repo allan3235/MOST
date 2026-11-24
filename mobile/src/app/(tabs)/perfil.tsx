@@ -1,4 +1,4 @@
-import { Bell, Focus, LogOut, Sprout, Timer } from 'lucide-react-native';
+import { Bell, CalendarClock, Focus, LogOut, Sprout, Timer } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
@@ -109,6 +109,12 @@ export default function PerfilScreen() {
                 }
                 alerta={!avisosActivos}
                 onPress={() => navegar.push('/avisos-horas')}
+              />
+              {/* RF-02: agenda de bloques ocupados. */}
+              <MenuRow
+                icono={CalendarClock}
+                titulo={es.agenda.menu}
+                onPress={() => navegar.push('/agenda')}
               />
               {/* RF-14: modo enfoque. */}
               <MenuRow

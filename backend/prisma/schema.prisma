@@ -319,6 +319,7 @@ model profiles {
   habits              habits[]
   micro_pasos         micro_pasos[]
   habit_pausas        habit_pausas[]
+  agenda_bloques      agenda_bloques[]
   onboarding_answers  onboarding_answers?
   plans               plans[]
   plant_progress      plant_progress[]
@@ -419,5 +420,24 @@ model habit_pausas {
 
   @@index([habit_id], map: "habit_pausas_habit_idx")
   @@index([user_id, updated_at], map: "habit_pausas_user_updated_idx")
+  @@schema("public")
+}
+
+/// Agenda de bloques ocupados (RF-02): horarios fijos de la persona; los recordatorios no se ponen
+/// encima. eliminado_en marca un bloque borrado. CHECK y RLS en la migración
+/// 20261124090000_agenda_bloques.
+model agenda_bloques {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id      String    @db.Uuid
+  nombre       String
+  dias_semana  Int[]     @db.SmallInt
+  hora_inicio  DateTime  @db.Time(6)
+  hora_fin     DateTime  @db.Time(6)
+  eliminado_en DateTime? @db.Timestamptz(6)
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime  @default(now()) @db.Timestamptz(6)
+  profiles     profiles  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id, updated_at], map: "agenda_bloques_user_updated_idx")
   @@schema("public")
 }
