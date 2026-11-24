@@ -7,11 +7,13 @@
  *   necesita conexión; guardar funciona sin ella (cola de salida).
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-23
- * @version 1.0.0
+ * @version 1.1.0
  * @historial 1.0.0 (2026-11-23): creación.
+ *   1.1.0 (2026-11-24): UC-01, sin el perfil de la encuesta invita a responderla; el
+ *   recordatorio cae en el momento del perfil.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import { Alert } from '@/components/ui/alert';
@@ -28,6 +30,7 @@ import {
   type MotivoSinPropuesta,
   type PropuestaMeta,
 } from '@/db/metasRepositorio';
+import { leerGlobalesFormulario } from '@/db/plan-repository';
 import { leerAjustesLocales } from '@/db/settings-repository';
 import { useSession } from '@/features/auth/session-context';
 import { ListaMicroPasos } from '@/features/plan/components/ListaMicroPasos';
@@ -74,6 +77,14 @@ export function PantallaCrearMeta() {
   const [estado, setEstado] = useState<Estado>('escribiendo');
   const [propuesta, setPropuesta] = useState<PropuestaMeta | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  /** UC-01: sin la encuesta no hay perfil; null mientras se revisa. */
+  const [sinPerfil, setSinPerfil] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    leerGlobalesFormulario(userId)
+      .then((globales) => setSinPerfil(globales === null))
+      .catch(() => setSinPerfil(false));
+  }, [userId]);
 
   const descomponer = async () => {
     const meta = texto.trim();
@@ -95,6 +106,9 @@ export function PantallaCrearMeta() {
     if (resultado.ok) {
       setPropuesta(resultado.propuesta);
       setEstado('propuesta');
+    } else if (resultado.motivo === 'perfil_incompleto') {
+      setEstado('escribiendo');
+      setSinPerfil(true);
     } else {
       setAviso(mensajeDeMotivo(resultado.motivo, resultado.mensaje));
       setEstado('escribiendo');
@@ -109,7 +123,13 @@ export function PantallaCrearMeta() {
     setEstado('guardando');
     setAviso(null);
     try {
-      const { horaManana } = await leerAjustesLocales(userId);
+      // El recordatorio cae en el momento que eligió en la encuesta («varía»: la tarde).
+      const [{ horas }, globales] = await Promise.all([
+        leerAjustesLocales(userId),
+        leerGlobalesFormulario(userId),
+      ]);
+      const momento = globales?.momento ?? 'manana';
+      const hora = horas[momento === 'varia' ? 'tarde' : momento];
       await crearHabito(
         userId,
         {
@@ -118,7 +138,7 @@ export function PantallaCrearMeta() {
           categoria: propuesta.categoria,
           dias_semana: primero.dias_semana,
           duracion: primero.duracion_min,
-          hora: horaManana,
+          hora,
           notificar: true,
           fecha_inicio: fechaLocal(),
           fecha_fin: null,
@@ -154,7 +174,18 @@ export function PantallaCrearMeta() {
         <AppText tone="ink-soft">{conPropuesta ? t.propuestaAyuda : t.subtitulo}</AppText>
       </View>
 
-      {conPropuesta ? (
+      {sinPerfil ? (
+        <Card className="gap-4">
+          <AppText variant="h3">{t.sinPerfilTitulo}</AppText>
+          <AppText tone="ink-soft">{t.sinPerfilTexto}</AppText>
+          <Button
+            label={t.sinPerfilBoton}
+            onPress={() =>
+              navegar.replace({ pathname: '/plan-nuevo/[paso]', params: { paso: '1' } })
+            }
+          />
+        </Card>
+      ) : conPropuesta ? (
         <>
           <Card className="gap-3">
             <AppText variant="h3">{propuesta.titulo}</AppText>

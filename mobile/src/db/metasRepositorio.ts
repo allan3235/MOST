@@ -23,7 +23,8 @@ export type PropuestaMeta = {
   micro_pasos: MicroPaso[];
 };
 
-export type MotivoSinPropuesta = 'sin_conexion' | 'no_apropiada' | 'no_disponible' | 'error';
+export type MotivoSinPropuesta =
+  'sin_conexion' | 'no_apropiada' | 'no_disponible' | 'perfil_incompleto' | 'error';
 
 export type ResultadoMeta =
   | { ok: true; propuesta: PropuestaMeta }
@@ -36,6 +37,8 @@ type RespuestaMeta = { origen: 'ia'; habito: PropuestaMeta };
 const MOTIVO_POR_CODIGO: Record<string, MotivoSinPropuesta> = {
   META_NO_APROPIADA: 'no_apropiada',
   IA_NO_DISPONIBLE: 'no_disponible',
+  // UC-01: sin la encuesta no hay perfil para armar los micro-pasos.
+  PERFIL_INCOMPLETO: 'perfil_incompleto',
 };
 
 // ===== Principal =====

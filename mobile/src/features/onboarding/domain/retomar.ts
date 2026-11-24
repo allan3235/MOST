@@ -8,7 +8,6 @@ export type Retomar = { pantalla: 'formulario'; paso: Paso } | { pantalla: 'revi
 
 export type RutaOnboarding =
   | { name: 'empezar' }
-  | { name: 'modo' }
   | { name: 'formulario/[paso]'; params: { paso: string } }
   | { name: 'revision' };
 
@@ -19,9 +18,10 @@ function pasosHasta(paso: number): RutaOnboarding[] {
   }));
 }
 
-/** Pila de pantallas para volver a `retomar`: Empezar, modo, los pasos hasta ahí y la revisión. */
+/** Pila de pantallas para volver a `retomar`: Empezar, los pasos hasta ahí y la revisión. */
 export function pilaParaRetomar(retomar: Retomar): RutaOnboarding[] {
-  const base: RutaOnboarding[] = [{ name: 'empezar' }, { name: 'modo' }];
+  // UC-01: ya no hay elección de modo; Empezar lleva directo a la encuesta.
+  const base: RutaOnboarding[] = [{ name: 'empezar' }];
   if (retomar.pantalla === 'formulario') return [...base, ...pasosHasta(retomar.paso)];
   return [...base, ...pasosHasta(TOTAL_PASOS), { name: 'revision' }];
 }

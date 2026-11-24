@@ -179,14 +179,3 @@ export function filasDelPlan(input: {
 }
 
 export { fechaLocal } from '@/lib/dates';
-
-/** Ajustes por defecto del modo tradicional (SDD 6.5). */
-export function ajustesTradicionales(userId: string, presupuestoPorDefecto: number) {
-  return {
-    user_id: userId,
-    presupuesto_min: presupuestoPorDefecto,
-    estilo_notificaciones: 'recordatorio_suave' as const,
-    estrategias: [] as string[],
-    segundo_aviso: false,
-  };
-}

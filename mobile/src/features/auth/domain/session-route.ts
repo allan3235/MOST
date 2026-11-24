@@ -15,6 +15,7 @@ export function resolveAppZone(input: SessionRouteInput): AppZone {
   if (!input.hasSession) return 'auth';
   if (input.profileStatus === 'idle' || input.profileStatus === 'loading') return 'loading';
   if (input.profileStatus === 'error') return 'profile-error';
-  // Sin modo elegido, el usuario todavía no termina la bienvenida.
-  return input.mode === null ? 'onboarding' : 'tabs';
+  // UC-01: sin la encuesta (modo «guiado», que se guarda al confirmar el plan) no hay perfil para
+  // armar micro-pasos, así que se pide antes de entrar. Incluye cuentas viejas en «tradicional».
+  return input.mode === 'guiado' ? 'tabs' : 'onboarding';
 }

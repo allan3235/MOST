@@ -29,8 +29,11 @@ describe('resolveAppZone', () => {
     expect(resolveAppZone({ ...base, mode: null })).toBe('onboarding');
   });
 
-  it('lleva a las pestañas con cualquier modo elegido', () => {
-    expect(resolveAppZone({ ...base, mode: 'tradicional' })).toBe('tabs');
+  it('UC-01: sin la encuesta no entra a las pestañas, aunque la cuenta ya tuviera modo «tradicional»', () => {
+    expect(resolveAppZone({ ...base, mode: 'tradicional' })).toBe('onboarding');
+  });
+
+  it('con la encuesta respondida y el plan confirmado entra a las pestañas', () => {
     expect(resolveAppZone({ ...base, mode: 'guiado' })).toBe('tabs');
   });
 });

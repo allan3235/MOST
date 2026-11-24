@@ -19,7 +19,7 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { PrismaServicio } from '../baseDatos/prismaServicio.js';
 import { leerConfiguracion } from '../comun/configuracion.js';
 import { ErrorConCodigo } from '../comun/errorConCodigo.js';
-import type { Area, Respuestas } from '@most/compartido/encuesta';
+import { respuestasSchema, type Area, type Respuestas } from '@most/compartido/encuesta';
 import {
   alternativasDeNivel,
   generarPlan as calcularPlanMotor,
@@ -175,6 +175,27 @@ export class IaServicio {
   }
 
   /**
+   * Perfil de la encuesta (UC-01). Sin él no se pueden armar micro-pasos a la medida.
+   * @param usuarioId Usuario con sesión.
+   * @returns Las respuestas validadas.
+   */
+  private async leerPerfil(usuarioId: string): Promise<Respuestas> {
+    const fila = await this.prisma.onboarding_answers.findUnique({
+      where: { user_id: usuarioId },
+      select: { respuestas: true },
+    });
+    const perfil = respuestasSchema.safeParse(fila?.respuestas);
+    if (!perfil.success) {
+      throw new ErrorConCodigo(
+        HttpStatus.CONFLICT,
+        'PERFIL_INCOMPLETO',
+        'Antes de armar tus micro-pasos, cuéntanos un poco de ti con 7 preguntas.',
+      );
+    }
+    return perfil.data;
+  }
+
+  /**
    * Convierte una meta escrita por la persona en un hábito con micro-pasos (RF-03).
    * @param usuarioId Usuario con sesión.
    * @param texto Meta escrita.
@@ -182,6 +203,7 @@ export class IaServicio {
    * @returns Hábito propuesto.
    */
   async descomponerMeta(usuarioId: string, texto: string, categoria: Area): Promise<PropuestaMeta> {
+    const perfil = await this.leerPerfil(usuarioId);
     const ajustes = await this.prisma.user_settings.findUnique({
       where: { user_id: usuarioId },
       select: { presupuesto_min: true },
@@ -193,10 +215,17 @@ export class IaServicio {
       pasoInicial: 1,
       usaDuracionReducida: false,
     };
+    // UC-01: los micro-pasos se arman con el perfil de la encuesta, no solo con los minutos.
     const mensaje = JSON.stringify({
       meta: texto,
       area: categoria,
       minutos_maximos_por_habito: limites.minutosMaximos,
+      perfil: {
+        historial: perfil.historial,
+        tiempo: perfil.tiempo,
+        momento: perfil.momento,
+        obstaculo: perfil.obstaculo,
+      },
     });
 
     // Objeto (no variable suelta): TypeScript no ve los cambios hechos dentro del callback.

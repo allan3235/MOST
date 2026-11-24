@@ -1,7 +1,6 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
 import { limiteDuracionPlan, minutosPorDia } from '@/features/habits/domain/presupuesto';
-import { ajustesTradicionales } from '@/features/plan/domain/plan-rows';
 import {
   AVISOS_POR_DEFECTO,
   HORAS_POR_DEFECTO,
@@ -13,7 +12,6 @@ import {
   PROGRESION_POR_DEFECTO,
   type ConfigProgresion,
 } from '@/features/progression/domain/progresion';
-import { pedirApi } from '@/lib/clienteApi';
 import {
   ACOMPANAMIENTOS,
   OBSTACULOS,
@@ -29,22 +27,10 @@ import { avisarCambioLocal } from './db-version-store';
 import { leerHabitos } from './habits-repository';
 import { encolar } from './outbox';
 
-// Ajustes del usuario (`user_settings`). Los por defecto del modo tradicional se guardan directo
-// en el backend porque elegir el modo ya requiere conexión; al llegar a las pestañas, la
-// sincronización los descarga a SQLite junto con `app_config`, y desde ahí se leen. Lo que se
+// Ajustes del usuario (`user_settings`). Se crean al confirmar el plan de la encuesta (UC-01); al
+// llegar a las pestañas, la sincronización los descarga a SQLite junto con `app_config`, y desde
+// ahí se leen. Lo que se
 // cambia en Perfil se guarda en el teléfono y se sube con la cola, así que funciona sin conexión.
-
-async function presupuestoTradicional(): Promise<number> {
-  const { fila } = await pedirApi<{
-    fila: { valor: { tradicional_por_defecto?: number } } | null;
-  }>('/sync/fila', {
-    metodo: 'POST',
-    cuerpo: { tabla: 'app_config', clave: { clave: 'presupuestos' } },
-  });
-  const valor = fila?.valor.tradicional_por_defecto;
-  if (typeof valor !== 'number') throw new Error('Falta presupuestos.tradicional_por_defecto');
-  return valor;
-}
 
 const MOMENTOS_AVISO = Object.keys(HORAS_POR_DEFECTO) as MomentoAviso[];
 const HORA = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -231,6 +217,8 @@ export type AjustesLocales = {
   estiloNotificaciones: string | null;
   /** Hora de «Mañana» en Perfil: con ella empiezan los hábitos nuevos. */
   horaManana: string;
+  /** Hora de cada momento (Perfil sobre los valores por defecto). */
+  horas: HorasAvisos;
   /** Saldo del monedero; 0 hasta que lleguen las recompensas (Entrega 4). */
   saldo: number;
 };
@@ -246,15 +234,7 @@ export async function leerAjustesLocales(userId: string): Promise<AjustesLocales
   return {
     estiloNotificaciones: ajustes?.estilo ?? null,
     horaManana: ajustes?.horas.manana ?? HORAS_POR_DEFECTO.manana,
+    horas: { ...HORAS_POR_DEFECTO, ...ajustes?.horas },
     saldo: monedero?.saldo ?? 0,
   };
-}
-
-/** Ajustes por defecto al elegir el modo tradicional (SDD 6.5). */
-export async function guardarAjustesTradicionales(userId: string): Promise<void> {
-  const ajustes = ajustesTradicionales(userId, await presupuestoTradicional());
-  await pedirApi('/sync/operacion', {
-    metodo: 'POST',
-    cuerpo: { operacion: 'upsert', tabla: 'user_settings', filas: [ajustes] },
-  });
 }

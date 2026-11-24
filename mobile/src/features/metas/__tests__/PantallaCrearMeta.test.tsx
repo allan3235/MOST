@@ -6,16 +6,19 @@
  *   micro-pasos, resalta el campo con un mensaje neutro y conserva lo capturado.
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-23
- * @version 1.0.0
+ * @version 1.1.0
  * @historial 1.0.0 (2026-11-23): creación.
+ *   1.1.0 (2026-11-24): UC-01, sin perfil de la encuesta se invita a responderla; hora del perfil.
  */
 
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import { crearHabito } from '@/db/habits-repository';
+import { leerGlobalesFormulario } from '@/db/plan-repository';
 import { descomponerMeta } from '@/db/metasRepositorio';
 import { ESPERA_TOQUE_MS } from '@/lib/candado';
 import { es } from '@/i18n/es';
+import { navegar } from '@/lib/navegar';
 
 import { PantallaCrearMeta } from '../PantallaCrearMeta';
 
@@ -24,12 +27,24 @@ jest.mock('@/components/ui/back-button', () => ({ BackButton: () => null }));
 jest.mock('@/db/habits-repository', () => ({ crearHabito: jest.fn() }));
 jest.mock('@/db/metasRepositorio', () => ({ descomponerMeta: jest.fn() }));
 jest.mock('@/db/settings-repository', () => ({
-  leerAjustesLocales: jest.fn(async () => ({ horaManana: '08:00' })),
+  leerAjustesLocales: jest.fn(async () => ({
+    horaManana: '08:00',
+    horas: { manana: '08:00', mediodia: '13:00', tarde: '17:00', noche: '20:30' },
+  })),
+}));
+// Perfil de la encuesta (UC-01): por defecto, quien prefiere la noche.
+jest.mock('@/db/plan-repository', () => ({
+  leerGlobalesFormulario: jest.fn(async () => ({
+    tiempo: '10_20',
+    momento: 'noche',
+    obstaculo: 'poco_tiempo',
+    acompanamiento: 'recordatorio_suave',
+  })),
 }));
 jest.mock('@/features/auth/session-context', () => ({
   useSession: () => ({ session: { user: { id: 'u1' } } }),
 }));
-jest.mock('@/lib/navegar', () => ({ navegar: { back: jest.fn() } }));
+jest.mock('@/lib/navegar', () => ({ navegar: { back: jest.fn(), replace: jest.fn() } }));
 
 // ===== Datos de prueba =====
 
@@ -89,6 +104,8 @@ describe('PantallaCrearMeta', () => {
     expect(guardar).toHaveBeenCalledTimes(1);
     const [, datos, pasos] = guardar.mock.calls[0] ?? [];
     expect(datos?.nombre).toBe('Abrir el libro y leer 5 min');
+    // El recordatorio cae en el momento del perfil (noche), no en una hora fija.
+    expect(datos?.hora).toBe('20:30');
     expect(pasos).toHaveLength(3);
   });
 
@@ -107,5 +124,20 @@ describe('PantallaCrearMeta', () => {
     expect(screen.getByText(t.descomponer)).toBeTruthy();
     const [pastilla] = screen.getAllByLabelText(es.onboarding.formulario.areas.trabajo);
     expect(pastilla).toBeSelected();
+  });
+
+  it('UC-01: sin el perfil de la encuesta no se generan micro-pasos y se invita a responderla', async () => {
+    (leerGlobalesFormulario as jest.Mock).mockResolvedValueOnce(null);
+    await render(<PantallaCrearMeta />);
+    await act(async () => {});
+
+    expect(screen.getByText(t.sinPerfilTitulo)).toBeTruthy();
+    expect(screen.queryByText(t.descomponer)).toBeNull();
+    await fireEvent.press(screen.getByText(t.sinPerfilBoton));
+    expect(navegar.replace).toHaveBeenCalledWith({
+      pathname: '/plan-nuevo/[paso]',
+      params: { paso: '1' },
+    });
+    expect(pedir).not.toHaveBeenCalled();
   });
 });

@@ -137,23 +137,17 @@ export const es = {
       descripcion:
         'Descompón tus hábitos en micro-pasos, enfócate a tu ritmo y adapta tus metas según tu energía diaria. Aquí celebramos cada avance.',
       boton: 'Empezar',
+      // Cuentas que entraron antes sin la encuesta (UC-01): se pide una vez, sin perder nada.
+      tituloPerfil: 'Cuéntanos un poco de ti',
+      descripcionPerfil:
+        'Con 7 preguntas armamos micro-pasos a tu medida. Tus hábitos y tu historial se quedan como están.',
+      botonPerfil: 'Responder',
       ilustracion: 'Persona caminando entre árboles',
       // Flecha atrás: con la sesión iniciada, volver a la bienvenida es salir de la cuenta.
       salirTitulo: '¿Quieres salir de esta cuenta?',
       salirMensaje: 'Podrás volver a entrar con tu correo y contraseña.',
       cancelar: 'Cancelar',
       salir: 'Salir',
-    },
-    modo: {
-      titulo: '¿Cómo quieres empezar?',
-      ayuda:
-        'Es solo para empezar: después puedes crear tus propios hábitos o un plan desde Perfil.',
-      guiadoTitulo: 'Quiero un plan para mí',
-      guiadoDescripcion: 'Respondes 7 preguntas y te armamos un plan que empieza ligero.',
-      tradicionalTitulo: 'Prefiero crear mis hábitos',
-      tradicionalDescripcion: 'Tú eliges cada hábito, sus días y su hora.',
-      boton: 'Continuar',
-      error: 'No pudimos guardar tu elección. Inténtalo de nuevo.',
     },
     formulario: {
       continuar: 'Continuar',
@@ -960,6 +954,11 @@ export const es = {
     placeholder: 'Ej.: leer más por las noches',
     area: '¿De qué área es?',
     descomponer: 'Descomponer en micro-pasos',
+    // UC-01: sin el perfil de la encuesta no se generan micro-pasos.
+    sinPerfilTitulo: 'Primero, cuéntanos un poco de ti',
+    sinPerfilTexto:
+      'Con 7 preguntas sabemos cuánto tiempo tienes, a qué hora te acomoda y qué se te complica. Así tus micro-pasos quedan a tu medida.',
+    sinPerfilBoton: 'Responder 7 preguntas',
     pensando: 'Armando tus micro-pasos…',
     propuestaAyuda:
       'Empiezas con el paso 1. Cuando te salga bien, te proponemos el siguiente; si cuesta, lo hacemos más pequeño.',

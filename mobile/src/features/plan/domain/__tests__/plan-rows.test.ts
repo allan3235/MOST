@@ -1,6 +1,6 @@
 import { VERSION_FORMULARIO } from '@/schemas/onboarding';
 
-import { ajustesTradicionales, fechaLocal, filasDelPlan, type IdsPlan } from '../plan-rows';
+import { fechaLocal, filasDelPlan, type IdsPlan } from '../plan-rows';
 import { BORRADOR, habito, RESPUESTAS } from '../__fixtures__/plan';
 
 const IDS: IdsPlan = {
@@ -143,14 +143,4 @@ describe('filas que se guardan al pulsar «Empezar»', () => {
 
 it('fechaLocal usa la fecha del teléfono', () => {
   expect(fechaLocal(new Date(2026, 0, 5, 23, 59))).toBe('2026-01-05');
-});
-
-it('modo tradicional: ajustes por defecto (SDD 6.5)', () => {
-  expect(ajustesTradicionales('usuario-1', 20)).toEqual({
-    user_id: 'usuario-1',
-    presupuesto_min: 20,
-    estilo_notificaciones: 'recordatorio_suave',
-    estrategias: [],
-    segundo_aviso: false,
-  });
 });

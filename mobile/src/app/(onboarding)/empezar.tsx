@@ -11,9 +11,14 @@ import { Screen } from '@/components/ui/screen';
 import { useSession } from '@/features/auth/session-context';
 import { pilaParaRetomar } from '@/features/onboarding/domain/retomar';
 import { useOnboardingStore } from '@/features/onboarding/onboarding-store';
+import { usePlanReviewStore } from '@/features/plan/plan-review-store';
 import { es } from '@/i18n/es';
 import { navegar } from '@/lib/navegar';
 
+// UC-01: «Empezar» lleva directo a la encuesta de 7 preguntas (ya no hay elección de modo): sin
+// perfil no se pueden armar micro-pasos a la medida. Una cuenta que entró antes sin encuesta
+// (modo «tradicional») ve un texto propio y conserva sus hábitos.
+//
 // Pantalla «Empezar» del mockup: se ve justo después de confirmar la cuenta. La sesión ya está
 // iniciada, así que la flecha atrás pregunta si quiere salir de la cuenta y, al confirmar, cierra
 // sesión: el layout raíz lleva entonces a la bienvenida. Si la app se cerró a mitad del formulario
@@ -25,7 +30,8 @@ import { navegar } from '@/lib/navegar';
 
 export default function EmpezarScreen() {
   const t = es.onboarding.empezar;
-  const { signOut, session } = useSession();
+  const { signOut, session, profile } = useSession();
+  const sinEncuesta = profile?.modo === 'tradicional';
   const navigation = useNavigation();
 
   const userId = session?.user.id ?? null;
@@ -48,6 +54,17 @@ export default function EmpezarScreen() {
     return () => cancelAnimationFrame(cuadro);
   }, [navigation, userId]);
 
+  const empezarEncuesta = () => {
+    if (session) {
+      // Un plan en revisión de otra cuenta no se retoma; las respuestas de esta misma, sí.
+      if (useOnboardingStore.getState().userId !== session.user.id) {
+        usePlanReviewStore.getState().limpiar();
+      }
+      useOnboardingStore.getState().prepararPara(session.user.id);
+    }
+    navegar.push({ pathname: '/formulario/[paso]', params: { paso: '1' } });
+  };
+
   const salir = () =>
     AlertNativo.alert(t.salirTitulo, t.salirMensaje, [
       { text: t.cancelar, style: 'cancel' },
@@ -67,14 +84,18 @@ export default function EmpezarScreen() {
           style={{ width: '100%', aspectRatio: 1776 / 1354 }}
         />
         <AppText variant="h1" weight="semibold" className="text-center">
-          {t.titulo}
+          {sinEncuesta ? t.tituloPerfil : t.titulo}
         </AppText>
         <AppText variant="body" className="text-center">
-          {t.descripcion}
+          {sinEncuesta ? t.descripcionPerfil : t.descripcion}
         </AppText>
       </View>
 
-      <Button label={t.boton} onPress={() => navegar.push('/modo')} className="mt-10" />
+      <Button
+        label={sinEncuesta ? t.botonPerfil : t.boton}
+        onPress={empezarEncuesta}
+        className="mt-10"
+      />
     </Screen>
   );
 }
