@@ -1,4 +1,4 @@
-import { Bell, LogOut, Sprout, Timer } from 'lucide-react-native';
+import { Bell, Focus, LogOut, Sprout, Timer } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
@@ -109,6 +109,13 @@ export default function PerfilScreen() {
                 }
                 alerta={!avisosActivos}
                 onPress={() => navegar.push('/avisos-horas')}
+              />
+              {/* RF-14: modo enfoque. */}
+              <MenuRow
+                icono={Focus}
+                titulo={es.enfoque.menu}
+                onPress={() => navegar.push('/enfoque')}
+                ultima={!ajustes}
               />
               {ajustes ? (
                 <MenuRow

@@ -10,7 +10,13 @@ import {
   setNotificationHandler,
 } from 'expo-notifications';
 
+import { borrarEnfoque, guardarEnfoqueHasta, leerEnfoqueHasta } from '@/db/enfoque-repository';
 import { leerDatosAvisos, revisarAvisoMotivacional } from '@/db/reminders-repository';
+import {
+  estaEnEnfoque,
+  finDeEnfoque,
+  quitarAvisosDuranteEnfoque,
+} from '@/features/enfoque/domain/enfoque';
 import { es, formatear } from '@/i18n/es';
 import { fechaLocal } from '@/lib/dates';
 import { colors } from '@/theme';
@@ -33,13 +39,17 @@ export const ACCION_COMPLETAR = 'completar';
 /** Se llama al abrir la app: sin un canal creado, Android 13 no muestra la pregunta del permiso. */
 export async function prepararAvisos(): Promise<void> {
   setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowBanner: true,
-      shouldShowList: true,
-      // Con `false`, Android no muestra el aviso desplegable.
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-    }),
+    handleNotification: async () => {
+      // RF-14: durante el enfoque, lo que llegue con la app abierta no se muestra ni suena.
+      const silencio = estaEnEnfoque(enfoqueHasta, new Date());
+      return {
+        shouldShowBanner: !silencio,
+        shouldShowList: !silencio,
+        // Con `false`, Android no muestra el aviso desplegable.
+        shouldPlaySound: !silencio,
+        shouldSetBadge: false,
+      };
+    },
   });
   // El canal y la categoría van por separado: si uno falla (en Expo Go crear el canal puede
   // rechazarse), el otro igual se registra.
@@ -86,6 +96,8 @@ export async function permisoConcedido(): Promise<boolean> {
 // Ventana móvil (SDD 7.1): cada recálculo cancela lo programado y vuelve a programar los avisos de
 // los próximos 7 días. Si lo planeado no cambió desde la última vez, no se toca nada.
 let ultimaFirma: string | null = null;
+/** Fin de la sesión de enfoque en curso (RF-14), o null. Se lee de SQLite en cada recálculo. */
+let enfoqueHasta: Date | null = null;
 let enCurso: Promise<void> | null = null;
 let repetir = false;
 
@@ -95,7 +107,23 @@ function firma(avisos: readonly AvisoPlaneado[]): string {
 
 async function programar(userId: string): Promise<void> {
   const datos = await leerDatosAvisos(userId);
-  const avisos = datos ? planificarAvisos(datos, new Date()) : [];
+  const ahora = new Date();
+  const guardado = await leerEnfoqueHasta(userId);
+  enfoqueHasta = estaEnEnfoque(guardado, ahora) ? guardado : null;
+  // RF-14: durante el enfoque no se programa ningún aviso propio; al terminar, uno de cierre.
+  const avisos = quitarAvisosDuranteEnfoque(
+    datos ? planificarAvisos(datos, ahora) : [],
+    enfoqueHasta,
+  );
+  if (enfoqueHasta) {
+    avisos.unshift({
+      id: 'fin-enfoque',
+      fecha: enfoqueHasta,
+      titulo: es.enfoque.finTitulo,
+      cuerpo: es.enfoque.finCuerpo,
+      habitId: null,
+    });
+  }
   const nueva = firma(avisos);
   if (nueva === ultimaFirma) return;
   ultimaFirma = null;
@@ -152,7 +180,7 @@ export const RUTA_AVISO_MOTIVACIONAL = '/estadisticas' as const;
  * @param userId Usuario con sesión.
  */
 export async function mandarAvisoMotivacional(userId: string): Promise<void> {
-  if (!(await permisoConcedido())) {
+  if (!(await permisoConcedido()) || estaEnEnfoque(enfoqueHasta, new Date())) {
     return;
   }
   const dias = await revisarAvisoMotivacional(userId);
@@ -171,4 +199,29 @@ export async function mandarAvisoMotivacional(userId: string): Promise<void> {
     // Solo el canal: se muestra en cuanto se programa.
     trigger: { channelId: CANAL_RECORDATORIOS },
   });
+}
+
+/**
+ * Empieza una sesión de enfoque (RF-14): se guarda su fin y se recalculan los avisos sin los que
+ * caerían durante ella.
+ * @param userId Usuario con sesión.
+ * @param minutos Duración elegida.
+ * @returns Fin de la sesión.
+ */
+export async function iniciarEnfoque(userId: string, minutos: number): Promise<Date> {
+  const hasta = finDeEnfoque(new Date(), minutos);
+  await guardarEnfoqueHasta(userId, hasta);
+  enfoqueHasta = hasta;
+  await reprogramarAvisos(userId);
+  return hasta;
+}
+
+/**
+ * Termina o cancela la sesión: los avisos vuelven a programarse como antes.
+ * @param userId Usuario con sesión.
+ */
+export async function terminarEnfoque(userId: string): Promise<void> {
+  await borrarEnfoque(userId);
+  enfoqueHasta = null;
+  await reprogramarAvisos(userId);
 }

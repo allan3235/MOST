@@ -787,6 +787,32 @@ export const es = {
     errorGuardar: 'No pudimos guardar el cambio. Inténtalo de nuevo.',
   },
   // Reprogramación (SDD 6.2): tarjeta arriba de la lista de Hoy. Tono neutro, sin culpa.
+  // Modo enfoque (RF-14): la app silencia sus avisos y guía a silenciar el teléfono a mano.
+  enfoque: {
+    titulo: 'Modo enfoque',
+    menu: 'Modo enfoque',
+    explicacion:
+      'Mientras dure, most. no te mandará avisos. Para que nada más te interrumpa, también puedes silenciar tu teléfono.',
+    duracion: '¿Cuánto tiempo?',
+    minutos: '{n} min',
+    empezar: 'Empezar',
+    enCurso: 'En enfoque',
+    hasta: 'Tus avisos de most. están en pausa hasta las {hora}.',
+    silenciaTitulo: 'Silencia tu teléfono',
+    silenciaAndroid: 'Activa No Molestar para que tampoco te interrumpan otras apps.',
+    abrirNoMolestar: 'Abrir No Molestar',
+    silenciaIos:
+      'Desliza para abrir el Centro de control y activa Concentración. La app no puede hacerlo por ti.',
+    terminar: 'Terminar sesión',
+    terminadaTitulo: '¡Sesión terminada!',
+    terminadaTexto: 'Tus avisos de most. vuelven a la normalidad.',
+    recordatorioQuitar: 'Si activaste No Molestar, recuerda quitarlo cuando quieras.',
+    otraSesion: 'Otra sesión',
+    finTitulo: 'Terminó tu sesión de enfoque',
+    finCuerpo: 'Buen trabajo. Tus avisos vuelven a la normalidad.',
+    contadorA11y: 'Quedan {tiempo}',
+    error: 'No pudimos cambiar el modo enfoque. Inténtalo de nuevo.',
+  },
   // Introspección por valores (RF-04): sin diagnóstico ni etiquetas; no hay respuestas correctas.
   introspeccion: {
     tarjetaTitulo: 'Un momento para ti',

@@ -147,7 +147,7 @@ Decisión técnica (23-nov): **Prisma 7 (estable, 7.10.1) para el esquema, las m
 - [x] RF-04 Introspección por valores (solo local): 3 preguntas por valores con escala 1–5 (se puede saltar cualquiera), sin lenguaje clínico. Tarjeta «Un momento para ti» en Hoy cada 7 días (si no hay otra tarjeta) y al pausar un hábito (UC-11). Respuestas en la tabla local `introspecciones`, nunca se sincronizan (RR-04).
 - [x] RI-04 «Completado» desde la notificación: los avisos de un hábito traen el botón «Hecho ✓» (categoría `habito`); al tocarlo abre la app, marca el hábito con su recompensa y muestra Hoy. Visto el botón en el emulador; el toque llega a la app solo en build de desarrollo (Expo Go no lo entrega).
 - [ ] RF-02 Agenda sin traslapes (cuando se defina cómo se registra).
-- [ ] RF-14 Modo enfoque.
+- [x] RF-14 Modo enfoque (Perfil → Modo enfoque): sesiones de 15, 25 o 45 min con contador. Mientras dura, most. no programa ni muestra sus avisos y al final llega uno de cierre; al terminar o cancelar vuelven solos. Android: botón que abre los ajustes de No Molestar; iOS: solo instrucciones (no se intenta activarlo). Pendiente: activar No Molestar automáticamente con permiso especial en Android (CP-15) necesita un módulo nativo y build de desarrollo.
 
 ### Fase 5: Pruebas
 - [ ] Ejecutar CP-01 a CP-16 y registrar el resultado el mismo día.
