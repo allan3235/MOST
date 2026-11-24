@@ -26,6 +26,7 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      "./plugins/conNombreGradle.js",
       "expo-router",
       "expo-status-bar",
       "expo-font",
