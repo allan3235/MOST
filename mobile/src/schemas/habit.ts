@@ -36,7 +36,16 @@ export function limitesDeTexto(inicial?: {
   };
 }
 
-export const crearHabitoFormSchema = (limites: LimitesTexto = limitesDeTexto()) =>
+/**
+ * Esquema del formulario de hábito.
+ * @param limites Largo máximo del nombre y la descripción.
+ * @param duracionMinima Candado mínimo al ajustar (RR-03): con 0 se permite «Sin duración fija».
+ * @returns El esquema de zod.
+ */
+export const crearHabitoFormSchema = (
+  limites: LimitesTexto = limitesDeTexto(),
+  duracionMinima = 0,
+) =>
   z
     .object({
       nombre: z
@@ -69,6 +78,11 @@ export const crearHabitoFormSchema = (limites: LimitesTexto = limitesDeTexto()) 
       flexible: z.boolean(),
       fecha_inicio: fecha,
       fecha_fin: fecha.nullable(),
+    })
+    // RR-03 (CP-14): un hábito con minutos no baja del mínimo ni se queda sin duración al ajustarlo.
+    .refine((v) => duracionMinima === 0 || v.duracion >= duracionMinima, {
+      message: formatear(e.duracionMinima, { n: duracionMinima }),
+      path: ['duracion'],
     })
     .refine((v) => !v.notificar || v.hora !== null || v.flexible, {
       message: e.hora,

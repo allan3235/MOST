@@ -8,7 +8,8 @@ import {
   aplicarCandado,
   cumplimientoDe,
   decidir,
-  META_MINIMA,
+  DIAS_MINIMOS_POR_SEMANA,
+  MINUTOS_MINIMOS,
   pasoHaciaAbajo,
   PROGRESION_POR_DEFECTO,
   tocaDesbloquear,
@@ -498,10 +499,11 @@ describe('candado mínimo (RR-03)', () => {
     nivel_desde: null,
   };
 
-  it('ningún reajuste deja menos de 1 minuto ni menos de 1 día', () => {
-    expect(META_MINIMA).toBe(1);
+  it('ningún reajuste deja menos de 2 minutos ni menos de 1 día (decisión del 24-nov)', () => {
+    expect(DIAS_MINIMOS_POR_SEMANA).toBe(1);
+    expect(MINUTOS_MINIMOS).toBe(2);
     expect(aplicarCandado({ ...base, duracion_min: 0.4, dias_semana: [] })).toMatchObject({
-      duracion_min: 1,
+      duracion_min: 2,
       dias_semana: [1],
     });
   });

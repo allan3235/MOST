@@ -86,13 +86,14 @@ describe('corregirHabito', () => {
       ]),
       LIMITES,
     );
-    // Sin reducida válida se usa la mitad (2 → 1, 4 → 2); siempre menor que la normal (50 → 5).
-    expect(habito?.micro_pasos.map((p) => p.duracion_reducida_min)).toEqual([1, 2, 5]);
+    // Sin reducida válida se usa la mitad sin bajar de 2 min (2 → 2, 4 → 2); siempre menor que la
+    // normal (50 → 5).
+    expect(habito?.micro_pasos.map((p) => p.duracion_reducida_min)).toEqual([2, 2, 5]);
   });
 
-  it('un paso de 1 minuto conserva 1 minuto de reducida (candado mínimo)', () => {
+  it('un paso de 1 minuto sube al candado mínimo de 2 min (RR-03)', () => {
     const habito = corregirHabito(crearHabito([crearPaso(1), crearPaso(2), crearPaso(3)]), LIMITES);
-    expect(habito?.micro_pasos[0]).toMatchObject({ duracion_min: 1, duracion_reducida_min: 1 });
+    expect(habito?.micro_pasos[0]).toMatchObject({ duracion_min: 2, duracion_reducida_min: 2 });
   });
 
   it('si recorta los minutos, el título dice los minutos reales', () => {
@@ -161,14 +162,14 @@ describe('limpiarDias', () => {
 });
 
 describe('paso más ligero (meta intermedia)', () => {
-  it('siempre más corto que el actual y nunca menos de 1 min', () => {
+  it('siempre más corto que el actual y nunca menos de 2 min (RR-03)', () => {
     expect(corregirPasoLigero(crearPaso(30), PASO_ACTUAL)?.duracion_min).toBe(9);
-    expect(corregirPasoLigero(crearPaso(0), PASO_ACTUAL)?.duracion_min).toBe(1);
+    expect(corregirPasoLigero(crearPaso(0), PASO_ACTUAL)?.duracion_min).toBe(2);
   });
 
   it('sin IA: la mitad del tiempo con el candado mínimo', () => {
     expect(crearPasoLigeroSinIa(PASO_ACTUAL).duracion_min).toBe(5);
-    expect(crearPasoLigeroSinIa({ ...PASO_ACTUAL, duracion_min: 1 }).duracion_min).toBe(1);
+    expect(crearPasoLigeroSinIa({ ...PASO_ACTUAL, duracion_min: 1 }).duracion_min).toBe(2);
   });
 
   it('un recordatorio se aligera con menos días', () => {

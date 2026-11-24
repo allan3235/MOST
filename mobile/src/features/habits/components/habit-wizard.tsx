@@ -63,6 +63,8 @@ export type HabitWizardProps = {
   permitirSinDuracion?: boolean;
   /** Minutos máximos de un hábito del plan; sin límite si no se pasa. */
   limiteDuracion?: number | null;
+  /** Candado mínimo al editar un hábito con minutos (RR-03); 0 = sin mínimo. */
+  duracionMinima?: number;
   enviando: boolean;
   error: boolean;
   onEnviar: (valores: HabitoFormValues) => void;
@@ -85,6 +87,7 @@ export function HabitWizard({
   horaInicial,
   permitirSinDuracion = false,
   limiteDuracion = null,
+  duracionMinima = 0,
   enviando,
   error,
   onEnviar,
@@ -120,7 +123,7 @@ export function HabitWizard({
     getValues,
     formState: { errors, isDirty: cambiado },
   } = useForm<HabitoFormInput, unknown, HabitoFormValues>({
-    resolver: zodResolver(crearHabitoFormSchema(limites)),
+    resolver: zodResolver(crearHabitoFormSchema(limites, duracionMinima)),
     defaultValues: valoresIniciales,
   });
   const valores = useWatch({ control }) as HabitoFormInput;
@@ -364,6 +367,7 @@ export function HabitWizard({
           valor={valores.duracion}
           permitirSinDuracion={permitirSinDuracion}
           limite={limiteDuracion}
+          minimo={duracionMinima}
           onElegir={(minutos) => setValue('duracion', minutos, MARCAR)}
           onCerrar={() => setDialogo(null)}
         />

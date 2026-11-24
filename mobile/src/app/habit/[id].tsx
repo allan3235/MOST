@@ -12,6 +12,7 @@ import { useSession } from '@/features/auth/session-context';
 import { HabitWizard } from '@/features/habits/components/habit-wizard';
 import { textoDuracion } from '@/features/habits/domain/formato';
 import { valoresDeHabito } from '@/features/habits/domain/valores-formulario';
+import { MINUTOS_MINIMOS } from '@/features/progression/domain/progresion';
 import { es, formatear } from '@/i18n/es';
 import { fechaLocal } from '@/lib/dates';
 import type { HabitoFormValues } from '@/schemas/habit';
@@ -84,6 +85,8 @@ export default function EditarHabitoScreen() {
       editando
       permitirSinDuracion
       limiteDuracion={limite.data ?? null}
+      // RR-03 (CP-14): si ya tenía minutos, no baja de MINUTOS_MINIMOS ni queda sin duración.
+      duracionMinima={item.habito.duracion_min > 0 ? MINUTOS_MINIMOS : 0}
       hoy={hoy}
       inicioEditable={inicio >= hoy}
       enviando={enviando}

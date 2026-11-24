@@ -95,3 +95,30 @@ describe('límites de texto (decisión del usuario: 30 y 100)', () => {
     expect(es.habitForm.errores.nombreLargo).toContain('{n}');
   });
 });
+
+describe('candado mínimo al ajustar (RR-03)', () => {
+  const ajuste = crearHabitoFormSchema(limitesDeTexto(), 2);
+  const erroresAjuste = (cambios: Partial<HabitoFormInput>): string[] => {
+    const r = ajuste.safeParse({ ...valido, ...cambios });
+    return r.success ? [] : r.error.issues.map((i) => i.message);
+  };
+
+  it('CP-14: 0 días y 0 minutos no se guardan y se explica el mínimo con tono compasivo', () => {
+    const mensajes = erroresAjuste({ dias: [], duracion: 0 });
+    expect(mensajes).toContain(e.dias);
+    expect(mensajes).toContain(formatear(e.duracionMinima, { n: 2 }));
+    for (const m of mensajes) {
+      expect(m.toLowerCase()).not.toMatch(/fall|error|incorrect|inválid/);
+    }
+  });
+
+  it('CP-12: bajar de 20 a 10 min en lunes, miércoles y viernes sí se guarda', () => {
+    expect(erroresAjuste({ dias: [1, 3, 5], duracion: 10 })).toEqual([]);
+    expect(erroresAjuste({ duracion: 2 })).toEqual([]);
+    expect(erroresAjuste({ duracion: 1 })).toEqual([formatear(e.duracionMinima, { n: 2 })]);
+  });
+
+  it('al crear (sin mínimo) se puede elegir «Sin duración fija»', () => {
+    expect(errores({ duracion: 0 })).toEqual([]);
+  });
+});

@@ -38,8 +38,8 @@ export const DURACION_MAXIMA_PRIMER_PASO = 5;
 export const FACTOR_MAXIMO_ENTRE_PASOS = 3;
 export const MICRO_PASOS_MINIMO = 3;
 export const MICRO_PASOS_MAXIMO = 5;
-/** Candado mínimo (RR-03): ningún ajuste baja de 1 minuto. */
-export const META_MINIMA = 1;
+/** Candado mínimo (RR-03, decisión del 24-nov): ningún micro-paso ni ajuste baja de 2 minutos. */
+export const MINUTOS_MINIMOS = 2;
 const DIAS_VALIDOS = [1, 2, 3, 4, 5, 6, 7];
 const LARGO_MAXIMO_TITULO = 80;
 const LARGO_MAXIMO_DESCRIPCION = 200;
@@ -86,7 +86,7 @@ function corregirDuracion(
  */
 function corregirReducida(propuesta: number, duracion: number): number {
   const valor = propuesta > 0 ? propuesta : duracion / 2;
-  return acotar(valor, META_MINIMA, Math.max(duracion - 1, META_MINIMA));
+  return acotar(valor, MINUTOS_MINIMOS, Math.max(duracion - 1, MINUTOS_MINIMOS));
 }
 
 // ===== Principal =====
@@ -103,7 +103,7 @@ export function corregirHabito(habito: HabitoIa, limites: LimitesHabito): Habito
   }
   const pasos = habito.micro_pasos.slice(0, MICRO_PASOS_MAXIMO);
   const tieneDuracion = pasos[0].duracion_min > 0;
-  const maximoHabito = Math.max(limites.minutosMaximos, META_MINIMA);
+  const maximoHabito = Math.max(limites.minutosMaximos, MINUTOS_MINIMOS);
 
   const corregidos: MicroPaso[] = [];
   let anterior = 0;
@@ -119,7 +119,7 @@ export function corregirHabito(habito: HabitoIa, limites: LimitesHabito): Habito
         indice === 0
           ? Math.min(DURACION_MAXIMA_PRIMER_PASO, maximoHabito)
           : Math.min(anterior * FACTOR_MAXIMO_ENTRE_PASOS, maximoHabito);
-      ({ duracion, reducida } = corregirDuracion(paso, Math.max(anterior, META_MINIMA), maximo));
+      ({ duracion, reducida } = corregirDuracion(paso, Math.max(anterior, MINUTOS_MINIMOS), maximo));
       anterior = duracion;
     }
     const titulo = tieneDuracion
@@ -172,8 +172,8 @@ export function corregirPasoLigero(
       dias_semana: menosDias,
     };
   }
-  const maximo = Math.max(actual.duracion_min - 1, META_MINIMA);
-  const duracion = acotar(paso.duracion_min, META_MINIMA, maximo);
+  const maximo = Math.max(actual.duracion_min - 1, MINUTOS_MINIMOS);
+  const duracion = acotar(paso.duracion_min, MINUTOS_MINIMOS, maximo);
   return {
     titulo: recortar(
       ajustarMinutosEnTitulo(paso.titulo, paso.duracion_min, duracion),
@@ -202,7 +202,7 @@ export function crearPasoLigeroSinIa(actual: MicroPaso): Omit<MicroPaso, 'orden'
       dias_semana: actual.dias_semana.slice(0, 1),
     };
   }
-  const duracion = Math.max(Math.ceil(actual.duracion_min / 2), META_MINIMA);
+  const duracion = Math.max(Math.ceil(actual.duracion_min / 2), MINUTOS_MINIMOS);
   return {
     titulo: ajustarMinutosEnTitulo(actual.titulo, actual.duracion_min, duracion),
     descripcion,

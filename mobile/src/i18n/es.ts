@@ -429,6 +429,7 @@ export const es = {
       cancelar: 'Cancelar',
     },
     dialogoDuracion: {
+      minimo: 'Lo mínimo son {n} min: así de ligero sigue siendo tuyo.',
       titulo: '¿Cuánto dura?',
       horas: 'Horas',
       minutos: 'Minutos',
@@ -493,7 +494,9 @@ export const es = {
       nombreLargo: 'Usa {n} caracteres o menos.',
       descripcionLarga: 'Usa {n} caracteres o menos.',
       categoria: 'Elige una categoría.',
-      dias: 'Escoge mínimo un día.',
+      dias: 'Lo mínimo es un día a la semana: con uno basta para seguir.',
+      duracionMinima:
+        'Lo mínimo son {n} min: así de ligero sigue siendo tuyo. Puedes dejarlo en {n}.',
       duracion: 'Elige una duración de hasta 23 h 59 min.',
       hora: 'Elige una hora.',
       fechaFin: 'La fecha de fin no puede ser antes de la de inicio.',

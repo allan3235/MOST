@@ -171,7 +171,7 @@ Expo Go sirve para desarrollar, pero **no basta para todas las pruebas**:
 
 1. **Calendario:** las pruebas son del 18 al 27-nov. La migración completa no cabe antes del 27; hay que pedir prórroga o ejecutar los CP por partes.
 2. **Coordinación con Naín:** él tenía el backend asignado. Acordar quién hace cada módulo para no duplicar trabajo.
-3. Valor de `META_MINIMA` (RR-03).
+3. ~~Valor de `META_MINIMA` (RR-03)~~ → decidido el 24-nov: `DIAS_MINIMOS_POR_SEMANA = 1` y `MINUTOS_MINIMOS = 2` al ajustar (en la app y en las reglas de la IA). «Sin duración fija» queda solo para hábitos que nunca tuvieron minutos.
 4. ~~Cómo se registra la agenda (RF-02)~~ → decidido el 24-nov: bloques ocupados.
 5. ~~Hitos: 50/80 (RF-16) o 50/100 (RI-03)~~ → decidido el 23-nov: 50/80 sobre la meta del micro-paso (10 veces).
 6. Estándar ECM-TS: completo en el código nuevo; encabezados por script en el existente.

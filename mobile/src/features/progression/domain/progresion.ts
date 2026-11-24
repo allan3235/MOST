@@ -47,8 +47,14 @@ import type { HabitoPlan, Nivel } from '@/schemas/plan';
 /** RF-15: con menos de este cumplimiento en los últimos DIAS_EVALUADOS se propone bajar. */
 export const UMBRAL_CUMPLIMIENTO = 0.4;
 export const DIAS_EVALUADOS = 7;
-/** RR-03 candado mínimo: ningún reajuste baja de 1 minuto (si tiene duración) ni de 1 día. */
-export const META_MINIMA = 1;
+/**
+ * RR-03 candado mínimo (decisión del 24-nov): ningún reajuste deja un hábito en menos de 1 día por
+ * semana ni, si tiene duración, en menos de 2 minutos.
+ */
+export const DIAS_MINIMOS_POR_SEMANA = 1;
+/** Día que queda si un reajuste dejara un hábito sin días (lunes). */
+const DIA_POR_DEFECTO = 1;
+export const MINUTOS_MINIMOS = 2;
 
 export type ConfigProgresion = {
   umbral_subir: number;
@@ -249,15 +255,18 @@ export function valoresDeNivel(
 }
 
 /**
- * Candado mínimo (RR-03): un hábito con duración nunca queda en menos de META_MINIMA minutos, y
- * nunca en menos de META_MINIMA días por semana.
+ * Candado mínimo (RR-03): un hábito con duración nunca queda en menos de MINUTOS_MINIMOS minutos,
+ * y nunca en menos de DIAS_MINIMOS_POR_SEMANA días por semana.
  * @param valores Valores propuestos.
  * @returns Los mismos valores, con el piso aplicado.
  */
 export function aplicarCandado(valores: ValoresNivel): ValoresNivel {
-  const dias = valores.dias_semana.length >= META_MINIMA ? valores.dias_semana : [1];
+  const dias =
+    valores.dias_semana.length >= DIAS_MINIMOS_POR_SEMANA ? valores.dias_semana : [DIA_POR_DEFECTO];
   const duracion =
-    valores.duracion_min > 0 ? Math.max(valores.duracion_min, META_MINIMA) : valores.duracion_min;
+    valores.duracion_min > 0
+      ? Math.max(valores.duracion_min, MINUTOS_MINIMOS)
+      : valores.duracion_min;
   return { ...valores, dias_semana: dias, duracion_min: duracion };
 }
 
@@ -383,7 +392,7 @@ export function pasoHaciaAbajo(
     const tieneVersionCorta =
       actual.duracion_min > 0 &&
       actual.duracion_reducida_min < actual.duracion_min &&
-      actual.duracion_reducida_min >= META_MINIMA;
+      actual.duracion_reducida_min >= MINUTOS_MINIMOS;
     if (habito.usa_duracion_reducida || !tieneVersionCorta) return null;
     return valoresDePaso(actual, habito.nivel, true, hoy);
   }
@@ -397,14 +406,14 @@ export function pasoHaciaAbajo(
 }
 
 /**
- * Todavía cabe una versión más ligera sin pasar del candado mínimo (RR-03): más de 1 minuto o, si
+ * Todavía cabe una versión más ligera sin pasar del candado mínimo (RR-03): más de 2 minutos o, si
  * no tiene duración, más de 1 día por semana.
  * @param duracion Minutos actuales.
  * @param diasPorSemana Días actuales.
  * @returns true si se puede aligerar.
  */
 export function puedeAligerarse(duracion: number, diasPorSemana: number): boolean {
-  return duracion > META_MINIMA || (duracion === 0 && diasPorSemana > META_MINIMA);
+  return duracion > MINUTOS_MINIMOS || (duracion === 0 && diasPorSemana > DIAS_MINIMOS_POR_SEMANA);
 }
 
 /** Las tarjetas de una revisión, en el orden de los hábitos. */
