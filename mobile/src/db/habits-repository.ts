@@ -368,6 +368,38 @@ export async function editarHabito(
 }
 
 /**
+ * Mueve solo la hora del recordatorio de un hábito, desde hoy (D-04: sacarlo de un bloque
+ * ocupado). Los días, el aviso, las fechas y el historial se quedan igual.
+ * @param userId Dueño del hábito.
+ * @param habitId Hábito a mover.
+ * @param hora Hora nueva "HH:MM".
+ */
+export async function cambiarHoraRecordatorio(
+  userId: string,
+  habitId: string,
+  hora: string,
+): Promise<void> {
+  await aplicar(async (db) => {
+    const horarios = await leerFilas<Horario>(db, 'habit_schedules', 'habit_id = ?', [habitId]);
+    const hoy = fechaLocal();
+    const actual = horarioDeReferencia(horarios, hoy);
+    if (!actual) return [];
+    const version = nuevaVersionHorario(
+      actual,
+      {
+        dias_semana: actual.dias_semana,
+        hora,
+        notificar: actual.notificar,
+        vigente_hasta: actual.vigente_hasta,
+      },
+      hoy,
+      randomUUID(),
+    );
+    return guardarVersionHorario(db, userId, version);
+  });
+}
+
+/**
  * Pausar (activo = falso) o reanudar. Un hábito pausado no aparece en Hoy. Cada pausa queda como
  * un periodo en habit_pausas (desde hoy; al reanudar, hasta ayer), así sus días no cuentan como
  * fallo ni después de reanudar (RF-09).

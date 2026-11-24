@@ -8,7 +8,13 @@
  * @historial 1.0.0 (2026-11-24): creación.
  */
 
-import { bloqueQueChoca, primeraHoraLibre, validarBloque, type BloqueAgenda } from '../agenda';
+import {
+  bloqueQueChoca,
+  primeraHoraLibre,
+  recordatoriosQueChocan,
+  validarBloque,
+  type BloqueAgenda,
+} from '../agenda';
 
 const CLASES: BloqueAgenda = {
   id: 'b1',
@@ -55,5 +61,26 @@ describe('agenda de bloques ocupados', () => {
     expect(validarBloque({ ...CLASES, dias_semana: [] })).toBe('sin_dias');
     expect(validarBloque({ ...CLASES, hora_fin: '09:00' })).toBe('horas');
     expect(validarBloque(CLASES)).toBeNull();
+  });
+});
+
+describe('D-04: al guardar un bloque se revisan los recordatorios que ya existían', () => {
+  const estirar = {
+    habitId: 'h1',
+    titulo: 'Estirar',
+    dias: [1, 2, 3, 4, 5],
+    hora: '10:30:00',
+    duracionMin: 5,
+  };
+  const agua = { habitId: 'h2', titulo: 'Tomar agua', dias: [1], hora: '09:00', duracionMin: 1 };
+
+  it('encuentra el que quedó dentro del bloque y le sugiere la primera hora libre', () => {
+    expect(recordatoriosQueChocan([CLASES], [estirar, agua])).toEqual([
+      { recordatorio: estirar, bloque: CLASES, sugerida: '11:00' },
+    ]);
+  });
+
+  it('sin choques no hay nada que revisar', () => {
+    expect(recordatoriosQueChocan([TRABAJO], [agua])).toEqual([]);
   });
 });

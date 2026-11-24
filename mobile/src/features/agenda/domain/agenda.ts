@@ -8,8 +8,9 @@
  *   Funciones puras sobre minutos del día.
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-24
- * @version 1.0.0
+ * @version 1.1.0
  * @historial 1.0.0 (2026-11-24): creación.
+ *   1.1.0 (2026-11-23): `recordatoriosQueChocan` para revisar los avisos al guardar un bloque (D-04).
  */
 
 // ===== Tipos =====
@@ -31,6 +32,8 @@ export type ErrorBloque = 'sin_nombre' | 'sin_dias' | 'horas';
 const MINUTOS_POR_HORA = 60;
 const MINUTOS_DEL_DIA = 24 * MINUTOS_POR_HORA;
 const DIGITOS = 2;
+/** Largo de "HH:MM" (la base guarda "HH:MM:SS"). */
+const LARGO_HORA = 5;
 export const LARGO_MAXIMO_NOMBRE = 60;
 
 // ===== Funciones auxiliares =====
@@ -125,4 +128,44 @@ export function validarBloque(
     return 'horas';
   }
   return null;
+}
+
+/** Recordatorio fijo de un hábito, lo mínimo para revisarlo contra la agenda. */
+export type RecordatorioHabito = {
+  habitId: string;
+  titulo: string;
+  dias: readonly number[];
+  /** "HH:MM" o "HH:MM:SS". */
+  hora: string;
+  duracionMin: number;
+};
+
+/** Un recordatorio que quedó dentro de un bloque ocupado, con la hora libre sugerida. */
+export type ChoqueRecordatorio = {
+  recordatorio: RecordatorioHabito;
+  bloque: BloqueAgenda;
+  /** Primera hora libre, o null si ya no cabe ese día. */
+  sugerida: string | null;
+};
+
+/**
+ * Recordatorios que ya existían y ahora caen en un bloque ocupado (D-04: al agregar o editar un
+ * bloque se revisan, para que ninguno quede encima de la agenda).
+ * @param bloques Agenda de la persona, ya con el bloque nuevo.
+ * @param recordatorios Recordatorios fijos de sus hábitos.
+ * @returns Los que chocan, con su sugerencia.
+ */
+export function recordatoriosQueChocan(
+  bloques: readonly BloqueAgenda[],
+  recordatorios: readonly RecordatorioHabito[],
+): ChoqueRecordatorio[] {
+  return recordatorios.flatMap((recordatorio) => {
+    const hora = recordatorio.hora.slice(0, LARGO_HORA);
+    const bloque = bloqueQueChoca(bloques, recordatorio.dias, hora, recordatorio.duracionMin);
+    if (!bloque) {
+      return [];
+    }
+    const sugerida = primeraHoraLibre(bloques, recordatorio.dias, hora, recordatorio.duracionMin);
+    return [{ recordatorio, bloque, sugerida }];
+  });
 }

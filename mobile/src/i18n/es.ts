@@ -822,6 +822,13 @@ export const es = {
     usarHora: 'Usar las {hora}',
     otraHora: 'Elegir otra hora',
     entendido: 'Entendido',
+    // Al guardar un bloque, los recordatorios que ya caían ahí (D-04).
+    revisar: '«{habito}» quedó dentro de «{bloque}». ¿Lo movemos a las {hora}?',
+    revisarSinHora:
+      '«{habito}» quedó dentro de «{bloque}» y ese día ya no queda espacio después. Puedes cambiar su hora desde el hábito.',
+    mover: 'Mover a las {hora}',
+    dejar: 'Dejarlo así',
+    movido: 'Listo: «{habito}» ahora te avisa a las {hora}.',
     error: 'No pudimos guardar tu agenda. Inténtalo de nuevo.',
   },
   // Modo enfoque (RF-14): la app silencia sus avisos y guía a silenciar el teléfono a mano.
