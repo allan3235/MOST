@@ -26,6 +26,10 @@ export const es = {
     explicacionAjustes:
       'Los avisos están apagados en tu teléfono. Para usar recordatorios, actívalos en Ajustes.',
     abrirAjustes: 'Abrir ajustes',
+    // RF-01: sin «Alarmas y recordatorios», Android puede entregar el aviso hasta 1 h tarde.
+    exactasExplicacion:
+      'Para que tus recordatorios lleguen justo a su hora, permite «Alarmas y recordatorios» para most. en Ajustes.',
+    exactasPermitir: 'Permitir',
     apagadosHabito:
       'Los avisos están apagados en tu teléfono: este recordatorio no sonará hasta que los actives.',
     // Notificaciones (docs/textos.md §1). {habito} va en el título de cada aviso por hábito.

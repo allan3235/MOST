@@ -13,6 +13,7 @@
     },
     "android": {
       "package": "com.most.app",
+      "permissions": ["android.permission.SCHEDULE_EXACT_ALARM"],
       "adaptiveIcon": {
         "backgroundColor": "#DFF2E4",
         "foregroundImage": "./assets/android-icon-foreground.png",

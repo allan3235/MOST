@@ -15,3 +15,22 @@ export function siguientePaso(estado: EstadoPermiso): SiguientePaso {
   if (estado.concedido) return 'listo';
   return estado.puedePreguntar ? 'preguntar' : 'ajustes';
 }
+
+/** Lo que se sabe para decidir si pedir el permiso de alarmas exactas. */
+export type EstadoAlarmasExactas = {
+  plataforma: string;
+  /** Ya se puede programar a la hora exacta. */
+  permitidas: boolean;
+  /** Ya se preguntó en esta sesión (para no insistir, RNF-06). */
+  yaPreguntado: boolean;
+};
+
+/**
+ * Si conviene explicar y pedir «Alarmas y recordatorios» (RF-01: el aviso llega a su hora). Solo
+ * en Android, solo si falta, y una vez por sesión.
+ * @param estado Plataforma, permiso y si ya se preguntó.
+ * @returns true si hay que mostrar la explicación.
+ */
+export function debePedirAlarmasExactas(estado: EstadoAlarmasExactas): boolean {
+  return estado.plataforma === 'android' && !estado.permitidas && !estado.yaPreguntado;
+}

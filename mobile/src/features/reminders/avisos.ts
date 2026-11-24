@@ -1,7 +1,9 @@
 import {
   AndroidImportance,
   cancelAllScheduledNotificationsAsync,
+  getExactAlarmPermissionsAsync,
   getPermissionsAsync,
+  requestExactAlarmPermissionsAsync,
   requestPermissionsAsync,
   SchedulableTriggerInputTypes,
   scheduleNotificationAsync,
@@ -101,6 +103,34 @@ export async function permisoConcedido(): Promise<boolean> {
   return (await getPermissionsAsync()).granted;
 }
 
+/**
+ * ¿Android deja programar alarmas exactas? Sin ese permiso los avisos llegan «a una hora
+ * aproximada» (hasta 1 h tarde). En iOS siempre llegan a su hora. Si no se puede leer, cuenta como
+ * permitido: no se pregunta de más.
+ * @returns true si los avisos llegarán a su hora.
+ */
+export async function alarmasExactasPermitidas(): Promise<boolean> {
+  if (Platform.OS !== 'android') {
+    return true;
+  }
+  try {
+    return (await getExactAlarmPermissionsAsync()).granted;
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Abre el ajuste de Android «Alarmas y recordatorios» para most. y espera a que la persona vuelva.
+ * @returns true si quedó permitido.
+ */
+export async function pedirAlarmasExactas(): Promise<boolean> {
+  if (Platform.OS !== 'android') {
+    return true;
+  }
+  return (await requestExactAlarmPermissionsAsync()).granted;
+}
+
 // Ventana móvil (SDD 7.1): cada recálculo cancela lo programado y vuelve a programar los avisos de
 // los próximos 7 días. Si lo planeado no cambió desde la última vez, no se toca nada.
 let ultimaFirma: string | null = null;
@@ -136,7 +166,10 @@ async function programar(userId: string): Promise<void> {
       habitId: null,
     });
   }
-  const nueva = firma(avisos);
+  // El permiso de alarmas exactas entra en la firma: al darlo se vuelven a programar (y llegan a
+  // su hora) aunque la lista de avisos sea la misma.
+  const nueva = `${(await alarmasExactasPermitidas()) ? 'exactas' : 'aproximadas'}
+${firma(avisos)}`;
   if (nueva === ultimaFirma) return;
   ultimaFirma = null;
   await cancelAllScheduledNotificationsAsync();
