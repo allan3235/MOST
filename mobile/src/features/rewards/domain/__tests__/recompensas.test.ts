@@ -89,6 +89,25 @@ describe('completar', () => {
   });
 });
 
+describe('CP-07 (RF-08): recompensa al completar un micro-paso', () => {
+  it('«Abrir el libro» da XP a la planta y monedas al instante, y queda registrado en el log', () => {
+    const LIMITE_MS = 1500;
+    const inicio = performance.now();
+    const r = aplicarCompletar(vacio, log('abrir-libro'), C);
+    const transcurrido = performance.now() - inicio;
+    expect(transcurrido).toBeLessThan(LIMITE_MS);
+    expect(r.monedas).toBe(true);
+    expect(r.sinMonedas).toBeNull();
+    expect(r.estado.planta.xp).toBeGreaterThan(vacio.planta.xp);
+    expect(r.estado.saldo).toBeGreaterThan(vacio.saldo);
+    expect(r.estado.logs[0]).toMatchObject({
+      habit_id: 'abrir-libro',
+      xp_otorgado: true,
+      monedas_otorgadas: true,
+    });
+  });
+});
+
 describe('deshacer', () => {
   it('revierte y transfiere XP y monedas al que se quedó sin ellos', () => {
     const logs = [

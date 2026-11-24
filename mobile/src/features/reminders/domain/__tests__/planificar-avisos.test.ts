@@ -238,6 +238,71 @@ describe('planificarAvisos', () => {
     expect(avisos.some((a) => a.id.startsWith('resumen'))).toBe(false);
   });
 
+  it('CP-03: «Tomar agua» a las 10:00 diario avisa a las 10:00 cada uno de los 7 días', () => {
+    const avisos = sinFin(
+      planificarAvisos(
+        datos({
+          habitos: [habito('agua', { titulo: 'Tomar agua' })],
+          horarios: [horario('agua', { hora: '10:00' })],
+        }),
+        AHORA,
+      ),
+    );
+    expect(avisos).toHaveLength(TODOS.length);
+    avisos.forEach((aviso, i) => {
+      expect(aviso.titulo).toBe('Tomar agua');
+      expect(aviso.habitId).toBe('agua');
+      expect(aviso.fecha).toEqual(fechaHora(`2026-11-${16 + i}`, '10:00'));
+    });
+  });
+
+  it('CP-12: al ajustar a lunes, miércoles y viernes de 10 min, los avisos se acomodan solos', () => {
+    // El ajuste cierra la versión anterior del horario (L–V, 20 min) y abre una nueva desde hoy.
+    const avisos = sinFin(
+      planificarAvisos(
+        datos({
+          habitos: [habito('a', { duracion_min: 10 })],
+          horarios: [
+            horario('a', {
+              id: 'h-viejo',
+              dias_semana: [1, 2, 3, 4, 5],
+              vigente_hasta: '2026-11-15',
+            }),
+            horario('a', { id: 'h-nuevo', dias_semana: [1, 3, 5], vigente_desde: '2026-11-16' }),
+          ],
+          registros: [{ habit_id: 'a', fecha: '2026-11-13', eliminado_en: null }],
+        }),
+        AHORA,
+      ),
+    );
+    expect(avisos.map((a) => a.fecha)).toEqual([
+      fechaHora('2026-11-16', '08:00'),
+      fechaHora('2026-11-18', '08:00'),
+      fechaHora('2026-11-20', '08:00'),
+    ]);
+    expect(avisos[0]?.cuerpo).toBe('Es un buen momento para tus 10 min.');
+  });
+
+  it('CP-06: el resumen de las 21:00 nombra los hábitos de mañana', () => {
+    const avisos = planificarAvisos(
+      datos({
+        estilo: 'resumen_nocturno',
+        habitos: [
+          habito('agua', { titulo: 'Tomar agua' }),
+          habito('leer', { titulo: 'Leer 20 minutos' }),
+        ],
+        horarios: [horario('agua'), horario('leer')],
+      }),
+      AHORA,
+    );
+    const [primero] = avisos;
+    expect(primero?.fecha).toEqual(fechaHora('2026-11-16', '21:00'));
+    expect(primero?.titulo).toBe('Mañana te esperan 2 hábitos');
+    expect(primero?.cuerpo).toBe('Tomar agua y Leer 20 minutos. Descansa bien.');
+    // Sin hábito: al tocarlo abre la app en Hoy (el plan del día), no marca nada.
+    expect(primero?.habitId).toBeNull();
+  });
+
   it('resumen nocturno con un solo hábito', () => {
     const [primero] = planificarAvisos(datos({ estilo: 'resumen_nocturno' }), AHORA);
     expect(primero?.titulo).toBe('Mañana te espera un hábito');

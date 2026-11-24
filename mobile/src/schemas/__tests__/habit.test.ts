@@ -77,6 +77,18 @@ describe('asistente de hábito', () => {
   });
 });
 
+describe('CP-05 (RF-01): recordatorio sin hora', () => {
+  it('no se guarda, el error queda en el campo hora y el mensaje es claro y sin culpa', () => {
+    const r = habitoFormSchema.safeParse({ ...valido, hora: null, notificar: true });
+    expect(r.success).toBe(false);
+    const issues = r.success ? [] : r.error.issues;
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toEqual(['hora']);
+    expect(issues[0]?.message).toBe(e.hora);
+    expect(e.hora).not.toMatch(/fallaste|fracaso|error tuyo|incorrect/i);
+  });
+});
+
 describe('límites de texto (decisión del usuario: 30 y 100)', () => {
   it('al crear, 30 para el nombre y 100 para la descripción', () => {
     expect(limitesDeTexto()).toEqual({ nombre: 30, descripcion: 100 });

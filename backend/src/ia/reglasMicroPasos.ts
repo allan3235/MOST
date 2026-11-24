@@ -119,7 +119,11 @@ export function corregirHabito(habito: HabitoIa, limites: LimitesHabito): Habito
         indice === 0
           ? Math.min(DURACION_MAXIMA_PRIMER_PASO, maximoHabito)
           : Math.min(anterior * FACTOR_MAXIMO_ENTRE_PASOS, maximoHabito);
-      ({ duracion, reducida } = corregirDuracion(paso, Math.max(anterior, MINUTOS_MINIMOS), maximo));
+      ({ duracion, reducida } = corregirDuracion(
+        paso,
+        Math.max(anterior, MINUTOS_MINIMOS),
+        maximo,
+      ));
       anterior = duracion;
     }
     const titulo = tieneDuracion
