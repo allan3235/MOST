@@ -27,7 +27,7 @@ import { useSession } from '@/features/auth/session-context';
 import { iniciarEnfoque, terminarEnfoque } from '@/features/reminders/avisos';
 import { es, formatear } from '@/i18n/es';
 
-import { DURACIONES_ENFOQUE, estaEnEnfoque, textoRestante } from '../domain/enfoque';
+import { DURACIONES_ENFOQUE, estaEnEnfoque, finDeEnfoque, textoRestante } from '../domain/enfoque';
 
 // ===== Constantes =====
 
@@ -65,10 +65,15 @@ export default function PantallaEnfoque() {
   const [minutos, setMinutos] = useState(DURACION_POR_DEFECTO);
   const [ahora, setAhora] = useState(() => new Date());
   const [terminadaAMano, setTerminadaAMano] = useState(false);
+  /**
+   * Lo que se acaba de decidir, antes de que SQLite lo confirme: la pantalla cambia al momento
+   * (RNF-01, ≤ 1.5 s). undefined = usar lo guardado.
+   */
+  const [optimista, setOptimista] = useState<Date | null | undefined>(undefined);
   const [ocupado, setOcupado] = useState(false);
   const [error, setError] = useState(false);
 
-  const hasta = guardado.data ?? null;
+  const hasta = optimista !== undefined ? optimista : (guardado.data ?? null);
   const activo = estaEnEnfoque(hasta, ahora);
 
   // El contador avanza cada segundo mientras hay sesión.
@@ -148,8 +153,9 @@ export default function PantallaEnfoque() {
               disabled={ocupado}
               onPress={() =>
                 void accion(async () => {
-                  await terminarEnfoque(userId);
+                  setOptimista(null);
                   setTerminadaAMano(true);
+                  await terminarEnfoque(userId);
                 })
               }
             />
@@ -167,8 +173,10 @@ export default function PantallaEnfoque() {
               label={t.otraSesion}
               onPress={() =>
                 void accion(async () => {
+                  const habiaExpirado = expirada;
+                  setOptimista(null);
                   setTerminadaAMano(false);
-                  if (expirada) {
+                  if (habiaExpirado) {
                     await borrarEnfoque(userId);
                   }
                 })
@@ -194,8 +202,13 @@ export default function PantallaEnfoque() {
               loading={ocupado}
               onPress={() =>
                 void accion(async () => {
-                  await iniciarEnfoque(userId, minutos);
-                  setAhora(new Date());
+                  // El reloj y el fin se toman antes de guardar: el contador nunca marca más de lo
+                  // elegido y la pantalla cambia al momento.
+                  const inicio = new Date();
+                  const fin = finDeEnfoque(inicio, minutos);
+                  setAhora(inicio);
+                  setOptimista(fin);
+                  await iniciarEnfoque(userId, fin);
                 })
               }
             />

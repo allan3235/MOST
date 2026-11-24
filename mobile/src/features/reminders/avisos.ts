@@ -12,11 +12,7 @@ import {
 
 import { borrarEnfoque, guardarEnfoqueHasta, leerEnfoqueHasta } from '@/db/enfoque-repository';
 import { leerDatosAvisos, revisarAvisoMotivacional } from '@/db/reminders-repository';
-import {
-  estaEnEnfoque,
-  finDeEnfoque,
-  quitarAvisosDuranteEnfoque,
-} from '@/features/enfoque/domain/enfoque';
+import { estaEnEnfoque, quitarAvisosDuranteEnfoque } from '@/features/enfoque/domain/enfoque';
 import { es, formatear } from '@/i18n/es';
 import { fechaLocal } from '@/lib/dates';
 import { colors } from '@/theme';
@@ -201,19 +197,24 @@ export async function mandarAvisoMotivacional(userId: string): Promise<void> {
   });
 }
 
+/** Recalcula los avisos sin esperar: reprogramar decenas de avisos tarda segundos (RNF-01). */
+function reprogramarEnSegundoPlano(userId: string): void {
+  reprogramarAvisos(userId).catch((causa: unknown) => {
+    console.warn('No se pudieron reprogramar los avisos', causa);
+  });
+}
+
 /**
  * Empieza una sesión de enfoque (RF-14): se guarda su fin y se recalculan los avisos sin los que
- * caerían durante ella.
+ * caerían durante ella. El silencio aplica al momento (el fin queda en memoria para el manejador);
+ * la reprogramación sigue en segundo plano.
  * @param userId Usuario con sesión.
- * @param minutos Duración elegida.
- * @returns Fin de la sesión.
+ * @param hasta Fin de la sesión (finDeEnfoque).
  */
-export async function iniciarEnfoque(userId: string, minutos: number): Promise<Date> {
-  const hasta = finDeEnfoque(new Date(), minutos);
-  await guardarEnfoqueHasta(userId, hasta);
+export async function iniciarEnfoque(userId: string, hasta: Date): Promise<void> {
   enfoqueHasta = hasta;
-  await reprogramarAvisos(userId);
-  return hasta;
+  await guardarEnfoqueHasta(userId, hasta);
+  reprogramarEnSegundoPlano(userId);
 }
 
 /**
@@ -223,5 +224,5 @@ export async function iniciarEnfoque(userId: string, minutos: number): Promise<D
 export async function terminarEnfoque(userId: string): Promise<void> {
   await borrarEnfoque(userId);
   enfoqueHasta = null;
-  await reprogramarAvisos(userId);
+  reprogramarEnSegundoPlano(userId);
 }
