@@ -12,7 +12,6 @@ import {
   leerPaso,
   pasoCompleto,
   totalPasos,
-  type Borrador,
   type Paso,
 } from '@/features/onboarding/domain/form-rules';
 import { useOnboardingStore } from '@/features/onboarding/onboarding-store';
@@ -33,7 +32,7 @@ const CAMPO_POR_PASO = {
   5: 'momento',
   6: 'obstaculo',
   7: 'acompanamiento',
-} as const satisfies Record<Paso, keyof Borrador>;
+} as const satisfies Record<Paso, keyof typeof es.onboarding.formulario.preguntas>;
 
 export default function FormularioPasoScreen() {
   const t = es.onboarding.formulario;

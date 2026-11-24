@@ -1,3 +1,4 @@
+import { disponibilidadIgual } from '@/schemas/onboarding';
 import type { Respuestas } from '@/schemas/onboarding';
 
 import type { ConfigPlan, FilaCatalogo } from '../plan-engine';
@@ -38,8 +39,8 @@ const RESPUESTAS: Respuestas = {
   objetivos: [],
   historial: 'primera_vez',
   tiempo: '10_20',
-  momento: 'noche',
-  obstaculo: 'olvido',
+  disponibilidad: disponibilidadIgual(['noche']),
+  obstaculos: ['olvido'],
   acompanamiento: 'recordatorio_suave',
 };
 

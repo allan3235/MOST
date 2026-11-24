@@ -36,8 +36,8 @@ jest.mock('@/db/settings-repository', () => ({
 jest.mock('@/db/plan-repository', () => ({
   leerGlobalesFormulario: jest.fn(async () => ({
     tiempo: '10_20',
-    momento: 'noche',
-    obstaculo: 'poco_tiempo',
+    disponibilidad: [['noche'], ['noche'], ['noche'], ['noche'], ['noche'], ['noche'], ['noche']],
+    obstaculos: ['poco_tiempo'],
     acompanamiento: 'recordatorio_suave',
   })),
 }));

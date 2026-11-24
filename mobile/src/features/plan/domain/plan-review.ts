@@ -1,5 +1,10 @@
 import { ajustePresupuesto, minutosPorDia } from '@/features/habits/domain/presupuesto';
-import type { Objetivo, Respuestas } from '@/schemas/onboarding';
+import {
+  momentoPrincipal,
+  tieneObstaculo,
+  type Objetivo,
+  type Respuestas,
+} from '@/schemas/onboarding';
 import type { BorradorPlan, HabitoPlan } from '@/schemas/plan';
 
 // Cambios que el usuario hace en la revisión del plan (SDD 9.4) antes de pulsar «Empezar».
@@ -12,7 +17,9 @@ import type { BorradorPlan, HabitoPlan } from '@/schemas/plan';
  */
 export function muestraSegundoAviso(r: Respuestas): boolean {
   return (
-    r.obstaculo === 'olvido' && r.momento !== 'varia' && r.acompanamiento !== 'resumen_nocturno'
+    tieneObstaculo(r, 'olvido') &&
+    momentoPrincipal(r.disponibilidad) !== 'varia' &&
+    r.acompanamiento !== 'resumen_nocturno'
   );
 }
 

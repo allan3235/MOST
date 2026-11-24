@@ -20,7 +20,13 @@ import {
 import { ajustarMinutosEnTitulo } from '@most/compartido/textos';
 
 import { diasEntre, sumarDias } from '@/lib/dates';
-import { areaDeObjetivo, OBJETIVOS, type Objetivo, type Respuestas } from '@/schemas/onboarding';
+import {
+  areaDeObjetivo,
+  OBJETIVOS,
+  tieneObstaculo,
+  type Objetivo,
+  type Respuestas,
+} from '@/schemas/onboarding';
 import type { HabitoPlan, Nivel } from '@/schemas/plan';
 
 // Progresión (SDD 6.3). Funciones puras: reciben lo que ya está en SQLite y deciden qué proponer.
@@ -240,7 +246,12 @@ export function valoresDeNivel(
   reducida: boolean,
   nivelDesde: string | null,
 ): ValoresNivel {
-  const fila = elegirFilaCatalogo(catalogo, objetivo, nivel, respuestas.obstaculo === 'recursos');
+  const fila = elegirFilaCatalogo(
+    catalogo,
+    objetivo,
+    nivel,
+    tieneObstaculo(respuestas, 'recursos'),
+  );
   const duracion = reducida ? fila.duracion_reducida_min : fila.duracion_min;
   return aplicarCandado({
     nivel,
@@ -354,7 +365,7 @@ function siguiente(
   habito: Habito & { objetivo: Objetivo; nivel: Nivel },
   entrada: EntradaProgresion,
 ): ValoresNivel | null {
-  const pocoTiempo = entrada.respuestas.obstaculo === 'poco_tiempo';
+  const pocoTiempo = tieneObstaculo(entrada.respuestas, 'poco_tiempo');
   const { catalogo, respuestas, hoy } = entrada;
   const pasos = pasosDe(entrada.microPasos, habito.id);
   if (pasos.length > 0) {
@@ -382,7 +393,7 @@ export function pasoHaciaAbajo(
   habito: Habito & { objetivo: Objetivo; nivel: Nivel },
   entrada: EntradaProgresion,
 ): ValoresNivel | null {
-  const pocoTiempo = entrada.respuestas.obstaculo === 'poco_tiempo';
+  const pocoTiempo = tieneObstaculo(entrada.respuestas, 'poco_tiempo');
   const { catalogo, respuestas, hoy } = entrada;
   const pasos = pasosDe(entrada.microPasos, habito.id);
   if (pasos.length > 0) {

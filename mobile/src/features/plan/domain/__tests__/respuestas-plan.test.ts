@@ -1,3 +1,4 @@
+import { disponibilidadIgual } from '@/schemas/onboarding';
 import type { Respuestas } from '@/schemas/onboarding';
 
 import { respuestasDelPlan } from '../respuestas-plan';
@@ -7,8 +8,8 @@ const GLOBALES: Respuestas = {
   objetivos: ['mover_mas', 'saber_gastos'],
   historial: 'primera_vez',
   tiempo: '10_20',
-  momento: 'manana',
-  obstaculo: 'olvido',
+  disponibilidad: disponibilidadIgual(['manana']),
+  obstaculos: ['olvido'],
   acompanamiento: 'recordatorio_suave',
 };
 

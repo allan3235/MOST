@@ -18,7 +18,7 @@ import {
   type SemanaApoyo,
 } from '@/features/reminders/domain/semana-apoyo';
 import { fechaLocal, sumarDias } from '@/lib/dates';
-import { MOMENTOS, type Momento } from '@/schemas/onboarding';
+import { globalesSchema, momentoPrincipal, type Momento } from '@/schemas/onboarding';
 
 import { getDb, leerFilas } from './database';
 import { leerAjustesEn, leerConfigAvisos } from './settings-repository';
@@ -44,10 +44,11 @@ async function leerContexto(db: SQLiteDatabase, userId: string): Promise<Context
     'user_id = ? AND activo = 1 ORDER BY creado_en',
     [userId],
   );
-  const momento = respuestas?.respuestas?.momento;
+  // P5 por día (versión 4) o un solo momento (versión 3): se resume en un momento o «varía».
+  const globales = globalesSchema.safeParse(respuestas?.respuestas);
   const historialGlobal = respuestas?.respuestas?.historial;
   return {
-    momento: (MOMENTOS as readonly unknown[]).includes(momento) ? (momento as Momento) : null,
+    momento: globales.success ? momentoPrincipal(globales.data.disponibilidad) : null,
     planes: planes.flatMap((p) =>
       p.creado_en
         ? [

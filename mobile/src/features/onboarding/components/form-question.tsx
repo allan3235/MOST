@@ -1,9 +1,11 @@
 import { es } from '@/i18n/es';
-import { ACOMPANAMIENTOS, HISTORIALES, MOMENTOS, OBSTACULOS, TIEMPOS } from '@/schemas/onboarding';
+import { ACOMPANAMIENTOS, HISTORIALES, TIEMPOS } from '@/schemas/onboarding';
 
 import type { Paso } from '../domain/form-rules';
 import { AreasQuestion } from './areas-question';
 import { ObjetivosQuestion } from './objetivos-question';
+import { PreguntaMomentos } from './PreguntaMomentos';
+import { PreguntaObstaculos } from './PreguntaObstaculos';
 import { SingleChoiceQuestion } from './single-choice-question';
 
 // Elige qué opciones mostrar en cada paso del formulario.
@@ -24,9 +26,9 @@ export function FormQuestion({ paso }: FormQuestionProps) {
     case 4:
       return <SingleChoiceQuestion campo="tiempo" claves={TIEMPOS} textos={t.tiempo} />;
     case 5:
-      return <SingleChoiceQuestion campo="momento" claves={MOMENTOS} textos={t.momento} />;
+      return <PreguntaMomentos />;
     case 6:
-      return <SingleChoiceQuestion campo="obstaculo" claves={OBSTACULOS} textos={t.obstaculo} />;
+      return <PreguntaObstaculos />;
     case 7:
       return (
         <SingleChoiceQuestion

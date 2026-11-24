@@ -1,11 +1,16 @@
 import {
   areaDeObjetivo,
+  disponibilidadIgual,
   MAX_AREAS_POR_PLAN,
   MAX_OBJETIVOS,
+  MOMENTOS_CON_HORA,
   OBJETIVOS_POR_AREA,
   respuestasSchema,
   type Area,
+  type Disponibilidad,
+  type MomentoConHora,
   type Objetivo,
+  type Obstaculo,
   type Respuestas,
 } from '@/schemas/onboarding';
 
@@ -20,12 +25,65 @@ export type Borrador = {
   objetivos: Objetivo[];
   historial?: Respuestas['historial'];
   tiempo?: Respuestas['tiempo'];
-  momento?: Respuestas['momento'];
-  obstaculo?: Respuestas['obstaculo'];
+  /** P5: momentos libres de cada día (lunes a domingo). */
+  disponibilidad: Disponibilidad;
+  /** P6: varias respuestas. */
+  obstaculos: Obstaculo[];
   acompanamiento?: Respuestas['acompanamiento'];
 };
 
-export const BORRADOR_VACIO: Borrador = { areas: [], objetivos: [] };
+export const BORRADOR_VACIO: Borrador = {
+  areas: [],
+  objetivos: [],
+  disponibilidad: disponibilidadIgual([]),
+  obstaculos: [],
+};
+
+// ===== P5 y P6 (varias respuestas) =====
+
+/** ¿El momento está libre todos los días? Así se ve marcado en los botones generales de la P5. */
+export function momentoEnTodosLosDias(d: Disponibilidad, momento: MomentoConHora): boolean {
+  return d.every((momentos) => momentos.includes(momento));
+}
+
+/** ¿Los 7 días tienen los mismos momentos? Si no, la cuadrícula por día queda abierta. */
+export function esIgualTodosLosDias(d: Disponibilidad): boolean {
+  const [primero = []] = d;
+  return d.every(
+    (momentos) => momentos.length === primero.length && momentos.every((m) => primero.includes(m)),
+  );
+}
+
+function ordenar(momentos: readonly MomentoConHora[]): MomentoConHora[] {
+  return MOMENTOS_CON_HORA.filter((m) => momentos.includes(m));
+}
+
+/** Botón general de la P5: lo marca en todos los días, o lo quita de todos si ya estaba. */
+export function alternarMomento(d: Disponibilidad, momento: MomentoConHora): Disponibilidad {
+  const quitar = momentoEnTodosLosDias(d, momento);
+  return d.map((momentos) =>
+    quitar ? momentos.filter((m) => m !== momento) : ordenar([...momentos, momento]),
+  );
+}
+
+/** Una casilla de la cuadrícula: un momento en un día (índice 0 = lunes). */
+export function alternarCelda(
+  d: Disponibilidad,
+  indiceDia: number,
+  momento: MomentoConHora,
+): Disponibilidad {
+  return d.map((momentos, i) => {
+    if (i !== indiceDia) return momentos;
+    return momentos.includes(momento)
+      ? momentos.filter((m) => m !== momento)
+      : ordenar([...momentos, momento]);
+  });
+}
+
+/** P6: marca o desmarca un obstáculo, sin tope (decisión del usuario). */
+export function alternarObstaculo(lista: readonly Obstaculo[], obstaculo: Obstaculo): Obstaculo[] {
+  return lista.includes(obstaculo) ? lista.filter((o) => o !== obstaculo) : [...lista, obstaculo];
+}
 
 /**
  * Marca o desmarca un valor en una pregunta de «hasta N». Si ya hay N elegidos, el nuevo entra y
@@ -79,9 +137,9 @@ export function pasoCompleto(paso: Paso, b: Borrador): boolean {
     case 4:
       return b.tiempo !== undefined;
     case 5:
-      return b.momento !== undefined;
+      return b.disponibilidad.some((momentos) => momentos.length > 0);
     case 6:
-      return b.obstaculo !== undefined;
+      return b.obstaculos.length > 0;
     case 7:
       return b.acompanamiento !== undefined;
   }

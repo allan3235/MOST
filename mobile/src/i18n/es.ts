@@ -175,12 +175,13 @@ export const es = {
           ayuda: 'Es tu límite. Empezaremos con menos para que sea fácil.',
         },
         momento: {
-          titulo: '¿En qué momento del día tienes más espacio libre?',
-          ayuda: 'Podrás ajustar la hora exacta al revisar tu plan.',
+          titulo: '¿En qué momentos sueles tener un rato libre?',
+          ayuda:
+            'Puedes elegir varios. Si cambia según el día, ajústalo por día. La hora exacta la ves al revisar tu plan.',
         },
         obstaculo: {
-          titulo: '¿Qué es lo que más se te complica para ser constante?',
-          ayuda: 'Elige la que más se parezca a ti.',
+          titulo: '¿Qué se te complica para ser constante?',
+          ayuda: 'Elige todas las que se parezcan a ti.',
         },
         acompanamiento: {
           titulo: '¿Cómo te gustaría que most. te acompañe?',
@@ -244,6 +245,11 @@ export const es = {
         '20_40': '20 a 40 min',
         mas_40: 'Más de 40 min',
       },
+      // P5 por día (cuadrícula días × momentos).
+      momentosPorDia: 'Cambia según el día',
+      momentosOcultarDias: 'Ocultar los días',
+      momentosAyudaDias: 'Toca los ratos libres de cada día.',
+      momentosCeldaA11y: '{dia}, {momento}',
       momento: {
         manana: 'Mañana',
         mediodia: 'Mediodía',

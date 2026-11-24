@@ -1,3 +1,4 @@
+import { disponibilidadIgual, MOMENTOS_CON_HORA } from '@/schemas/onboarding';
 import type { Respuestas } from '@/schemas/onboarding';
 
 import {
@@ -109,8 +110,8 @@ const BASE: Respuestas = {
   objetivos: ['mover_mas', 'tiempo_de_calidad'],
   historial: 'primera_vez',
   tiempo: '10_20',
-  momento: 'manana',
-  obstaculo: 'motivacion',
+  disponibilidad: disponibilidadIgual(['manana']),
+  obstaculos: ['motivacion'],
   acompanamiento: 'recordatorio_suave',
 };
 
@@ -205,7 +206,7 @@ describe('generarPlan', () => {
   });
 
   it('«poco_tiempo» usa la duración reducida', () => {
-    const { habitos } = plan({ obstaculo: 'poco_tiempo' });
+    const { habitos } = plan({ obstaculos: ['poco_tiempo'] });
     expect(habitos[0]).toMatchObject({ duracion_min: 2, usa_duracion_reducida: true });
   });
 
@@ -217,11 +218,39 @@ describe('generarPlan', () => {
 
   it('«varia» deja el aviso flexible, salvo con momento fijo', () => {
     const { habitos } = plan({
-      momento: 'varia',
+      disponibilidad: disponibilidadIgual(MOMENTOS_CON_HORA),
       objetivos: ['dormir_mejor', 'tiempo_de_calidad'],
     });
     expect(habitos[0]).toMatchObject({ hora: '20:30', flexible: false });
     expect(habitos[1]).toMatchObject({ hora: null, flexible: true });
+  });
+
+  it('P5 con varios momentos: cada hábito toma uno distinto para no amontonar los avisos', () => {
+    const { habitos } = plan({ disponibilidad: disponibilidadIgual(['manana', 'noche']) });
+    expect(habitos.map((h) => h.hora)).toEqual(['08:00', '20:30']);
+    expect(habitos.every((h) => !h.flexible)).toBe(true);
+  });
+
+  it('P5 por día: los días del hábito se mueven a los días con un rato libre', () => {
+    // Caminar 5 min trae L, M, J, S en el catálogo; la persona solo tiene libres L, M, X y V.
+    const disponibilidad = [['tarde'], ['tarde'], ['tarde'], [], ['tarde'], [], []] as const;
+    const { habitos } = plan({ disponibilidad: disponibilidad.map((d) => [...d]) });
+    expect(habitos[0]).toMatchObject({ dias_semana: [1, 2, 3, 5], hora: '17:00' });
+  });
+
+  it('P5 que cambia según el día (sin momento común): el aviso es flexible', () => {
+    const disponibilidad = [['manana'], ['noche'], ['manana'], ['noche'], ['manana'], [], []];
+    const { habitos } = plan({
+      disponibilidad: disponibilidad as Respuestas['disponibilidad'],
+    });
+    expect(habitos[0]).toMatchObject({ hora: null, flexible: true });
+  });
+
+  it('P6 con varias respuestas: aplica todas (versión corta, sin equipo) y las guarda', () => {
+    const { habitos, ajustes } = plan({ obstaculos: ['poco_tiempo', 'recursos', 'olvido'] });
+    expect(habitos[0]).toMatchObject({ usa_duracion_reducida: true });
+    expect(ajustes.estrategias).toEqual(['poco_tiempo', 'recursos', 'olvido']);
+    expect(ajustes.segundo_aviso).toBe(true);
   });
 
   it('con el estilo «minimo» los hábitos no avisan por defecto', () => {
@@ -244,13 +273,14 @@ describe('segundo aviso (precedencia P7/P6, SDD 5.6)', () => {
     ['resumen_nocturno', 'manana', false],
     ['recordatorio_suave', 'varia', false],
   ] as const)('olvido + %s + %s → %s', (acompanamiento, momento, esperado) => {
-    expect(plan({ obstaculo: 'olvido', acompanamiento, momento }).ajustes.segundo_aviso).toBe(
-      esperado,
-    );
+    const disponibilidad = disponibilidadIgual(momento === 'varia' ? MOMENTOS_CON_HORA : [momento]);
+    expect(
+      plan({ obstaculos: ['olvido'], acompanamiento, disponibilidad }).ajustes.segundo_aviso,
+    ).toBe(esperado);
   });
 
   it('sin «olvido» no hay segundo aviso', () => {
-    expect(plan({ obstaculo: 'distraccion' }).ajustes.segundo_aviso).toBe(false);
+    expect(plan({ obstaculos: ['distraccion'] }).ajustes.segundo_aviso).toBe(false);
   });
 });
 
@@ -285,7 +315,7 @@ describe('textos de la IA', () => {
     const { habitos } = plan({});
     expect(JSON.parse(mensajeParaIa(BASE, habitos))).toEqual({
       historial: 'primera_vez',
-      obstaculo: 'motivacion',
+      obstaculos: ['motivacion'],
       habitos: [
         {
           objetivo: 'mover_mas',

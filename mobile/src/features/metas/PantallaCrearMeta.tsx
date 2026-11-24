@@ -37,7 +37,7 @@ import { ListaMicroPasos } from '@/features/plan/components/ListaMicroPasos';
 import { es, formatear } from '@/i18n/es';
 import { fechaLocal } from '@/lib/dates';
 import { navegar } from '@/lib/navegar';
-import { AREAS, type Area } from '@/schemas/onboarding';
+import { AREAS, momentoPrincipal, type Area } from '@/schemas/onboarding';
 
 // ===== Tipos =====
 
@@ -128,7 +128,7 @@ export function PantallaCrearMeta() {
         leerAjustesLocales(userId),
         leerGlobalesFormulario(userId),
       ]);
-      const momento = globales?.momento ?? 'manana';
+      const momento = globales ? momentoPrincipal(globales.disponibilidad) : 'manana';
       const hora = horas[momento === 'varia' ? 'tarde' : momento];
       await crearHabito(
         userId,

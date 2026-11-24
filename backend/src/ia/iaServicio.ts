@@ -19,7 +19,12 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { PrismaServicio } from '../baseDatos/prismaServicio.js';
 import { leerConfiguracion } from '../comun/configuracion.js';
 import { ErrorConCodigo } from '../comun/errorConCodigo.js';
-import { respuestasSchema, type Area, type Respuestas } from '@most/compartido/encuesta';
+import {
+  respuestasSchema,
+  tieneObstaculo,
+  type Area,
+  type Respuestas,
+} from '@most/compartido/encuesta';
 import {
   alternativasDeNivel,
   generarPlan as calcularPlanMotor,
@@ -152,7 +157,7 @@ export class IaServicio {
       },
     );
 
-    const sinRecursos = respuestas.obstaculo === 'recursos';
+    const sinRecursos = tieneObstaculo(respuestas, 'recursos');
     const habitos = plan.habitos.map((habito, indice) => {
       if (desdeIa) {
         return combinarConMicroPasos(habito, desdeIa.propuestos[indice], true);
@@ -223,8 +228,8 @@ export class IaServicio {
       perfil: {
         historial: perfil.historial,
         tiempo: perfil.tiempo,
-        momento: perfil.momento,
-        obstaculo: perfil.obstaculo,
+        disponibilidad: perfil.disponibilidad,
+        obstaculos: perfil.obstaculos,
       },
     });
 

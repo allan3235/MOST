@@ -7,7 +7,10 @@ import { useOnboardingStore } from '../onboarding-store';
 
 // Pregunta de una sola respuesta (pasos 3 a 7). Elegir otra opción reemplaza la anterior.
 
-type PreguntaUnica = Exclude<keyof Borrador, 'areas' | 'objetivos'>;
+type PreguntaUnica = Exclude<
+  keyof Borrador,
+  'areas' | 'objetivos' | 'disponibilidad' | 'obstaculos'
+>;
 
 export type SingleChoiceQuestionProps<K extends PreguntaUnica> = {
   campo: K;

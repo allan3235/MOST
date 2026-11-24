@@ -25,8 +25,8 @@ const REGLAS_PASOS = `Reglas de los micro-pasos:
 
 const COMO_USAR_PERFIL = `Cómo usar el perfil de la encuesta:
 - "historial": si es primera_vez, empieza_y_deja o semanas_y_suelta, el primer paso debe ser mínimo y muy fácil.
-- "obstaculo": poco_tiempo → pasos muy cortos; olvido → pasos ligados a algo que ya hace (al despertar, después de comer); motivacion → pasos que den una pequeña satisfacción inmediata; desanimo → pasos imposibles de "fallar"; distraccion → pasos de una sola acción; recursos → nada que requiera equipo, dinero ni espacio especial.
-- "momento": cuándo tiene más espacio libre; los pasos deben caber ahí.`;
+- "obstaculos" (puede traer varios; tómalos todos en cuenta): poco_tiempo → pasos muy cortos; olvido → pasos ligados a algo que ya hace (al despertar, después de comer); motivacion → pasos que den una pequeña satisfacción inmediata; desanimo → pasos imposibles de "fallar"; distraccion → pasos de una sola acción; recursos → nada que requiera equipo, dinero ni espacio especial.
+- "disponibilidad": 7 listas, de lunes a domingo, con los momentos libres de cada día (manana, mediodia, tarde, noche). Los pasos deben caber en esos ratos; si un día no tiene momentos libres, ese día no cuenta.`;
 
 const REGLAS_TONO = `Tono (obligatorio):
 - Cercano, breve y sin culpa, basado en terapia cognitivo-conductual y de aceptación y compromiso: valida, normaliza los tropiezos y conecta con lo que a la persona le importa.

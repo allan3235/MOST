@@ -5,12 +5,10 @@ import type { Habito } from '@/features/habits/domain/habitos-del-dia';
 import { filasDelPlan, fechaLocal, type IdsPlan } from '@/features/plan/domain/plan-rows';
 import { ErrorSinRed, pedirApi } from '@/lib/clienteApi';
 import {
-  ACOMPANAMIENTOS,
   AREAS,
-  MOMENTOS,
-  OBSTACULOS,
-  TIEMPOS,
+  globalesSchema,
   type Area,
+  type Globales,
   type Respuestas,
 } from '@/schemas/onboarding';
 import { borradorPlanSchema, type BorradorPlan } from '@/schemas/plan';
@@ -183,38 +181,18 @@ export async function leerMisPlanes(userId: string): Promise<MiPlan[]> {
   );
 }
 
-type Globales = Pick<Respuestas, 'tiempo' | 'momento' | 'obstaculo' | 'acompanamiento'>;
-
 /**
  * Respuestas globales del formulario (P4 a P7) para un plan siguiente, o null si nunca hizo el
- * formulario (empezó creando sus hábitos): entonces su primer plan pregunta los 7 pasos.
+ * formulario (empezó creando sus hábitos): entonces su primer plan pregunta los 7 pasos. Las de la
+ * versión 3 (un momento y un obstáculo) se convierten al leerlas.
  */
 export async function leerGlobalesFormulario(userId: string): Promise<Globales | null> {
   const db = await getDb();
-  const [fila] = await leerFilas<{ respuestas: Partial<Record<keyof Globales, unknown>> | null }>(
-    db,
-    'onboarding_answers',
-    'user_id = ?',
-    [userId],
-  );
-  const r = fila?.respuestas;
-  const valido = <T extends string>(lista: readonly T[], valor: unknown): valor is T =>
-    (lista as readonly unknown[]).includes(valor);
-  if (
-    !r ||
-    !valido(TIEMPOS, r.tiempo) ||
-    !valido(MOMENTOS, r.momento) ||
-    !valido(OBSTACULOS, r.obstaculo) ||
-    !valido(ACOMPANAMIENTOS, r.acompanamiento)
-  ) {
-    return null;
-  }
-  return {
-    tiempo: r.tiempo,
-    momento: r.momento,
-    obstaculo: r.obstaculo,
-    acompanamiento: r.acompanamiento,
-  };
+  const [fila] = await leerFilas<{ respuestas: unknown }>(db, 'onboarding_answers', 'user_id = ?', [
+    userId,
+  ]);
+  const globales = globalesSchema.safeParse(fila?.respuestas);
+  return globales.success ? globales.data : null;
 }
 
 /** Un hábito del plan pasa a ser propio. Objetivo y nivel van juntos: la base los pide a los dos. */

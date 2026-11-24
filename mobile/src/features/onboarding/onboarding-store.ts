@@ -2,9 +2,21 @@ import Storage from 'expo-sqlite/kv-store';
 import { create } from 'zustand';
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
 
-import type { Area, Objetivo } from '@/schemas/onboarding';
+import {
+  normalizarRespuestas,
+  type Area,
+  type Disponibilidad,
+  type Objetivo,
+  type Obstaculo,
+} from '@/schemas/onboarding';
 
-import { alternarArea, alternarObjetivo, BORRADOR_VACIO, type Borrador } from './domain/form-rules';
+import {
+  alternarArea,
+  alternarObjetivo,
+  alternarObstaculo,
+  BORRADOR_VACIO,
+  type Borrador,
+} from './domain/form-rules';
 import type { Retomar } from './domain/retomar';
 
 // Avance del formulario inicial (SDD 5.3). Vive en Zustand y se guarda en el almacén clave-valor
@@ -12,7 +24,10 @@ import type { Retomar } from './domain/retomar';
 // síncrona del almacén para que las respuestas ya estén cargadas al abrir la primera pantalla.
 // También se guarda en qué pantalla va (`retomar`), para volver ahí si se cierra la app.
 
-type PreguntaUnica = Exclude<keyof Borrador, 'areas' | 'objetivos'>;
+type PreguntaUnica = Exclude<
+  keyof Borrador,
+  'areas' | 'objetivos' | 'disponibilidad' | 'obstaculos'
+>;
 
 type OnboardingState = {
   /** Dueño de las respuestas: si entra otra cuenta en el mismo teléfono, se empieza de cero. */
@@ -34,6 +49,10 @@ type OnboardingState = {
   /** Con 2 ya elegidos, el nuevo reemplaza al primero que se eligió. */
   alternarArea: (area: Area) => void;
   alternarObjetivo: (objetivo: Objetivo) => void;
+  /** P5: la disponibilidad completa (botones generales o cuadrícula por día). */
+  cambiarDisponibilidad: (disponibilidad: Disponibilidad) => void;
+  /** P6: varias respuestas. */
+  alternarObstaculo: (obstaculo: Obstaculo) => void;
   responder: <K extends PreguntaUnica>(pregunta: K, valor: NonNullable<Borrador[K]>) => void;
   reiniciar: () => void;
 };
@@ -81,6 +100,16 @@ export const useOnboardingStore = create<OnboardingState>()(
         set({ borrador: { ...borrador, objetivos: alternarObjetivo(borrador, objetivo) } });
       },
 
+      cambiarDisponibilidad: (disponibilidad) =>
+        set({ borrador: { ...get().borrador, disponibilidad } }),
+
+      alternarObstaculo: (obstaculo) => {
+        const { borrador } = get();
+        set({
+          borrador: { ...borrador, obstaculos: alternarObstaculo(borrador.obstaculos, obstaculo) },
+        });
+      },
+
       responder: (pregunta, valor) => set({ borrador: { ...get().borrador, [pregunta]: valor } }),
 
       reiniciar: () =>
@@ -88,7 +117,13 @@ export const useOnboardingStore = create<OnboardingState>()(
     }),
     {
       name: 'most-onboarding',
-      version: 1,
+      // 2: P5 por día y P6 con varias respuestas; un borrador guardado antes se convierte.
+      version: 2,
+      migrate: (guardado) => {
+        const estado = (guardado ?? {}) as { borrador?: unknown };
+        const borrador = normalizarRespuestas(estado.borrador) as Partial<Borrador> | undefined;
+        return { ...estado, borrador: { ...BORRADOR_VACIO, ...(borrador ?? {}) } } as never;
+      },
       storage: createJSONStorage(() => sqliteStorage),
       partialize: (state) => ({
         userId: state.userId,

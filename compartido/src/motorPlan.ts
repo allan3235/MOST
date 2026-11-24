@@ -5,14 +5,21 @@
  *   Paquete compartido por la app y el backend.
  * @autor Equipo most. (código heredado de Habit Green; movido por Allan con Claude Code)
  * @fecha 2026-11-23
- * @version 1.1.0
+ * @version 2.0.0
  * @historial 1.0.0 (2026-11-23): se mueve a @most/compartido. 1.1.0: títulos con los minutos de la
  *   versión reducida.
+ *   2.0.0 (2026-11-24): días y hora según la disponibilidad por día (P5) y varios obstáculos (P6).
  */
 
 import {
   areaDeObjetivo,
+  diasDisponibles,
+  MOMENTOS_CON_HORA,
+  momentoPrincipal,
+  momentosComunes,
+  tieneObstaculo,
   type Area,
+  type Disponibilidad,
   type Historial,
   type MomentoConHora,
   type Objetivo,
@@ -92,25 +99,50 @@ export function elegirFilaCatalogo(
  */
 export function usaSegundoAviso(r: Respuestas): boolean {
   return (
-    r.obstaculo === 'olvido' &&
+    tieneObstaculo(r, 'olvido') &&
     (r.acompanamiento === 'recordatorio_suave' || r.acompanamiento === 'recordatorio_y_animo') &&
-    r.momento !== 'varia'
+    momentoPrincipal(r.disponibilidad) !== 'varia'
   );
 }
 
-/** Hábito de un objetivo en un nivel concreto, con las reglas de la P5, la P6 y la P7. */
+/**
+ * Días del hábito según la P5: los del catálogo que tengan algún momento libre y, si faltan, los
+ * siguientes días libres, hasta tener los mismos que el catálogo (o todos los libres si no alcanzan).
+ */
+export function diasSegunDisponibilidad(
+  diasCatalogo: readonly number[],
+  disponibilidad: Disponibilidad,
+): number[] {
+  const libres = diasDisponibles(disponibilidad);
+  const quedan = diasCatalogo.filter((dia) => libres.includes(dia));
+  const extra = libres.filter((dia) => !quedan.includes(dia));
+  const faltan = Math.max(0, diasCatalogo.length - quedan.length);
+  return [...quedan, ...extra.slice(0, faltan)].sort((a, b) => a - b);
+}
+
+/**
+ * Hábito de un objetivo en un nivel concreto, con las reglas de la P5, la P6 y la P7.
+ * @param indice Posición del hábito en el plan: con varios momentos comunes, cada hábito toma uno
+ *   distinto (el primero, el segundo…), para no amontonar todos los avisos a la misma hora.
+ */
 export function habitoParaNivel(
   respuestas: Respuestas,
   catalogo: readonly FilaCatalogo[],
   config: ConfigPlan,
   objetivo: Objetivo,
   nivel: Nivel,
+  indice = 0,
 ): HabitoPlan {
-  const reducida = respuestas.obstaculo === 'poco_tiempo';
-  const fila = elegirFilaCatalogo(catalogo, objetivo, nivel, respuestas.obstaculo === 'recursos');
+  const reducida = tieneObstaculo(respuestas, 'poco_tiempo');
+  const fila = elegirFilaCatalogo(catalogo, objetivo, nivel, tieneObstaculo(respuestas, 'recursos'));
+  const dias = diasSegunDisponibilidad(fila.dias_semana, respuestas.disponibilidad);
 
-  // El momento fijo del catálogo gana sobre la P5; sin ninguno de los dos, el aviso es flexible.
-  const momento = fila.momento_fijo ?? (respuestas.momento === 'varia' ? null : respuestas.momento);
+  // El momento fijo del catálogo gana sobre la P5. Si sus días no comparten momento (o cualquiera
+  // le acomoda), el aviso es flexible.
+  const comunes = momentosComunes(respuestas.disponibilidad, dias);
+  const sinMomentoFijo = comunes.length === 0 || comunes.length === MOMENTOS_CON_HORA.length;
+  const momento =
+    fila.momento_fijo ?? (sinMomentoFijo ? null : comunes[indice % comunes.length]!);
 
   return {
     objetivo,
@@ -124,7 +156,7 @@ export function habitoParaNivel(
     descripcion: fila.descripcion,
     duracion_min: reducida ? fila.duracion_reducida_min : fila.duracion_min,
     usa_duracion_reducida: reducida,
-    dias_semana: [...fila.dias_semana],
+    dias_semana: dias,
     hora: momento === null ? null : config.horas[momento],
     flexible: momento === null,
     // Con el estilo `minimo` solo avisan los hábitos que el usuario marque (SDD 7.1).
@@ -148,18 +180,19 @@ export function generarPlan(
   // Los hábitos sin duración (recordatorios) no gastan tiempo: el tiempo diario se reparte solo
   // entre los que tienen minutos en su nivel inicial.
   const conDuracion = respuestas.objetivos.filter(
-    (objetivo) => habitoParaNivel(respuestas, catalogo, config, objetivo, inicial).duracion_min > 0,
+    (objetivo, indice) =>
+      habitoParaNivel(respuestas, catalogo, config, objetivo, inicial, indice).duracion_min > 0,
   ).length;
   const maxPorHabito = libre / Math.max(1, conDuracion);
 
-  const habitos = respuestas.objetivos.map((objetivo): HabitoPlan => {
+  const habitos = respuestas.objetivos.map((objetivo, indice): HabitoPlan => {
     // Se empieza en el nivel inicial y se baja mientras la duración no quepa. El nivel 1 dura
     // 5 minutos o menos, así que siempre cabe (SDD 5.4, regla 2).
     let nivel = inicial;
-    let habito = habitoParaNivel(respuestas, catalogo, config, objetivo, nivel);
+    let habito = habitoParaNivel(respuestas, catalogo, config, objetivo, nivel, indice);
     while (nivel > 1 && habito.duracion_min > maxPorHabito) {
       nivel = (nivel - 1) as Nivel;
-      habito = habitoParaNivel(respuestas, catalogo, config, objetivo, nivel);
+      habito = habitoParaNivel(respuestas, catalogo, config, objetivo, nivel, indice);
     }
     return habito;
   });
@@ -169,7 +202,7 @@ export function generarPlan(
     ajustes: {
       presupuesto_min: presupuesto,
       estilo_notificaciones: respuestas.acompanamiento,
-      estrategias: [respuestas.obstaculo],
+      estrategias: [...respuestas.obstaculos],
       segundo_aviso: usaSegundoAviso(respuestas),
     },
   };
@@ -183,12 +216,12 @@ export function alternativasDeNivel(
   habitos: readonly HabitoPlan[],
 ): BorradorPlan['alternativas'] {
   const alternativas: BorradorPlan['alternativas'] = {};
-  for (const habito of habitos) {
+  habitos.forEach((habito, indice) => {
     const niveles = ([1, 2, 3] as const).filter((n) => n < habito.nivel);
     alternativas[habito.objetivo] = niveles.map((n) =>
-      habitoParaNivel(respuestas, catalogo, config, habito.objetivo, n),
+      habitoParaNivel(respuestas, catalogo, config, habito.objetivo, n, indice),
     );
-  }
+  });
   return alternativas;
 }
 
@@ -219,7 +252,7 @@ export function sugerenciasDeHabitos(
 export function mensajeParaIa(respuestas: Respuestas, habitos: readonly HabitoPlan[]): string {
   return JSON.stringify({
     historial: respuestas.historial,
-    obstaculo: respuestas.obstaculo,
+    obstaculos: respuestas.obstaculos,
     habitos: habitos.map((h) => ({
       objetivo: h.objetivo,
       nivel: h.nivel,

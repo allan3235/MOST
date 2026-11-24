@@ -1,3 +1,4 @@
+import { disponibilidadIgual } from '@/schemas/onboarding';
 import type { Habito, Horario } from '@/features/habits/domain/habitos-del-dia';
 import type { ConfigPlan, FilaCatalogo } from '@/features/plan/domain/plan-engine';
 import type { OcurrenciaEstadistica } from '@/features/stats/domain/cumplimiento';
@@ -61,8 +62,8 @@ const RESPUESTAS: Respuestas = {
   objetivos: ['mover_mas', 'saber_gastos'],
   historial: 'empieza_y_deja',
   tiempo: '20_40',
-  momento: 'manana',
-  obstaculo: 'olvido',
+  disponibilidad: disponibilidadIgual(['manana']),
+  obstaculos: ['olvido'],
   acompanamiento: 'recordatorio_suave',
 };
 
@@ -252,7 +253,7 @@ describe('tabla de 6.3', () => {
       despues: { nivel: 1, duracion_min: 5, usa_duracion_reducida: false },
     });
 
-    const poco = { ...RESPUESTAS, obstaculo: 'poco_tiempo' as const };
+    const poco = { ...RESPUESTAS, obstaculos: ['poco_tiempo' as const] };
     const [t2] = decidir(
       entrada({ habitos: [corto], respuestas: poco, ocurrencias: ocurrencias('a', 14, 14) }),
     );

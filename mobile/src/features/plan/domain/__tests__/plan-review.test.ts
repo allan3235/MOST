@@ -1,3 +1,5 @@
+import { disponibilidadIgual, MOMENTOS_CON_HORA } from '@/schemas/onboarding';
+
 import {
   bajarNivel,
   cambiarHora,
@@ -66,9 +68,15 @@ describe('cuándo se muestra el interruptor «Segundo aviso» (SDD 5.6)', () => 
     ['olvido', 'recordatorio_suave', 'varia', false],
     ['motivacion', 'recordatorio_suave', 'manana', false],
   ] as const)('%s + %s + %s → %s', (obstaculo, acompanamiento, momento, esperado) => {
-    expect(muestraSegundoAviso({ ...RESPUESTAS, obstaculo, acompanamiento, momento })).toBe(
-      esperado,
-    );
+    const disponibilidad = disponibilidadIgual(momento === 'varia' ? MOMENTOS_CON_HORA : [momento]);
+    expect(
+      muestraSegundoAviso({
+        ...RESPUESTAS,
+        obstaculos: [obstaculo],
+        acompanamiento,
+        disponibilidad,
+      }),
+    ).toBe(esperado);
   });
 });
 

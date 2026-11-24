@@ -1,3 +1,4 @@
+import { disponibilidadIgual } from '@/schemas/onboarding';
 import type { Respuestas } from '@/schemas/onboarding';
 import type { BorradorPlan, HabitoPlan } from '@/schemas/plan';
 
@@ -8,8 +9,8 @@ export const RESPUESTAS: Respuestas = {
   objetivos: ['mover_mas', 'tiempo_de_calidad'],
   historial: 'mantiene',
   tiempo: '20_40',
-  momento: 'manana',
-  obstaculo: 'olvido',
+  disponibilidad: disponibilidadIgual(['manana']),
+  obstaculos: ['olvido'],
   acompanamiento: 'recordatorio_suave',
 };
 
