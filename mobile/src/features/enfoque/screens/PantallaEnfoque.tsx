@@ -188,7 +188,8 @@ export default function PantallaEnfoque() {
               {t.terminadaTitulo}
             </AppText>
             <AppText tone="ink-soft">{t.terminadaTexto}</AppText>
-            {Platform.OS === 'android' ? (
+            {/* Si most. lo activó, ya lo regresó solo: no hay nada que quitar a mano. */}
+            {Platform.OS === 'android' && noMolestar !== 'activado' ? (
               <AppText tone="ink-soft">{t.recordatorioQuitar}</AppText>
             ) : null}
             <Button
