@@ -27,6 +27,7 @@
     },
     "plugins": [
       "./plugins/conNombreGradle.js",
+      "./plugins/conCompilacionNativaCorta.js",
       "expo-router",
       "expo-status-bar",
       "expo-font",
