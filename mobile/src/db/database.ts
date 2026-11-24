@@ -2,6 +2,8 @@ import * as SQLite from 'expo-sqlite';
 
 import { accionDueno } from '@/sync/domain/dueno-base';
 
+import { aplicarClave, obtenerClaveBase } from './cifrado';
+
 import {
   aValoresLocales,
   desdeValoresLocales,
@@ -67,8 +69,31 @@ export function enTransaccion(
   return esta;
 }
 
+/**
+ * Abre la base y le aplica la clave de SQLCipher (RNF-05, CP-10). Si la clave no abre el archivo
+ * (una base sin cifrar de antes), se recrea: las tablas espejo se vuelven a descargar del servidor.
+ */
+async function abrirBase(): Promise<SQLite.SQLiteDatabase> {
+  const clave = await obtenerClaveBase();
+  const db = await SQLite.openDatabaseAsync(NOMBRE);
+  const resultado = await aplicarClave(db, clave);
+  if (resultado === 'sin_sqlcipher') {
+    console.warn('SQLCipher no está en este binario (Expo Go): la base local va sin cifrar.');
+    return db;
+  }
+  if (resultado === 'cifrada') {
+    return db;
+  }
+  console.warn('La base local no abría con su clave: se crea de nuevo, cifrada.');
+  await db.closeAsync();
+  await SQLite.deleteDatabaseAsync(NOMBRE);
+  const nueva = await SQLite.openDatabaseAsync(NOMBRE);
+  await aplicarClave(nueva, clave);
+  return nueva;
+}
+
 export function getDb(): Promise<SQLite.SQLiteDatabase> {
-  abierta ??= SQLite.openDatabaseAsync(NOMBRE).then(async (db) => {
+  abierta ??= abrirBase().then(async (db) => {
     await prepararEsquema(db);
     return db;
   });
