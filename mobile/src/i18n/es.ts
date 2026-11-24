@@ -844,6 +844,9 @@ export const es = {
     hasta: 'Tus avisos de most. están en pausa hasta las {hora}.',
     silenciaTitulo: 'Silencia tu teléfono',
     silenciaAndroid: 'Activa No Molestar para que tampoco te interrumpan otras apps.',
+    // CP-15: con el permiso especial, most. lo activa y lo deja como estaba al terminar.
+    silenciaAuto: 'Tu teléfono está en No Molestar. Al terminar, lo dejamos como estaba.',
+    darPermiso: 'Permitir que most. lo active solo',
     abrirNoMolestar: 'Abrir No Molestar',
     silenciaIos:
       'Desliza para abrir el Centro de control y activa Concentración. La app no puede hacerlo por ti.',

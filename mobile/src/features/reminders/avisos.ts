@@ -9,14 +9,26 @@ import {
   setNotificationChannelAsync,
   setNotificationHandler,
 } from 'expo-notifications';
+import { Platform } from 'react-native';
 
-import { borrarEnfoque, guardarEnfoqueHasta, leerEnfoqueHasta } from '@/db/enfoque-repository';
+import {
+  borrarEnfoque,
+  guardadoFiltroPrevio,
+  guardarEnfoqueHasta,
+  leerEnfoqueHasta,
+} from '@/db/enfoque-repository';
 import { leerDatosAvisos, revisarAvisoMotivacional } from '@/db/reminders-repository';
 import { estaEnEnfoque, quitarAvisosDuranteEnfoque } from '@/features/enfoque/domain/enfoque';
+import {
+  activarNoMolestar,
+  restaurarNoMolestar,
+  type EstadoNoMolestar,
+} from '@/features/enfoque/domain/no-molestar';
 import { es, formatear } from '@/i18n/es';
 import { fechaLocal } from '@/lib/dates';
 import { colors } from '@/theme';
 
+import { NoMolestar } from '../../../modules/no-molestar';
 import { DIAS_PARA_AVISO } from './domain/aviso-motivacional';
 import { siguientePaso, type SiguientePaso } from './domain/permiso';
 import { planificarAvisos, type AvisoPlaneado } from './domain/planificar-avisos';
@@ -106,6 +118,10 @@ async function programar(userId: string): Promise<void> {
   const ahora = new Date();
   const guardado = await leerEnfoqueHasta(userId);
   enfoqueHasta = estaEnEnfoque(guardado, ahora) ? guardado : null;
+  if (!enfoqueHasta) {
+    // CP-15: si la sesión venció con la app cerrada, No Molestar vuelve como estaba al abrirla.
+    await restaurarNoMolestar(NoMolestar, Platform.OS, guardadoFiltroPrevio(userId));
+  }
   // RF-14: durante el enfoque no se programa ningún aviso propio; al terminar, uno de cierre.
   const avisos = quitarAvisosDuranteEnfoque(
     datos ? planificarAvisos(datos, ahora) : [],
@@ -209,12 +225,15 @@ function reprogramarEnSegundoPlano(userId: string): void {
  * caerían durante ella. El silencio aplica al momento (el fin queda en memoria para el manejador);
  * la reprogramación sigue en segundo plano.
  * @param userId Usuario con sesión.
+ * Con el permiso de Android, además pone el teléfono en No Molestar (CP-15); en iOS nunca.
  * @param hasta Fin de la sesión (finDeEnfoque).
+ * @returns Qué pasó con No Molestar.
  */
-export async function iniciarEnfoque(userId: string, hasta: Date): Promise<void> {
+export async function iniciarEnfoque(userId: string, hasta: Date): Promise<EstadoNoMolestar> {
   enfoqueHasta = hasta;
   await guardarEnfoqueHasta(userId, hasta);
   reprogramarEnSegundoPlano(userId);
+  return activarNoMolestar(NoMolestar, Platform.OS, guardadoFiltroPrevio(userId));
 }
 
 /**
@@ -224,5 +243,14 @@ export async function iniciarEnfoque(userId: string, hasta: Date): Promise<void>
 export async function terminarEnfoque(userId: string): Promise<void> {
   await borrarEnfoque(userId);
   enfoqueHasta = null;
+  await restaurarNoMolestar(NoMolestar, Platform.OS, guardadoFiltroPrevio(userId));
   reprogramarEnSegundoPlano(userId);
+}
+
+/**
+ * Cuando la sesión vence con la pantalla abierta: No Molestar vuelve como estaba (CP-15).
+ * @param userId Usuario con sesión.
+ */
+export async function restaurarTrasEnfoque(userId: string): Promise<void> {
+  await restaurarNoMolestar(NoMolestar, Platform.OS, guardadoFiltroPrevio(userId));
 }

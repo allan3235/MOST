@@ -9,12 +9,16 @@
  * @historial 1.0.0 (2026-11-23): creación.
  */
 
+import type { GuardadoFiltro } from '@/features/enfoque/domain/no-molestar';
+
 import { getDb } from './database';
 import { avisarCambioLocal } from './db-version-store';
 
 // ===== Constantes =====
 
 const CLAVE_ENFOQUE = 'enfoque_hasta';
+/** Filtro de No Molestar que tenía el teléfono antes de la sesión (CP-15). */
+const CLAVE_FILTRO_PREVIO = 'enfoque_filtro_previo';
 
 // ===== Principal =====
 
@@ -61,4 +65,37 @@ export async function borrarEnfoque(userId: string): Promise<void> {
     CLAVE_ENFOQUE,
   ]);
   avisarCambioLocal();
+}
+
+/**
+ * Guardado del filtro de No Molestar previo a la sesión, en las preferencias locales.
+ * @param userId Usuario con sesión.
+ * @returns Leer, guardar y borrar el filtro.
+ */
+export function guardadoFiltroPrevio(userId: string): GuardadoFiltro {
+  return {
+    leer: async () => {
+      const db = await getDb();
+      const fila = await db.getFirstAsync<{ valor: string }>(
+        'SELECT valor FROM preferencias_locales WHERE user_id = ? AND clave = ?',
+        [userId, CLAVE_FILTRO_PREVIO],
+      );
+      const filtro = fila ? Number(fila.valor) : Number.NaN;
+      return Number.isInteger(filtro) ? filtro : null;
+    },
+    guardar: async (filtro) => {
+      const db = await getDb();
+      await db.runAsync(
+        'INSERT OR REPLACE INTO preferencias_locales (user_id, clave, valor) VALUES (?, ?, ?)',
+        [userId, CLAVE_FILTRO_PREVIO, String(filtro)],
+      );
+    },
+    borrar: async () => {
+      const db = await getDb();
+      await db.runAsync('DELETE FROM preferencias_locales WHERE user_id = ? AND clave = ?', [
+        userId,
+        CLAVE_FILTRO_PREVIO,
+      ]);
+    },
+  };
 }

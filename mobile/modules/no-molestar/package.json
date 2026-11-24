@@ -1,0 +1,6 @@
+{
+  "name": "no-molestar",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts"
+}

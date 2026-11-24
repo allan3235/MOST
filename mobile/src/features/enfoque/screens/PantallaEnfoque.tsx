@@ -24,10 +24,13 @@ import { Snackbar } from '@/components/ui/snackbar';
 import { borrarEnfoque, leerEnfoqueHasta } from '@/db/enfoque-repository';
 import { useLocalQuery } from '@/db/use-local-query';
 import { useSession } from '@/features/auth/session-context';
-import { iniciarEnfoque, terminarEnfoque } from '@/features/reminders/avisos';
+import { iniciarEnfoque, restaurarTrasEnfoque, terminarEnfoque } from '@/features/reminders/avisos';
+
+import { NoMolestar } from '../../../../modules/no-molestar';
 import { es, formatear } from '@/i18n/es';
 
 import { DURACIONES_ENFOQUE, estaEnEnfoque, finDeEnfoque, textoRestante } from '../domain/enfoque';
+import { estadoNoMolestar } from '../domain/no-molestar';
 
 // ===== Constantes =====
 
@@ -65,6 +68,8 @@ export default function PantallaEnfoque() {
   const [minutos, setMinutos] = useState(DURACION_POR_DEFECTO);
   const [ahora, setAhora] = useState(() => new Date());
   const [terminadaAMano, setTerminadaAMano] = useState(false);
+  // CP-15/16: con permiso en Android lo activa solo; si no, guía a hacerlo a mano.
+  const noMolestar = estadoNoMolestar(NoMolestar, Platform.OS);
   /**
    * Lo que se acaba de decidir, antes de que SQLite lo confirme: la pantalla cambia al momento
    * (RNF-01, ≤ 1.5 s). undefined = usar lo guardado.
@@ -88,6 +93,14 @@ export default function PantallaEnfoque() {
   // Al acabarse el tiempo no hay que hacer nada: los avisos de después ya estaban programados y el
   // de cierre llega solo. La sesión guardada se borra al empezar otra.
   const expirada = hasta !== null && !activo;
+
+  useEffect(() => {
+    if (expirada) {
+      restaurarTrasEnfoque(userId).catch((causa: unknown) => {
+        console.warn('No se pudo restaurar No Molestar', causa);
+      });
+    }
+  }, [expirada, userId]);
 
   const accion = async (tarea: () => Promise<unknown>) => {
     setOcupado(true);
@@ -134,7 +147,9 @@ export default function PantallaEnfoque() {
               <AppText weight="bold" accessibilityRole="header">
                 {t.silenciaTitulo}
               </AppText>
-              {Platform.OS === 'android' ? (
+              {noMolestar === 'activado' ? (
+                <AppText tone="ink-soft">{t.silenciaAuto}</AppText>
+              ) : Platform.OS === 'android' ? (
                 <>
                   <AppText tone="ink-soft">{t.silenciaAndroid}</AppText>
                   <Button
@@ -142,6 +157,13 @@ export default function PantallaEnfoque() {
                     label={t.abrirNoMolestar}
                     onPress={() => void abrirNoMolestar()}
                   />
+                  {noMolestar === 'sin_permiso' ? (
+                    <Button
+                      variant="tertiary"
+                      label={t.darPermiso}
+                      onPress={() => NoMolestar?.abrirAjustePermiso()}
+                    />
+                  ) : null}
                 </>
               ) : (
                 <AppText tone="ink-soft">{t.silenciaIos}</AppText>
