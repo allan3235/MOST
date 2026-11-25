@@ -47,6 +47,9 @@ import {
 } from '../datos/repositorioHabitos';
 import { actualizarFila, getDb, guardarFilas, leerFilas } from '@/comun/datos/database';
 import { leerConfig, leerEstado } from './servicioRegistros';
+import { contarHechosDelPaso } from '@/zonas/plantas/datos/repositorioHitos';
+import { avanceDelPaso, type AvancePaso } from '@/zonas/plantas/logica/hitos';
+import type { MicroPasoLocal } from '@/zonas/reajuste/logica/progresion';
 import { descartarMovidasDelPatron } from '@/zonas/reajuste/logica/servicioReprogramacion';
 
 // Repositorio de hábitos (SDD 3.4). Todo se lee y se escribe en SQLite, así que funciona sin
@@ -116,6 +119,33 @@ export async function leerHabitos(): Promise<HabitoConHorario[]> {
 
 export async function leerHabito(id: string): Promise<HabitoConHorario | null> {
   return (await leerHabitos()).find((h) => h.habito.id === id) ?? null;
+}
+
+export type VistaHabito = HabitoConHorario & {
+  /** Micro-pasos en orden (vacío si el hábito no tiene secuencia). */
+  pasos: MicroPasoLocal[];
+  /** Veces hechas del paso en curso (RF-16), o null sin secuencia. */
+  avance: AvancePaso | null;
+};
+
+/**
+ * Vista previa de un hábito (al tocarlo en Hábitos): sus datos, sus micro-pasos y en cuál va.
+ * Solo lee; editar sigue en el menú ⋮.
+ * @param id Hábito.
+ * @returns La vista, o null si el hábito ya no existe.
+ */
+export async function leerVistaHabito(id: string): Promise<VistaHabito | null> {
+  const item = await leerHabito(id);
+  if (!item) return null;
+  const db = await getDb();
+  const pasos = await leerFilas<MicroPasoLocal>(db, 'micro_pasos', 'habit_id = ? ORDER BY orden', [
+    id,
+  ]);
+  const avance =
+    pasos.length > 0
+      ? avanceDelPaso(await contarHechosDelPaso(id, item.habito.nivel_desde ?? null))
+      : null;
+  return { ...item, pasos, avance };
 }
 
 /** Hábitos de hoy para la pantalla Hoy. */

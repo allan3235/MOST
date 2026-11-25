@@ -396,11 +396,21 @@ export const es = {
       cancelar: 'Cancelar',
     },
     todas: 'Todas',
+    // Vista previa al tocar un hábito (editar sigue en el menú ⋮).
+    vista: {
+      hoyHecho: 'Hoy ya lo hiciste',
+      hoyToca: 'Toca hoy',
+      hoyNoToca: 'Hoy no toca',
+      enPausa: 'En pausa: no cuenta en contra mientras descansa.',
+      noEncontrado: 'Este hábito ya no está en tu lista.',
+      comoEditar: 'Para cambiarlo, toca ⋮ junto al hábito y elige «Editar».',
+    },
     enPausa: 'En pausa',
     noTocaHoy: 'No toca hoy',
     marcado: '{titulo}, hecho',
     sinMarcar: '{titulo}, pendiente',
     opciones: 'Opciones de {titulo}',
+    verDetalle: 'Ver el hábito',
     error: 'No pudimos cargar tus hábitos.',
     errorGuardar: 'No pudimos guardar el cambio. Inténtalo de nuevo.',
     presupuestoSubio:

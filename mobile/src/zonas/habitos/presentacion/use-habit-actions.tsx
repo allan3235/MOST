@@ -26,8 +26,8 @@ import {
 import { LimiteHabitosDialog } from '@/zonas/habitos/presentacion/componentes/limite-habitos-dialog';
 import { useCheckIn } from './use-check-in';
 
-// Lo que se puede hacer con un hábito de una lista: marcarlo y abrir su menú ⋮ (editar, pausar o
-// reanudar, eliminar). Lo comparten Hábitos y Detalles de la planta. `capas` va dentro de `Screen` y
+// Lo que se puede hacer con un hábito de una lista: marcarlo, tocarlo para ver su vista previa y
+// abrir su menú ⋮ (editar, pausar o reanudar, eliminar). Lo comparten Hábitos y Detalles de la planta. `capas` va dentro de `Screen` y
 // `aviso`, como hermano de `Screen`, para que flote sin desplazarse con la lista. El detalle del
 // plan agrega opciones al menú (`extras`) y lo abre desde sus propias filas (`abrirMenu`).
 
@@ -87,6 +87,8 @@ export function useHabitActions(
   };
 
   const editar = (id: string) => navegar.push({ pathname: '/habit/[id]', params: { id } });
+  // Tocar el hábito solo lo muestra; editar es desde el menú ⋮ (decisión del usuario).
+  const ver = (id: string) => navegar.push({ pathname: '/habit/ver/[id]', params: { id } });
 
   const propsTarjeta = (item: HabitoConHorario): HabitCheckCardProps => ({
     titulo: item.habito.titulo,
@@ -97,7 +99,7 @@ export function useHabitActions(
     enPausa: !item.habito.activo,
     ocupado: checkIn.ocupado === item.habito.id,
     onAlternar: () => checkIn.alternar({ ...item.habito, categoria: item.categoria }, item.hecho),
-    onPress: () => editar(item.habito.id),
+    onPress: () => ver(item.habito.id),
     onOpciones: (ancla) => setMenu({ item, ancla }),
     menuAbierto: menu?.item.habito.id === item.habito.id,
   });

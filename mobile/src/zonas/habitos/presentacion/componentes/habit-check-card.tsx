@@ -75,7 +75,7 @@ export function HabitCheckCard({
       accessible={Boolean(onPress)}
       accessibilityRole={onPress ? 'button' : undefined}
       accessibilityLabel={onPress ? `${titulo}, ${detalle}` : undefined}
-      accessibilityHint={onPress ? t.menu.editar : undefined}
+      accessibilityHint={onPress ? t.verDetalle : undefined}
       className={`flex-row items-center gap-3 rounded-card bg-campo py-2 pl-2 pr-1 ${
         onPress ? 'active:bg-accent-claro' : ''
       }`}

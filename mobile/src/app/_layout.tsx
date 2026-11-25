@@ -89,6 +89,7 @@ function RootNavigator() {
         <Stack.Screen name="habit/nuevo" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="crear-meta" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="habit/[id]" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="habit/ver/[id]" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="tienda" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="planta/[categoria]" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="plan-nuevo" options={{ animation: 'slide_from_right' }} />
