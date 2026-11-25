@@ -4,7 +4,7 @@ import { OptionChip } from '@/comun/presentacion/ui/option-chip';
 import { es } from '@/comun/i18n/es';
 import { AREAS } from '@/comun/modelo/esquemas/onboarding';
 
-import { useOnboardingStore } from '../onboarding-store';
+import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
 
 // Pregunta 1: un área por plan (varios planes por usuario); elegir otra reemplaza a la anterior y
 // descarta sus objetivos de la pregunta 2. Las áreas que ya tienen un plan activo salen

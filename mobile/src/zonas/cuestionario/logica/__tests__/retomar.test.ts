@@ -1,4 +1,4 @@
-import { pilaParaRetomar } from '../retomar';
+import { pilaParaRetomar } from '@/zonas/cuestionario/logica/retomar';
 
 describe('retomar el formulario', () => {
   it('en el paso 3: Empezar y los pasos 1 a 3 (UC-01: ya no hay elección de modo)', () => {

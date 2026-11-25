@@ -1,6 +1,7 @@
-import Storage from 'expo-sqlite/kv-store';
 import { create } from 'zustand';
-import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
+
+import { almacenSincrono } from '@/comun/datos/almacen-local';
 
 import {
   normalizarRespuestas,
@@ -16,8 +17,8 @@ import {
   alternarObstaculo,
   BORRADOR_VACIO,
   type Borrador,
-} from './domain/form-rules';
-import type { Retomar } from './domain/retomar';
+} from './form-rules';
+import type { Retomar } from './retomar';
 
 // Avance del formulario inicial (SDD 5.3). Vive en Zustand y se guarda en el almacén clave-valor
 // de expo-sqlite, así que si se cierra la app las respuestas siguen ahí. Se usa la versión
@@ -55,14 +56,6 @@ type OnboardingState = {
   alternarObstaculo: (obstaculo: Obstaculo) => void;
   responder: <K extends PreguntaUnica>(pregunta: K, valor: NonNullable<Borrador[K]>) => void;
   reiniciar: () => void;
-};
-
-const sqliteStorage: StateStorage = {
-  getItem: (key) => Storage.getItemSync(key),
-  setItem: (key, value) => Storage.setItemSync(key, value),
-  removeItem: (key) => {
-    Storage.removeItemSync(key);
-  },
 };
 
 export const useOnboardingStore = create<OnboardingState>()(
@@ -124,7 +117,7 @@ export const useOnboardingStore = create<OnboardingState>()(
         const borrador = normalizarRespuestas(estado.borrador) as Partial<Borrador> | undefined;
         return { ...estado, borrador: { ...BORRADOR_VACIO, ...(borrador ?? {}) } } as never;
       },
-      storage: createJSONStorage(() => sqliteStorage),
+      storage: createJSONStorage(() => almacenSincrono),
       partialize: (state) => ({
         userId: state.userId,
         borrador: state.borrador,

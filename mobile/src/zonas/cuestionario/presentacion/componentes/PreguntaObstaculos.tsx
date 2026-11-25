@@ -15,7 +15,7 @@ import { OptionChip } from '@/comun/presentacion/ui/option-chip';
 import { es } from '@/comun/i18n/es';
 import { OBSTACULOS } from '@/comun/modelo/esquemas/onboarding';
 
-import { useOnboardingStore } from '../onboarding-store';
+import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
 
 // ===== Principal =====
 

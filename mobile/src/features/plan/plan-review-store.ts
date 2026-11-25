@@ -1,7 +1,8 @@
 import { randomUUID } from 'expo-crypto';
-import Storage from 'expo-sqlite/kv-store';
 import { create } from 'zustand';
-import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
+
+import { almacenSincrono } from '@/comun/datos/almacen-local';
 
 import type { Objetivo } from '@/comun/modelo/esquemas/onboarding';
 import type { BorradorPlan, HabitoPlan } from '@/schemas/plan';
@@ -46,14 +47,6 @@ function conPlanesPorArea(borrador: BorradorPlan, ids: IdsPlan): IdsPlan {
   for (const area of faltan) planesExtra[area] = randomUUID();
   return { ...ids, planesExtra };
 }
-
-const sqliteStorage: StateStorage = {
-  getItem: (key) => Storage.getItemSync(key),
-  setItem: (key, value) => Storage.setItemSync(key, value),
-  removeItem: (key) => {
-    Storage.removeItemSync(key);
-  },
-};
 
 export const usePlanReviewStore = create<PlanReviewState>()(
   persist(
@@ -101,7 +94,7 @@ export const usePlanReviewStore = create<PlanReviewState>()(
     {
       name: 'most-plan-revision',
       version: 1,
-      storage: createJSONStorage(() => sqliteStorage),
+      storage: createJSONStorage(() => almacenSincrono),
       partialize: (state) => ({ borrador: state.borrador, ids: state.ids }),
     },
   ),

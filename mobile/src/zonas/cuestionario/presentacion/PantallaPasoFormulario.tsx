@@ -7,14 +7,14 @@ import { BackButton } from '@/comun/presentacion/ui/back-button';
 import { Button } from '@/comun/presentacion/ui/button';
 import { ProgressSteps } from '@/comun/presentacion/ui/progress-steps';
 import { Screen } from '@/comun/presentacion/ui/screen';
-import { FormQuestion } from '@/features/onboarding/components/form-question';
+import { FormQuestion } from '@/zonas/cuestionario/presentacion/componentes/form-question';
 import {
   leerPaso,
   pasoCompleto,
   totalPasos,
   type Paso,
-} from '@/features/onboarding/domain/form-rules';
-import { useOnboardingStore } from '@/features/onboarding/onboarding-store';
+} from '@/zonas/cuestionario/logica/form-rules';
+import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
 import { useRutasPlan } from '@/features/plan/use-rutas-plan';
 import { es } from '@/comun/i18n/es';
 import { navegar } from '@/comun/presentacion/navegar';

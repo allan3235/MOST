@@ -24,8 +24,8 @@ import {
   alternarMomento,
   esIgualTodosLosDias,
   momentoEnTodosLosDias,
-} from '../domain/form-rules';
-import { useOnboardingStore } from '../onboarding-store';
+} from '@/zonas/cuestionario/logica/form-rules';
+import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
 
 // ===== Constantes =====
 

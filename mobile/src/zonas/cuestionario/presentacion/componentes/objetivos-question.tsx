@@ -4,8 +4,8 @@ import { AppText } from '@/comun/presentacion/ui/app-text';
 import { OptionChip } from '@/comun/presentacion/ui/option-chip';
 import { es } from '@/comun/i18n/es';
 
-import { objetivosPorAreaElegida } from '../domain/form-rules';
-import { useOnboardingStore } from '../onboarding-store';
+import { objetivosPorAreaElegida } from '@/zonas/cuestionario/logica/form-rules';
+import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
 
 // Pregunta 2: hasta 2 objetivos (un tercero reemplaza al primero elegido), solo de las áreas
 // elegidas, agrupados con un encabezado por área.

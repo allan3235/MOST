@@ -19,7 +19,7 @@ import {
   alternarObstaculo,
   esIgualTodosLosDias,
   momentoEnTodosLosDias,
-} from '../form-rules';
+} from '@/zonas/cuestionario/logica/form-rules';
 
 describe('alternarSeleccion', () => {
   it('agrega y quita valores', () => {

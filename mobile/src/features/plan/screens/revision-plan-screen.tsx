@@ -14,8 +14,8 @@ import { leerAjustes, leerMinutosPorDia } from '@/zonas/cuenta/logica/servicioAj
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { minutosPorDia } from '@/features/habits/domain/presupuesto';
-import { respuestasCompletas } from '@/features/onboarding/domain/form-rules';
-import { useOnboardingStore } from '@/features/onboarding/onboarding-store';
+import { respuestasCompletas } from '@/zonas/cuestionario/logica/form-rules';
+import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
 import { EditPlanHabitSheet } from '@/features/plan/components/edit-plan-habit-sheet';
 import { PlanHabitCard } from '@/features/plan/components/plan-habit-card';
 import { SecondNoticeToggle } from '@/features/plan/components/second-notice-toggle';

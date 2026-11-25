@@ -2,8 +2,8 @@ import { View } from 'react-native';
 
 import { OptionChip } from '@/comun/presentacion/ui/option-chip';
 
-import type { Borrador } from '../domain/form-rules';
-import { useOnboardingStore } from '../onboarding-store';
+import type { Borrador } from '@/zonas/cuestionario/logica/form-rules';
+import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
 
 // Pregunta de una sola respuesta (pasos 3 a 7). Elegir otra opción reemplaza la anterior.
 

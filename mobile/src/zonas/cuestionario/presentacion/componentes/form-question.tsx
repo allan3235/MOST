@@ -1,7 +1,7 @@
 import { es } from '@/comun/i18n/es';
 import { ACOMPANAMIENTOS, HISTORIALES, TIEMPOS } from '@/comun/modelo/esquemas/onboarding';
 
-import type { Paso } from '../domain/form-rules';
+import type { Paso } from '@/zonas/cuestionario/logica/form-rules';
 import { AreasQuestion } from './areas-question';
 import { ObjetivosQuestion } from './objetivos-question';
 import { PreguntaMomentos } from './PreguntaMomentos';
