@@ -1,0 +1,16 @@
+**/node_modules
+**/.env
+**/.env.*
+!**/.env.example
+**/dist
+**/.expo
+**/*.tsbuildinfo
+.git
+legado
+docs
+mobile/android
+mobile/ios
+.claude
+.codex
+.agents
+.impeccable
