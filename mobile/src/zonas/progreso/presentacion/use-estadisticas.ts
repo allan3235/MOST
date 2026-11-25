@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { leerProgreso } from '../logica/servicioProgreso';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
-import { estaVisible } from '@/features/habits/domain/habitos-del-dia';
+import { estaVisible } from '@/zonas/habitos/logica/habitos-del-dia';
 import { fechaLocal } from '@/comun/util/dates';
 import { AREAS, type Area } from '@/comun/modelo/esquemas/onboarding';
 

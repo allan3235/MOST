@@ -1,3 +1,4 @@
+import type { ConfigAvisos, HorasAvisos } from '@/comun/modelo/configuracion';
 import {
   habitosDelDia,
   type Habito,
@@ -5,9 +6,9 @@ import {
   type Horario,
   type Ocurrencia,
   type Registro,
-} from '@/features/habits/domain/habitos-del-dia';
-import { textoDuracion } from '@/features/habits/domain/formato';
-import { horaCorta } from '@/features/habits/domain/horario';
+} from '@/zonas/habitos/logica/habitos-del-dia';
+import { textoDuracion } from '@/zonas/habitos/logica/formato';
+import { horaCorta } from '@/zonas/habitos/logica/horario';
 import { es, formatear } from '@/comun/i18n/es';
 import { diaIso, fechaLocal, sumarDias } from '@/comun/util/dates';
 import type { Acompanamiento, Momento, Obstaculo } from '@/comun/modelo/esquemas/onboarding';
@@ -25,7 +26,6 @@ export {
   type HorasAvisos,
   type MomentoAviso,
 } from '@/comun/modelo/configuracion';
-import type { ConfigAvisos, HorasAvisos, MomentoAviso } from '@/comun/modelo/configuracion';
 
 // La ventana flexible empieza a la hora de «Tarde» y su segundo aviso llega 3 h después
 // (17:00 y 20:00 por defecto), así sigue la hora que la persona elija en Perfil.

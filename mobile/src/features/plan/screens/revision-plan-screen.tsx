@@ -13,7 +13,7 @@ import { guardarPlan } from '@/db/plan-repository';
 import { leerAjustes, leerMinutosPorDia } from '@/zonas/cuenta/logica/servicioAjustes';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
-import { minutosPorDia } from '@/features/habits/domain/presupuesto';
+import { minutosPorDia } from '@/zonas/habitos/logica/presupuesto';
 import { respuestasCompletas } from '@/zonas/cuestionario/logica/form-rules';
 import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
 import { EditPlanHabitSheet } from '@/features/plan/components/edit-plan-habit-sheet';

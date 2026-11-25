@@ -7,8 +7,8 @@ import {
   type Horario,
   type Ocurrencia,
   type Registro,
-} from '@/features/habits/domain/habitos-del-dia';
-import { nuevaVersionHorario } from '@/features/habits/domain/horario';
+} from '@/zonas/habitos/logica/habitos-del-dia';
+import { nuevaVersionHorario } from '@/zonas/habitos/logica/horario';
 import { avanceDelPlan, diasParaRevision, type Avance } from '@/features/plan/domain/detalle-plan';
 import type { FilaCatalogo } from '@/features/plan/domain/plan-engine';
 import { respuestasDelPlan } from '@/features/plan/domain/respuestas-plan';
@@ -49,7 +49,8 @@ import type { OperacionOutbox } from '@/comun/logica/sync/sync-rules';
 import { aplicar } from '@/comun/datos/aplicar-cambio';
 import { actualizarFila, getDb, guardarFilas, leerFilas } from '@/comun/datos/database';
 import { avisarCambioLocal } from '@/comun/datos/db-version-store';
-import { categoriasPorId, guardarVersionHorario, idCategoria } from './habits-repository';
+import { categoriasPorId, idCategoria } from '@/zonas/habitos/datos/repositorioHabitos';
+import { guardarVersionHorario } from '@/zonas/habitos/logica/servicioHabitos';
 import { contarHechosDePasos } from '@/zonas/plantas/datos/repositorioHitos';
 import { descartarMovidasDelPatron, filasDe, guardarOcurrencias } from './occurrences-repository';
 import {

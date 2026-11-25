@@ -1,11 +1,12 @@
+import type { ConfigProgresion } from '@/comun/modelo/configuracion';
 import {
   estaVisible,
   horarioVigente,
   type Habito,
   type Horario,
-} from '@/features/habits/domain/habitos-del-dia';
-import { alcanzoLimiteHabitos, limiteHabitos } from '@/features/habits/domain/limite-habitos';
-import { minutosPorDia, type CargaHabito } from '@/features/habits/domain/presupuesto';
+} from '@/zonas/habitos/logica/habitos-del-dia';
+import { alcanzoLimiteHabitos, limiteHabitos } from '@/zonas/habitos/logica/limite-habitos';
+import { minutosPorDia, type CargaHabito } from '@/zonas/habitos/logica/presupuesto';
 import {
   elegirFilaCatalogo,
   habitoParaNivel,
@@ -56,7 +57,6 @@ export {
   UMBRAL_CUMPLIMIENTO,
   type ConfigProgresion,
 } from '@/comun/modelo/configuracion';
-import type { ConfigProgresion } from '@/comun/modelo/configuracion';
 /**
  * RR-03 candado mínimo (decisión del 24-nov): ningún reajuste deja un hábito en menos de 1 día por
  * semana ni, si tiene duración, en menos de 2 minutos.

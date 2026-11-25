@@ -12,7 +12,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import { guardarBloque, leerBloques } from '@/zonas/recordatorios/logica/servicioAgenda';
-import { cambiarHoraRecordatorio, leerHabitos } from '@/db/habits-repository';
+import { cambiarHoraRecordatorio, leerHabitos } from '@/zonas/habitos/logica/servicioHabitos';
 import { es, formatear } from '@/comun/i18n/es';
 
 import PantallaAgenda from '@/zonas/recordatorios/presentacion/PantallaAgenda';
@@ -35,7 +35,7 @@ jest.mock('@/zonas/recordatorios/logica/servicioAgenda', () => ({
   guardarBloque: jest.fn(async () => undefined),
   eliminarBloque: jest.fn(),
 }));
-jest.mock('@/db/habits-repository', () => ({
+jest.mock('@/zonas/habitos/logica/servicioHabitos', () => ({
   leerHabitos: jest.fn(),
   cambiarHoraRecordatorio: jest.fn(async () => undefined),
 }));

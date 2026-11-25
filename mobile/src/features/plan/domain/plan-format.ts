@@ -1,4 +1,4 @@
-import { textoDias, type TextosDias } from '@/features/habits/domain/formato';
+import { textoDias, type TextosDias } from '@/zonas/habitos/logica/formato';
 import type { BorradorPlan, HabitoPlan } from '@/schemas/plan';
 
 // Textos de una tarjeta de la revisión del plan. Reciben las plantillas de i18n para que esta

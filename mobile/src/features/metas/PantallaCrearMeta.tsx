@@ -24,7 +24,7 @@ import { Card } from '@/comun/presentacion/ui/card';
 import { ChoicePill } from '@/comun/presentacion/ui/choice-pill';
 import { Field } from '@/comun/presentacion/ui/field';
 import { Screen } from '@/comun/presentacion/ui/screen';
-import { crearHabito } from '@/db/habits-repository';
+import { crearHabito } from '@/zonas/habitos/logica/servicioHabitos';
 import {
   descomponerMeta,
   type MotivoSinPropuesta,

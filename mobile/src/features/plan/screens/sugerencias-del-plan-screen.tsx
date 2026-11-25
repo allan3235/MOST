@@ -16,7 +16,7 @@ import {
 } from '@/zonas/cuenta/logica/servicioAjustes';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
-import { minutosPorDia } from '@/features/habits/domain/presupuesto';
+import { minutosPorDia } from '@/zonas/habitos/logica/presupuesto';
 import { es, formatear } from '@/comun/i18n/es';
 import type { HabitoPlan } from '@/schemas/plan';
 import { colors } from '@/comun/tema';

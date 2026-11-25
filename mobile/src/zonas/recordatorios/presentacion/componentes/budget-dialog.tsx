@@ -3,10 +3,10 @@ import { useState } from 'react';
 import { Alert } from '@/comun/presentacion/ui/alert';
 import { AppText } from '@/comun/presentacion/ui/app-text';
 import { Dialog } from '@/comun/presentacion/ui/dialog';
-import { DialogActions } from '@/features/habits/components/dialog-actions';
-import { DurationWheels } from '@/features/habits/components/duration-wheels';
-import { textoDuracion } from '@/features/habits/domain/formato';
-import { limiteTiempoDiario } from '@/features/habits/domain/presupuesto';
+import { DialogActions } from '@/zonas/habitos/presentacion/componentes/dialog-actions';
+import { DurationWheels } from '@/zonas/habitos/presentacion/componentes/duration-wheels';
+import { textoDuracion } from '@/zonas/habitos/logica/formato';
+import { limiteTiempoDiario } from '@/zonas/habitos/logica/presupuesto';
 import { es, formatear } from '@/comun/i18n/es';
 
 // Tiempo diario (`presupuesto_min`) en Perfil: las mismas ruedas de Horas y Minutos que la

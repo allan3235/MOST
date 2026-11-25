@@ -1,6 +1,6 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-import type { Habito } from '@/features/habits/domain/habitos-del-dia';
+import type { Habito } from '@/zonas/habitos/logica/habitos-del-dia';
 
 import { filasDelPlan, fechaLocal, type IdsPlan } from '@/features/plan/domain/plan-rows';
 import { ErrorSinRed, pedirApi } from '@/comun/datos/clienteApi';

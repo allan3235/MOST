@@ -9,7 +9,7 @@ import { Button } from '@/comun/presentacion/ui/button';
 import { ConfirmDialog } from '@/comun/presentacion/ui/confirm-dialog';
 import { Screen } from '@/comun/presentacion/ui/screen';
 import { Snackbar } from '@/comun/presentacion/ui/snackbar';
-import { leerHabitos, type HabitoConHorario } from '@/db/habits-repository';
+import { leerHabitos, type HabitoConHorario } from '@/zonas/habitos/logica/servicioHabitos';
 import { sacarDelPlan, terminarPlan } from '@/db/plan-repository';
 import {
   hacerMasLigero,
@@ -19,9 +19,9 @@ import {
 } from '@/db/progression-repository';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
-import { ICONO_CATEGORIA } from '@/features/habits/categoria-icono';
-import { textoDuracion } from '@/features/habits/domain/formato';
-import { useHabitActions } from '@/features/habits/use-habit-actions';
+import { ICONO_CATEGORIA } from '@/zonas/habitos/presentacion/categoria-icono';
+import { textoDuracion } from '@/zonas/habitos/logica/formato';
+import { useHabitActions } from '@/zonas/habitos/presentacion/use-habit-actions';
 import { ProgressionCard } from '@/features/progression/components/progression-card';
 import { useProgresion } from '@/features/progression/use-progresion';
 import { es, formatear } from '@/comun/i18n/es';

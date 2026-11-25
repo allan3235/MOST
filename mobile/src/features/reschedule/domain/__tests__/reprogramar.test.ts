@@ -1,9 +1,4 @@
-import type {
-  Habito,
-  Horario,
-  Ocurrencia,
-  Registro,
-} from '@/features/habits/domain/habitos-del-dia';
+import type { Habito, Horario, Ocurrencia, Registro } from '@/zonas/habitos/logica/habitos-del-dia';
 
 import {
   diasLibres,

@@ -33,7 +33,7 @@ import {
   cambiarHoraRecordatorio,
   leerHabitos,
   type HabitoConHorario,
-} from '@/db/habits-repository';
+} from '@/zonas/habitos/logica/servicioHabitos';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { es, formatear } from '@/comun/i18n/es';

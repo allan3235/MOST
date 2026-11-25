@@ -16,7 +16,7 @@ import { Circle, CircleCheck, Footprints, type LucideIcon } from 'lucide-react-n
 import { View } from 'react-native';
 
 import { AppText, type TextTone } from '@/comun/presentacion/ui/app-text';
-import { textoDuracion } from '@/features/habits/domain/formato';
+import { textoDuracion } from '@/zonas/habitos/logica/formato';
 import type { AvancePaso } from '@/zonas/plantas/logica/hitos';
 import { es, formatear } from '@/comun/i18n/es';
 import { colors } from '@/comun/tema';

@@ -10,8 +10,8 @@
  * @historial 1.0.0 (2026-11-24): creación (antes mezclado en db/settings-repository.ts).
  */
 
-import { leerHabitos, type HabitoConHorario } from '@/db/habits-repository';
-import { limiteDuracionPlan, minutosPorDia } from '@/features/habits/domain/presupuesto';
+import { leerHabitos, type HabitoConHorario } from '@/zonas/habitos/logica/servicioHabitos';
+import { limiteDuracionPlan, minutosPorDia } from '@/zonas/habitos/logica/presupuesto';
 
 import {
   guardarAjustes as guardarEnBase,

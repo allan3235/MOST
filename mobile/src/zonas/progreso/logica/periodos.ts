@@ -1,4 +1,4 @@
-import { diasDelMes } from '@/features/habits/domain/fechas';
+import { diasDelMes } from '@/zonas/habitos/logica/fechas';
 import { diaIso, sumarDias } from '@/comun/util/dates';
 
 // Periodos de Progreso (SDD 8): semana ISO (lunes a domingo), mes y año naturales. Cada periodo se

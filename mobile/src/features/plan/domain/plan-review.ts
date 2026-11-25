@@ -1,4 +1,4 @@
-import { ajustePresupuesto, minutosPorDia } from '@/features/habits/domain/presupuesto';
+import { ajustePresupuesto, minutosPorDia } from '@/zonas/habitos/logica/presupuesto';
 import {
   momentoPrincipal,
   tieneObstaculo,

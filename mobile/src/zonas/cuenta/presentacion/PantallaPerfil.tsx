@@ -13,7 +13,7 @@ import { leerMisPlanes } from '@/db/plan-repository';
 import { guardarAjustes, leerAjustesPerfil } from '@/zonas/cuenta/logica/servicioAjustes';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from './session-context';
-import { textoDuracion } from '@/features/habits/domain/formato';
+import { textoDuracion } from '@/zonas/habitos/logica/formato';
 import { BudgetDialog } from '@/zonas/recordatorios/presentacion/componentes/budget-dialog';
 import { useAvisosActivos } from '@/zonas/recordatorios/presentacion/use-avisos-activos';
 import { es, formatear } from '@/comun/i18n/es';

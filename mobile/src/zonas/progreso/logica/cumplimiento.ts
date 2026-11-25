@@ -6,7 +6,7 @@ import {
   type HabitoDelDia,
   type Ocurrencia,
   type Registro,
-} from '@/features/habits/domain/habitos-del-dia';
+} from '@/zonas/habitos/logica/habitos-del-dia';
 import { fechaLocal, sumarDias } from '@/comun/util/dates';
 import type { Area } from '@/comun/modelo/esquemas/onboarding';
 

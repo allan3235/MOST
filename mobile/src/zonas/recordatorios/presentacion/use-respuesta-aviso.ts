@@ -22,7 +22,7 @@ import {
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 
-import { completarDesdeAviso } from '@/db/logs-repository';
+import { completarDesdeAviso } from '@/zonas/habitos/logica/servicioRegistros';
 
 import {
   ACCION_COMPLETAR,

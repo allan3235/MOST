@@ -9,16 +9,11 @@
  * @historial 1.1.0 (2026-11-24): pasa a zonas/progreso/datos (antes db/stats-repository.ts).
  */
 
-import type {
-  Habito,
-  Horario,
-  Ocurrencia,
-  Registro,
-} from '@/features/habits/domain/habitos-del-dia';
+import type { Habito, Horario, Ocurrencia, Registro } from '@/zonas/habitos/logica/habitos-del-dia';
 import type { DatosEstadisticas, Pausa } from '@/zonas/progreso/logica/cumplimiento';
 
 import { getDb, leerFilas } from '@/comun/datos/database';
-import { categoriasPorId } from '@/db/habits-repository';
+import { categoriasPorId } from '@/zonas/habitos/datos/repositorioHabitos';
 import { leerAjustesEn } from '@/zonas/cuenta/datos/repositorioAjustes';
 
 // Progreso (SDD 8): todo sale de SQLite, así que funciona sin conexión. Se leen también los

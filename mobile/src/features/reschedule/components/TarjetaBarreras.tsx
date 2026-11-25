@@ -18,7 +18,7 @@ import { View } from 'react-native';
 import { AppText } from '@/comun/presentacion/ui/app-text';
 import { Button } from '@/comun/presentacion/ui/button';
 import { Card } from '@/comun/presentacion/ui/card';
-import { textoDuracion } from '@/features/habits/domain/formato';
+import { textoDuracion } from '@/zonas/habitos/logica/formato';
 import { es, formatear } from '@/comun/i18n/es';
 import { colors } from '@/comun/tema';
 

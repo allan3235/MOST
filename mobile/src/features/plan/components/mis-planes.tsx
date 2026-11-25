@@ -6,7 +6,7 @@ import { AppText } from '@/comun/presentacion/ui/app-text';
 import { Button } from '@/comun/presentacion/ui/button';
 import { leerGlobalesFormulario, leerMisPlanes } from '@/db/plan-repository';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
-import { ICONO_CATEGORIA } from '@/features/habits/categoria-icono';
+import { ICONO_CATEGORIA } from '@/zonas/habitos/presentacion/categoria-icono';
 import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
 import { es, formatear } from '@/comun/i18n/es';
 import { useAccionUnica } from '@/comun/presentacion/use-accion-unica';

@@ -1,4 +1,4 @@
-import type { Habito, Horario } from '@/features/habits/domain/habitos-del-dia';
+import type { Habito, Horario } from '@/zonas/habitos/logica/habitos-del-dia';
 import { es } from '@/comun/i18n/es';
 
 import {

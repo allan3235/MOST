@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { View } from 'react-native';
 
 import { AppText } from '@/comun/presentacion/ui/app-text';
-import { ICONO_CATEGORIA } from '@/features/habits/categoria-icono';
+import { ICONO_CATEGORIA } from '@/zonas/habitos/presentacion/categoria-icono';
 import { es } from '@/comun/i18n/es';
 import type { Area } from '@/comun/modelo/esquemas/onboarding';
 import { colors, tintes } from '@/comun/tema';

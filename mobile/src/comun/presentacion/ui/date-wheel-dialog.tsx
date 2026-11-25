@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
-import { diasDelMes, fechaDesdeMesDia, mesYDia } from '@/features/habits/domain/fechas';
+import { diasDelMes, fechaDesdeMesDia, mesYDia } from '@/zonas/habitos/logica/fechas';
 
 import { AppText } from './app-text';
 import { Button } from './button';

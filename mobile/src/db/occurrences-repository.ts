@@ -1,12 +1,7 @@
 import { randomUUID } from 'expo-crypto';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-import type {
-  Habito,
-  Horario,
-  Ocurrencia,
-  Registro,
-} from '@/features/habits/domain/habitos-del-dia';
+import type { Habito, Horario, Ocurrencia, Registro } from '@/zonas/habitos/logica/habitos-del-dia';
 import {
   DIAS_ADELANTE,
   DIAS_ATRAS,

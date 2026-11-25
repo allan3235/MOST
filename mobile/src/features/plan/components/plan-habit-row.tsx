@@ -3,8 +3,8 @@ import { useRef } from 'react';
 import { Pressable, View, type HostInstance } from 'react-native';
 
 import { AppText } from '@/comun/presentacion/ui/app-text';
-import type { Ancla } from '@/features/habits/components/habit-menu';
-import { textoHabito } from '@/features/habits/domain/formato';
+import type { Ancla } from '@/zonas/habitos/presentacion/componentes/habit-menu';
+import { textoHabito } from '@/zonas/habitos/logica/formato';
 import { es, formatear } from '@/comun/i18n/es';
 import { useAccionUnica } from '@/comun/presentacion/use-accion-unica';
 import { colors } from '@/comun/tema';

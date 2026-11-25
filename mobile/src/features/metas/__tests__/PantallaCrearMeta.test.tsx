@@ -13,7 +13,7 @@
 
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
-import { crearHabito } from '@/db/habits-repository';
+import { crearHabito } from '@/zonas/habitos/logica/servicioHabitos';
 import { leerGlobalesFormulario } from '@/db/plan-repository';
 import { descomponerMeta } from '@/db/metasRepositorio';
 import { ESPERA_TOQUE_MS } from '@/comun/presentacion/candado';
@@ -24,7 +24,7 @@ import { PantallaCrearMeta } from '../PantallaCrearMeta';
 
 jest.mock('lucide-react-native', () => new Proxy({}, { get: () => () => null }));
 jest.mock('@/comun/presentacion/ui/back-button', () => ({ BackButton: () => null }));
-jest.mock('@/db/habits-repository', () => ({ crearHabito: jest.fn() }));
+jest.mock('@/zonas/habitos/logica/servicioHabitos', () => ({ crearHabito: jest.fn() }));
 jest.mock('@/db/metasRepositorio', () => ({ descomponerMeta: jest.fn() }));
 jest.mock('@/zonas/cuenta/logica/servicioAjustes', () => ({
   leerAjustesLocales: jest.fn(async () => ({
