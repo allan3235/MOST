@@ -14,9 +14,8 @@
 import {
   areaDeObjetivo,
   diasDisponibles,
-  MOMENTOS_CON_HORA,
+  momentoParaDias,
   momentoPrincipal,
-  momentosComunes,
   tieneObstaculo,
   type Area,
   type Disponibilidad,
@@ -139,10 +138,7 @@ export function habitoParaNivel(
 
   // El momento fijo del catálogo gana sobre la P5. Si sus días no comparten momento (o cualquiera
   // le acomoda), el aviso es flexible.
-  const comunes = momentosComunes(respuestas.disponibilidad, dias);
-  const sinMomentoFijo = comunes.length === 0 || comunes.length === MOMENTOS_CON_HORA.length;
-  const momento =
-    fila.momento_fijo ?? (sinMomentoFijo ? null : comunes[indice % comunes.length]!);
+  const momento = fila.momento_fijo ?? momentoParaDias(respuestas.disponibilidad, dias, indice);
 
   return {
     objetivo,

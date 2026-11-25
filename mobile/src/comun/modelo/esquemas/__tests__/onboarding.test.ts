@@ -9,6 +9,8 @@ import {
   momentosComunes,
   normalizarRespuestas,
   type Disponibilidad,
+  diasConMomento,
+  momentoParaDias,
 } from '@/comun/modelo/esquemas/onboarding';
 
 const validas = {
@@ -96,5 +98,31 @@ describe('versión 4: P5 por día y P6 con varias respuestas', () => {
       respuestasSchema.safeParse({ ...validas, disponibilidad: disponibilidadIgual([]) }).success,
     ).toBe(false);
     expect(respuestasSchema.safeParse({ ...validas, obstaculos: [] }).success).toBe(false);
+  });
+});
+
+describe('momento de un hábito según sus días', () => {
+  const d: Disponibilidad = [
+    ['manana', 'noche'],
+    ['manana', 'noche'],
+    ['manana', 'noche'],
+    ['manana', 'noche'],
+    ['manana', 'noche'],
+    ['noche'],
+    ['noche'],
+  ];
+
+  it('en días con mañana y noche libres reparte: el primer hábito mañana, el segundo noche', () => {
+    expect(momentoParaDias(d, [1, 3, 5], 0)).toBe('manana');
+    expect(momentoParaDias(d, [1, 3, 5], 1)).toBe('noche');
+  });
+
+  it('si incluye el sábado (solo noche), queda en la noche', () => {
+    expect(momentoParaDias(d, [1, 2, 4, 6], 0)).toBe('noche');
+  });
+
+  it('dice qué días tienen libre cada momento', () => {
+    expect(diasConMomento(d, 'manana')).toEqual([1, 2, 3, 4, 5]);
+    expect(diasConMomento(d, 'noche')).toEqual([1, 2, 3, 4, 5, 6, 7]);
   });
 });

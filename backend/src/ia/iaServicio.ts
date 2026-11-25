@@ -20,9 +20,15 @@ import { PrismaServicio } from '../baseDatos/prismaServicio.js';
 import { leerConfiguracion } from '../comun/configuracion.js';
 import { ErrorConCodigo } from '../comun/errorConCodigo.js';
 import {
+  diasConMomento,
+  diasDisponibles,
+  MOMENTOS_CON_HORA,
+  momentoParaDias,
+  momentosComunes,
   respuestasSchema,
   tieneObstaculo,
   type Area,
+  type MomentoConHora,
   type Respuestas,
 } from '@most/compartido/encuesta';
 import {
@@ -125,17 +131,35 @@ export class IaServicio {
     // El tiempo libre se reparte entre los hábitos con duración (definición 5, P4).
     const libre = Math.max(0, config.presupuestos[respuestas.tiempo] - minutosOcupados);
     const conDuracion = plan.habitos.filter((habito) => habito.duracion_min > 0).length;
+    // Momento de cada hábito (o flexible) y los días en que está libre: la IA los respeta en los
+    // días y en los textos (no «al levantarte» si su aviso es de noche).
+    const momentoDe = (habito: HabitoPlan): MomentoConHora | null =>
+      habito.flexible
+        ? null
+        : (MOMENTOS_CON_HORA.find((m) => config.horas[m] === habito.hora) ?? null);
+    const diasPosibles = (habito: HabitoPlan): number[] => {
+      const momento = momentoDe(habito);
+      return momento === null
+        ? diasDisponibles(respuestas.disponibilidad)
+        : diasConMomento(respuestas.disponibilidad, momento);
+    };
     const limitesDe = (habito: HabitoPlan): LimitesHabito => ({
       minutosMaximos: Math.floor(libre / Math.max(conDuracion, 1)),
       categoria: habito.categoria,
       objetivo: habito.objetivo,
       pasoInicial: habito.nivel,
       usaDuracionReducida: habito.usa_duracion_reducida,
+      diasPermitidos: diasPosibles(habito),
     });
 
     const mensaje = JSON.stringify({
       respuestas,
       minutos_maximos_por_habito: limitesDe(plan.habitos[0]).minutosMaximos,
+      habitos: plan.habitos.map((habito) => ({
+        objetivo: habito.objetivo,
+        momento: momentoDe(habito) ?? 'flexible',
+        dias_posibles: diasPosibles(habito),
+      })),
     });
     const desdeIa = await this.pedirIa(
       usuarioId,
@@ -158,9 +182,29 @@ export class IaServicio {
     );
 
     const sinRecursos = tieneObstaculo(respuestas, 'recursos');
+    // Con los días finales (los de la IA) se revisa la hora: se conserva si su momento sigue libre
+    // en todos esos días; si no, se elige otro (o queda flexible). El momento fijo del catálogo no
+    // se toca.
+    const conHoraRevisada = (habito: HabitoPlan, indice: number): HabitoPlan => {
+      const fila = catalogo.find((f) => f.objetivo === habito.objetivo && f.nivel === habito.nivel);
+      if (fila?.momento_fijo) return habito;
+      const actual = momentoDe(habito);
+      const comunes = momentosComunes(respuestas.disponibilidad, habito.dias_semana);
+      if (actual !== null && comunes.includes(actual)) return habito;
+      const momento = momentoParaDias(respuestas.disponibilidad, habito.dias_semana, indice);
+      return {
+        ...habito,
+        hora: momento === null ? null : config.horas[momento],
+        flexible: momento === null,
+      };
+    };
+
     const habitos = plan.habitos.map((habito, indice) => {
       if (desdeIa) {
-        return combinarConMicroPasos(habito, desdeIa.propuestos[indice], true);
+        return conHoraRevisada(
+          combinarConMicroPasos(habito, desdeIa.propuestos[indice], true),
+          indice,
+        );
       }
       const delCatalogo = armarHabitoDesdeCatalogo(catalogo, habito.objetivo, sinRecursos);
       const corregido = delCatalogo ? corregirHabito(delCatalogo, limitesDe(habito)) : null;
@@ -219,6 +263,7 @@ export class IaServicio {
       objetivo: null,
       pasoInicial: 1,
       usaDuracionReducida: false,
+      diasPermitidos: diasDisponibles(perfil.disponibilidad),
     };
     // UC-01: los micro-pasos se arman con el perfil de la encuesta, no solo con los minutos.
     const mensaje = JSON.stringify({

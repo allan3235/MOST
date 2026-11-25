@@ -272,6 +272,35 @@ export function momentosComunes(
 }
 
 /**
+ * Días (ISO) en los que ese momento está libre.
+ * @param disponibilidad Respuesta de la P5.
+ * @param momento Momento del día.
+ * @returns Días de 1 a 7, en orden.
+ */
+export function diasConMomento(disponibilidad: Disponibilidad, momento: MomentoConHora): number[] {
+  return disponibilidad.flatMap((momentos, indice) => (momentos.includes(momento) ? [indice + 1] : []));
+}
+
+/**
+ * Momento de un hábito según sus días: uno de los que se repiten en todos ellos (el `indice`-ésimo,
+ * para repartir varios hábitos), o null si no comparten momento o cualquiera le acomoda (aviso
+ * flexible).
+ * @param disponibilidad Respuesta de la P5.
+ * @param dias Días del hábito.
+ * @param indice Posición del hábito en el plan.
+ * @returns El momento, o null.
+ */
+export function momentoParaDias(
+  disponibilidad: Disponibilidad,
+  dias: readonly number[],
+  indice: number,
+): MomentoConHora | null {
+  const comunes = momentosComunes(disponibilidad, dias);
+  if (comunes.length === 0 || comunes.length === MOMENTOS_CON_HORA.length) return null;
+  return comunes[indice % comunes.length]!;
+}
+
+/**
  * Momento que resume la P5: el primero que se repite en todos sus días libres, o `varia` si cambia
  * según el día (o si cualquier momento le acomoda: entonces el aviso flexible encaja mejor).
  * @param disponibilidad Respuesta de la P5.

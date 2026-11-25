@@ -176,6 +176,28 @@ describe('CP-01 (RF-03): «Leer 20 minutos al día»', () => {
   });
 });
 
+describe('días permitidos por la P5 (ratos libres)', () => {
+  it('quita los días sin rato libre que proponga la IA', () => {
+    const habito = corregirHabito(
+      crearHabito([
+        crearPaso(5, { dias_semana: [1, 6, 7] }),
+        crearPaso(10, { dias_semana: [1, 3, 5, 6] }),
+        crearPaso(20, { dias_semana: [1, 3, 5] }),
+      ]),
+      { ...LIMITES, diasPermitidos: [1, 2, 3, 4, 5] },
+    );
+    expect(habito?.micro_pasos.map((p) => p.dias_semana)).toEqual([[1], [1, 3, 5], [1, 3, 5]]);
+  });
+
+  it('si ningún día propuesto está libre, usa los permitidos', () => {
+    const habito = corregirHabito(
+      crearHabito([crearPaso(5, { dias_semana: [6, 7] }), crearPaso(10), crearPaso(20)]),
+      { ...LIMITES, diasPermitidos: [2, 4] },
+    );
+    expect(habito?.micro_pasos[0]?.dias_semana).toEqual([2, 4]);
+  });
+});
+
 describe('limpiarDias', () => {
   it('quita repetidos e inválidos y ordena', () => {
     expect(limpiarDias([5, 1, 1, 8, 0, 3])).toEqual([1, 3, 5]);

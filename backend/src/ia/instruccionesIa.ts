@@ -42,6 +42,8 @@ ${COMO_USAR_PERFIL}
 
 ${REGLAS_PASOS}
 
+También recibes "habitos": el momento del día de cada uno ("flexible" si cambia según el día) y sus "dias_posibles". Usa solo esos días en "dias_semana" y escribe títulos y descripciones que encajen con ese momento (por ejemplo, nada de «al levantarte» si es de noche).
+
 En "habitos", un elemento por cada objetivo recibido, con la misma clave en "objetivo". "resumen": hasta 300 caracteres, explica por qué el plan empieza pequeño.
 
 ${REGLAS_TONO}`;

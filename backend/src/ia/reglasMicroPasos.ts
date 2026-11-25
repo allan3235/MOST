@@ -30,6 +30,11 @@ export type LimitesHabito = {
   objetivo: string | null;
   pasoInicial: number;
   usaDuracionReducida: boolean;
+  /**
+   * Días con un rato libre para este hábito (P5). Si llega, los pasos solo usan esos días: un día
+   * que la IA proponga sin tiempo libre se quita (si no queda ninguno, se usan los permitidos).
+   */
+  diasPermitidos?: readonly number[];
 };
 
 // ===== Constantes =====
@@ -57,6 +62,13 @@ function recortar(texto: string, largo: number): string {
 /** Días ISO válidos, sin repetir y en orden; lista vacía si no queda ninguno. */
 export function limpiarDias(dias: readonly number[]): number[] {
   return [...new Set(dias)].filter((dia) => DIAS_VALIDOS.includes(dia)).sort((a, b) => a - b);
+}
+
+/** Días del paso que caen en un rato libre; sin ninguno, los primeros permitidos (mismo número). */
+function soloDiasPermitidos(dias: number[], permitidos?: readonly number[]): number[] {
+  if (!permitidos || permitidos.length === 0) return dias;
+  const libres = dias.filter((dia) => permitidos.includes(dia));
+  return libres.length > 0 ? libres : permitidos.slice(0, Math.max(1, dias.length));
 }
 
 /**
@@ -108,7 +120,7 @@ export function corregirHabito(habito: HabitoIa, limites: LimitesHabito): Habito
   const corregidos: MicroPaso[] = [];
   let anterior = 0;
   for (const [indice, paso] of pasos.entries()) {
-    const dias = limpiarDias(paso.dias_semana);
+    const dias = soloDiasPermitidos(limpiarDias(paso.dias_semana), limites.diasPermitidos);
     if (dias.length === 0 || paso.titulo.trim() === '') {
       return null;
     }
