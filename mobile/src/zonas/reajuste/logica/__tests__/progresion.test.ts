@@ -1,6 +1,6 @@
 import { disponibilidadIgual } from '@/comun/modelo/esquemas/onboarding';
 import type { Habito, Horario } from '@/zonas/habitos/logica/habitos-del-dia';
-import type { ConfigPlan, FilaCatalogo } from '@/features/plan/domain/plan-engine';
+import type { ConfigPlan, FilaCatalogo } from '@/zonas/planes/logica/plan-engine';
 import type { OcurrenciaEstadistica } from '@/zonas/progreso/logica/cumplimiento';
 import { sumarDias } from '@/comun/util/dates';
 import type { Respuestas } from '@/comun/modelo/esquemas/onboarding';

@@ -8,7 +8,7 @@
  * @historial 1.0.0 (2026-11-23): creación.
  */
 
-import { PantallaCrearMeta } from '@/features/metas/PantallaCrearMeta';
+import { PantallaCrearMeta } from '@/zonas/planes/presentacion/PantallaCrearMeta';
 
 // ===== Principal =====
 

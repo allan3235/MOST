@@ -11,7 +11,7 @@ import { Screen } from '@/comun/presentacion/ui/screen';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { pilaParaRetomar } from '@/zonas/cuestionario/logica/retomar';
 import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
-import { usePlanReviewStore } from '@/features/plan/plan-review-store';
+import { usePlanReviewStore } from '@/zonas/planes/logica/plan-review-store';
 import { es } from '@/comun/i18n/es';
 import { navegar } from '@/comun/presentacion/navegar';
 

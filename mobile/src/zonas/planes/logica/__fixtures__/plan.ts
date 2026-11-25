@@ -1,0 +1,70 @@
+import { disponibilidadIgual } from '@/comun/modelo/esquemas/onboarding';
+import type { Respuestas } from '@/comun/modelo/esquemas/onboarding';
+import type { BorradorPlan, HabitoPlan } from '@/comun/modelo/esquemas/plan';
+
+// Datos de prueba compartidos por las pruebas de la revisión y el guardado del plan.
+
+export const RESPUESTAS: Respuestas = {
+  areas: ['salud_fisica', 'social'],
+  objetivos: ['mover_mas', 'tiempo_de_calidad'],
+  historial: 'mantiene',
+  tiempo: '20_40',
+  disponibilidad: disponibilidadIgual(['manana']),
+  obstaculos: ['olvido'],
+  acompanamiento: 'recordatorio_suave',
+};
+
+export function habito(cambios: Partial<HabitoPlan> = {}): HabitoPlan {
+  return {
+    objetivo: 'mover_mas',
+    categoria: 'salud_fisica',
+    nivel: 2,
+    variante: 'base',
+    titulo: 'Caminar 15 min',
+    descripcion: null,
+    duracion_min: 15,
+    usa_duracion_reducida: false,
+    dias_semana: [1, 2, 3, 4, 5],
+    hora: '08:00',
+    flexible: false,
+    notificar: true,
+    ...cambios,
+  };
+}
+
+export const BORRADOR: BorradorPlan = {
+  origen: 'ia',
+  resumen: 'Empezamos ligero.',
+  habitos: [
+    habito(),
+    habito({
+      objetivo: 'tiempo_de_calidad',
+      categoria: 'social',
+      nivel: 1,
+      titulo: '5 min con alguien',
+      duracion_min: 5,
+      dias_semana: [1, 3, 5],
+    }),
+  ],
+  ajustes: {
+    presupuesto_min: 40,
+    estilo_notificaciones: 'recordatorio_suave',
+    estrategias: ['olvido'],
+    segundo_aviso: true,
+  },
+  alternativas: {
+    mover_mas: [habito({ nivel: 1, titulo: 'Caminar 5 min', duracion_min: 5 })],
+    tiempo_de_calidad: [],
+  },
+  sugerencias: [
+    habito({
+      objetivo: 'dormir_mejor',
+      nivel: 1,
+      titulo: 'Acostarme a la misma hora',
+      duracion_min: 2,
+    }),
+    habito({ objetivo: 'tiempo_de_calidad', categoria: 'social', nivel: 1, duracion_min: 5 }),
+    habito({ objetivo: 'tomar_agua', nivel: 1, titulo: 'Un vaso de agua', duracion_min: 1 }),
+  ],
+  ventana_flexible: { inicio: '17:00', fin: '20:00' },
+};

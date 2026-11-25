@@ -12,7 +12,7 @@ import {
   habitoParaNivel,
   type ConfigPlan,
   type FilaCatalogo,
-} from '@/features/plan/domain/plan-engine';
+} from '@/zonas/planes/logica/plan-engine';
 import {
   contar,
   type Conteo,
@@ -28,7 +28,7 @@ import {
   type Objetivo,
   type Respuestas,
 } from '@/comun/modelo/esquemas/onboarding';
-import type { HabitoPlan, Nivel } from '@/schemas/plan';
+import type { HabitoPlan, Nivel } from '@/comun/modelo/esquemas/plan';
 
 // Progresión (SDD 6.3). Funciones puras: reciben lo que ya está en SQLite y deciden qué proponer.
 // Solo entran los hábitos del plan (`objetivo` y `nivel`); los manuales nunca suben ni bajan.

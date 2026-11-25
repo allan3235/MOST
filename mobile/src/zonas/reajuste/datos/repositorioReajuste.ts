@@ -82,3 +82,35 @@ export async function leerSubidasPlan(db: SQLiteDatabase, userId: string): Promi
   );
   return fila ? (fila.subidas_plan ?? 0) : null;
 }
+
+/**
+ * Quita las tarjetas pendientes de un plan (o solo las de un hábito, con `habitId`).
+ * @param db Base local (dentro de la transacción).
+ * @param userId Usuario con sesión.
+ * @param planId Plan.
+ * @param habitId Hábito, si solo se quitan las suyas.
+ */
+export async function quitarTarjetasDePlan(
+  db: SQLiteDatabase,
+  userId: string,
+  planId: string,
+  habitId?: string,
+): Promise<void> {
+  const tarjetas = await db.getAllAsync<{ id: string; json: string }>(
+    'SELECT id, json FROM progresion_tarjetas WHERE user_id = ?',
+    [userId],
+  );
+  for (const t of tarjetas) {
+    try {
+      const datos = JSON.parse(t.json) as { planId?: string; habitId?: string };
+      if (datos.planId !== planId) continue;
+      if (habitId !== undefined && datos.habitId !== habitId) continue;
+    } catch {
+      // Tarjeta ilegible: se quita también.
+    }
+    await db.runAsync('DELETE FROM progresion_tarjetas WHERE user_id = ? AND id = ?', [
+      userId,
+      t.id,
+    ]);
+  }
+}

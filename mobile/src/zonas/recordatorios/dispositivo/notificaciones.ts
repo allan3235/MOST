@@ -14,6 +14,9 @@
 import {
   AndroidImportance,
   cancelAllScheduledNotificationsAsync,
+  clearLastNotificationResponseAsync,
+  DEFAULT_ACTION_IDENTIFIER,
+  dismissNotificationAsync,
   getExactAlarmPermissionsAsync,
   getPermissionsAsync,
   requestExactAlarmPermissionsAsync,
@@ -23,8 +26,10 @@ import {
   setNotificationCategoryAsync,
   setNotificationChannelAsync,
   setNotificationHandler,
+  useLastNotificationResponse,
 } from 'expo-notifications';
-import { Platform } from 'react-native';
+import { useMemo } from 'react';
+import { Linking, Platform } from 'react-native';
 
 import { es } from '@/comun/i18n/es';
 import { colors } from '@/comun/tema';
@@ -35,6 +40,14 @@ import type { AvisoPlaneado } from '../logica/planificar-avisos';
 // ===== Tipos =====
 
 export type EstadoPermisoAvisos = { concedido: boolean; puedePreguntar: boolean };
+
+/** Último toque a una notificación: el botón «Hecho», tocar el aviso u otra acción. */
+export type RespuestaAviso = {
+  accion: 'completar' | 'abrir' | 'otra';
+  /** Identificador del aviso tocado (para quitarlo de la bandeja). */
+  idAviso: string;
+  datos: Record<string, unknown>;
+};
 
 // ===== Constantes =====
 
@@ -177,4 +190,45 @@ export async function mostrarAhora(aviso: {
     // Solo el canal: se muestra en cuanto se programa.
     trigger: { channelId: CANAL_RECORDATORIOS },
   });
+}
+
+/**
+ * Último toque a una notificación, ya traducido (null si no hay).
+ * @returns La respuesta.
+ */
+export function useUltimaRespuestaAviso(): RespuestaAviso | null {
+  const respuesta = useLastNotificationResponse();
+  return useMemo(() => {
+    if (!respuesta) return null;
+    const { actionIdentifier, notification } = respuesta;
+    const accion =
+      actionIdentifier === ACCION_COMPLETAR
+        ? 'completar'
+        : actionIdentifier === DEFAULT_ACTION_IDENTIFIER
+          ? 'abrir'
+          : 'otra';
+    return {
+      accion,
+      idAviso: notification.request.identifier,
+      datos: (notification.request.content.data ?? {}) as Record<string, unknown>,
+    };
+  }, [respuesta]);
+}
+
+/** Olvida el último toque para no atenderlo otra vez (en cada render o al volver a la app). */
+export function olvidarUltimaRespuesta(): void {
+  clearLastNotificationResponseAsync().catch(() => {});
+}
+
+/**
+ * Quita un aviso de la bandeja de notificaciones.
+ * @param idAviso Identificador del aviso.
+ */
+export function quitarAvisoMostrado(idAviso: string): void {
+  dismissNotificationAsync(idAviso).catch(() => {});
+}
+
+/** Abre los ajustes de la app en el sistema (para activar los avisos). */
+export async function abrirAjustesApp(): Promise<void> {
+  await Linking.openSettings();
 }

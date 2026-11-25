@@ -27,17 +27,23 @@ import {
   leerUltimoAvisoMotivacional,
   type FuentesContexto,
 } from '../datos/repositorioAvisos';
+import { completarDesdeAviso } from '@/zonas/habitos/logica/servicioRegistros';
+
 import {
+  abrirAjustesApp,
   alarmasExactasPermitidas as alarmasExactasDelTelefono,
   cancelarTodos,
   configurarManejador,
   leerEstadoPermiso,
   mostrarAhora,
+  olvidarUltimaRespuesta,
   pedirAlarmasExactas as pedirAlarmasExactasAlTelefono,
   pedirPermisoAvisos,
   permisoAvisosConcedido,
   programarAvisos,
+  quitarAvisoMostrado,
   registrarCanalYCategoria,
+  type RespuestaAviso,
 } from '../dispositivo/notificaciones';
 import { DIAS_PARA_AVISO, diasSeguidos, tocaAvisoMotivacional } from './aviso-motivacional';
 import { historialDelPlan } from './historial-plan';
@@ -49,12 +55,16 @@ export {
   ACCION_COMPLETAR,
   CANAL_RECORDATORIOS,
   CATEGORIA_HABITO,
+  useUltimaRespuestaAviso,
+  type RespuestaAviso,
 } from '../dispositivo/notificaciones';
 
 // ===== Constantes =====
 
 /** Pantalla que abre el aviso motivacional al tocarlo (acceso directo, RF-13). */
 export const RUTA_AVISO_MOTIVACIONAL = '/estadisticas' as const;
+/** Después de «Hecho» desde la notificación se ve Hoy, con la recompensa (RI-04). */
+const RUTA_HOY = '/hoy' as const;
 /** Días hacia atrás que se revisan para contar los días seguidos. */
 const DIAS_REVISADOS_MOTIVACION = 400;
 
@@ -262,4 +272,38 @@ export async function mandarAvisoMotivacional(userId: string): Promise<void> {
 export async function leerSemanaApoyo(userId: string): Promise<SemanaApoyo | null> {
   const { planes } = contextoDe(await leerFuentesContexto(userId));
   return semanaDeApoyoEnPlanes(planes, fechaLocal());
+}
+
+/** Abre los ajustes de la app en el sistema (cuando Android ya no deja preguntar el permiso). */
+export function abrirAjustesDeLaApp(): Promise<void> {
+  return abrirAjustesApp();
+}
+
+/**
+ * Atiende el último toque a una notificación (RI-04, RF-13). «Hecho» marca el hábito (en segundo
+ * plano) y lleva a Hoy; tocar el aviso motivacional abre Progreso.
+ * @param userId Usuario con sesión.
+ * @param respuesta Toque traducido por la capa de dispositivo.
+ * @returns A qué pantalla ir, o null si no hay que moverse.
+ */
+export function atenderRespuestaAviso(
+  userId: string,
+  respuesta: RespuestaAviso,
+): typeof RUTA_HOY | typeof RUTA_AVISO_MOTIVACIONAL | null {
+  // Se olvida para no repetirla en cada render o al regresar a la app.
+  olvidarUltimaRespuesta();
+  if (respuesta.accion === 'completar') {
+    quitarAvisoMostrado(respuesta.idAviso);
+    const { habitId, fecha } = respuesta.datos;
+    if (typeof habitId === 'string' && typeof fecha === 'string') {
+      completarDesdeAviso(userId, habitId, fecha).catch((causa: unknown) => {
+        console.warn('No se pudo marcar desde el aviso', causa);
+      });
+    }
+    return RUTA_HOY;
+  }
+  if (respuesta.accion === 'abrir' && respuesta.datos.ruta === RUTA_AVISO_MOTIVACIONAL) {
+    return RUTA_AVISO_MOTIVACIONAL;
+  }
+  return null;
 }

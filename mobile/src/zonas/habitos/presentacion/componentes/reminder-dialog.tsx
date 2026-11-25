@@ -2,7 +2,7 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 
 import { Button } from '@/comun/presentacion/ui/button';
 import { Dialog } from '@/comun/presentacion/ui/dialog';
-import { fechaDesdeHora, horaDesdeFecha } from '@/features/plan/domain/plan-review';
+import { fechaDesdeHora, horaDesdeFecha } from '@/zonas/planes/logica/plan-review';
 import { es } from '@/comun/i18n/es';
 
 import { HORA_POR_DEFECTO } from '@/zonas/habitos/logica/valores-formulario';

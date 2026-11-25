@@ -1,6 +1,6 @@
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useState, type ReactNode } from 'react';
-import { ActivityIndicator, Linking, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 
 import { Alert } from '@/comun/presentacion/ui/alert';
 import { AppText } from '@/comun/presentacion/ui/app-text';
@@ -18,14 +18,15 @@ import {
 } from '@/zonas/cuenta/logica/servicioAjustes';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
-import { SecondNoticeToggle } from '@/features/plan/components/second-notice-toggle';
-import { fechaDesdeHora, horaDesdeFecha } from '@/features/plan/domain/plan-review';
+import { SecondNoticeToggle } from '@/zonas/planes/presentacion/componentes/second-notice-toggle';
+import { fechaDesdeHora, horaDesdeFecha } from '@/zonas/planes/logica/plan-review';
 import { es } from '@/comun/i18n/es';
 import { cardShadow, colors } from '@/comun/tema';
 
 import { StyleDialog } from '@/zonas/recordatorios/presentacion/componentes/style-dialog';
 import type { MomentoAviso } from '@/zonas/recordatorios/logica/planificar-avisos';
 import { useAvisosActivos } from './use-avisos-activos';
+import { abrirAjustesDeLaApp } from '@/zonas/recordatorios/logica/servicioAvisos';
 
 // «Avisos y horas» (Perfil → Avisos y horas; decisión del usuario, Perfil como índice): el estilo
 // de avisos, el resumen nocturno (RF-18), el segundo aviso y las horas por momento. Cada cambio se guarda al momento en el
@@ -110,7 +111,7 @@ export default function AvisosHorasScreen() {
                   <Button
                     variant="secondary"
                     label={t.abrirAjustes}
-                    onPress={() => void Linking.openSettings()}
+                    onPress={() => void abrirAjustesDeLaApp()}
                   />
                 </View>
               )}

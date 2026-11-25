@@ -23,10 +23,10 @@ import {
   type Registro,
 } from '@/zonas/habitos/logica/habitos-del-dia';
 import { nuevaVersionHorario } from '@/zonas/habitos/logica/horario';
-import { avanceDelPlan, diasParaRevision, type Avance } from '@/features/plan/domain/detalle-plan';
-import type { FilaCatalogo } from '@/features/plan/domain/plan-engine';
-import { respuestasDelPlan } from '@/features/plan/domain/respuestas-plan';
-import { sugerenciasPorNiveles } from '@/features/plan/domain/sugerencias-plan';
+import { avanceDelPlan, diasParaRevision, type Avance } from '@/zonas/planes/logica/detalle-plan';
+import type { FilaCatalogo } from '@/zonas/planes/logica/plan-engine';
+import { respuestasDelPlan } from '@/zonas/planes/logica/respuestas-plan';
+import { sugerenciasPorNiveles } from '@/zonas/planes/logica/sugerencias-plan';
 import {
   decidir,
   esDelPlan,
@@ -57,7 +57,7 @@ import {
   type Objetivo,
   type Respuestas,
 } from '@/comun/modelo/esquemas/onboarding';
-import { type HabitoPlan, type PeticionAjuste } from '@/schemas/plan';
+import { type HabitoPlan, type PeticionAjuste } from '@/comun/modelo/esquemas/plan';
 import type { OperacionOutbox } from '@/comun/logica/sync/sync-rules';
 
 import { aplicar } from '@/comun/datos/aplicar-cambio';

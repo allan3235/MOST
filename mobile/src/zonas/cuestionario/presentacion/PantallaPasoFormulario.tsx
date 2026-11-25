@@ -15,7 +15,7 @@ import {
   type Paso,
 } from '@/zonas/cuestionario/logica/form-rules';
 import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
-import { useRutasPlan } from '@/features/plan/use-rutas-plan';
+import { useRutasPlan } from '@/zonas/planes/presentacion/use-rutas-plan';
 import { es } from '@/comun/i18n/es';
 import { navegar } from '@/comun/presentacion/navegar';
 

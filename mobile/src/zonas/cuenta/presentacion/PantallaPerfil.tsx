@@ -9,7 +9,7 @@ import { MenuRow } from '@/comun/presentacion/ui/menu-row';
 import { Screen } from '@/comun/presentacion/ui/screen';
 import { Snackbar } from '@/comun/presentacion/ui/snackbar';
 import { avisarCambioLocal } from '@/comun/logica/cambios-locales';
-import { leerMisPlanes } from '@/db/plan-repository';
+import { leerMisPlanes } from '@/zonas/planes/logica/servicioPlanes';
 import { guardarAjustes, leerAjustesPerfil } from '@/zonas/cuenta/logica/servicioAjustes';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from './session-context';

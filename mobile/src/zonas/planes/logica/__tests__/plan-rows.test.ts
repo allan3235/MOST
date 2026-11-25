@@ -1,0 +1,146 @@
+import { VERSION_FORMULARIO } from '@/comun/modelo/esquemas/onboarding';
+
+import { fechaLocal, filasDelPlan, type IdsPlan } from '@/zonas/planes/logica/plan-rows';
+import { BORRADOR, habito, RESPUESTAS } from '@/zonas/planes/logica/__fixtures__/plan';
+
+const IDS: IdsPlan = {
+  planId: 'plan-1',
+  planesExtra: { social: 'plan-2' },
+  habitos: {
+    mover_mas: { habitId: 'habito-1', scheduleId: 'horario-1' },
+    tiempo_de_calidad: { habitId: 'habito-2', scheduleId: 'horario-2' },
+  },
+};
+
+const CATEGORIAS = {
+  salud_fisica: 'cat-fisica',
+  trabajo: 'cat-trabajo',
+  salud_mental: 'cat-mental',
+  finanzas: 'cat-finanzas',
+  social: 'cat-social',
+};
+
+function filas(borrador = BORRADOR) {
+  return filasDelPlan({
+    userId: 'usuario-1',
+    borrador,
+    respuestas: RESPUESTAS,
+    ids: IDS,
+    categorias: CATEGORIAS,
+    hoy: '2026-11-01',
+  });
+}
+
+describe('filas que se guardan al pulsar «Empezar»', () => {
+  it('liga plan, hábitos y horarios con los ids del cliente', () => {
+    const f = filas();
+    expect(f.plans[0]).toMatchObject({ id: 'plan-1', user_id: 'usuario-1', origen: 'ia' });
+    expect(f.habits[1]).toMatchObject({
+      id: 'habito-2',
+      plan_id: 'plan-2',
+      category_id: 'cat-social',
+      objetivo: 'tiempo_de_calidad',
+      nivel: 1,
+    });
+    expect(f.schedules[0]).toEqual({
+      id: 'horario-1',
+      habit_id: 'habito-1',
+      user_id: 'usuario-1',
+      dias_semana: [1, 2, 3, 4, 5],
+      hora: '08:00',
+      flexible: false,
+      notificar: true,
+      vigente_desde: '2026-11-01',
+    });
+  });
+
+  it('guarda un plan por área, con sus objetivos y el historial', () => {
+    const { plans } = filas();
+    expect(plans.map((p) => [p.id, p.area])).toEqual([
+      ['plan-1', 'salud_fisica'],
+      ['plan-2', 'social'],
+    ]);
+    expect(plans[1]?.respuestas).toEqual({
+      areas: ['social'],
+      objetivos: ['tiempo_de_calidad'],
+      historial: RESPUESTAS.historial,
+    });
+  });
+
+  it('un horario flexible se guarda sin hora', () => {
+    const flexible = { ...BORRADOR, habitos: [habito({ hora: null, flexible: true })] };
+    expect(filas(flexible).schedules[0]).toMatchObject({ hora: null, flexible: true });
+  });
+
+  it('sin permiso de avisos, los hábitos se guardan sin recordatorio', () => {
+    const conFlexible = {
+      ...BORRADOR,
+      habitos: [BORRADOR.habitos[0]!, habito({ hora: null, flexible: true })],
+    };
+    const sinPermiso = filasDelPlan({
+      userId: 'usuario-1',
+      borrador: conFlexible,
+      respuestas: RESPUESTAS,
+      ids: IDS,
+      categorias: CATEGORIAS,
+      hoy: '2026-11-01',
+      conRecordatorios: false,
+    });
+    for (const horario of sinPermiso.schedules) {
+      expect(horario).toMatchObject({ hora: null, flexible: false, notificar: false });
+    }
+  });
+
+  it('guarda los ajustes y las respuestas con la versión del formulario', () => {
+    const f = filas();
+    expect(f.settings).toEqual({
+      user_id: 'usuario-1',
+      presupuesto_min: 40,
+      estilo_notificaciones: 'recordatorio_suave',
+      estrategias: ['olvido'],
+      segundo_aviso: true,
+    });
+    expect(f.answers).toEqual({
+      user_id: 'usuario-1',
+      respuestas: RESPUESTAS,
+      version_formulario: VERSION_FORMULARIO,
+    });
+  });
+
+  it('guarda la secuencia de micro-pasos y en qué paso va cada hábito', () => {
+    const pasos = [1, 2, 3].map((orden) => ({
+      orden,
+      titulo: `Caminar ${orden * 5} min`,
+      descripcion: '',
+      duracion_min: orden * 5,
+      duracion_reducida_min: orden,
+      dias_semana: [1, 3, 5],
+    }));
+    const [primero, segundo] = BORRADOR.habitos;
+    const f = filas({
+      ...BORRADOR,
+      habitos: [{ ...primero, micro_pasos: pasos, paso_actual: 2 }, segundo],
+    });
+    expect(f.habits.map((h) => h.paso_actual)).toEqual([2, null]);
+    expect(f.microPasos).toHaveLength(3);
+    expect(f.microPasos[1]).toEqual({
+      habit_id: 'habito-1',
+      user_id: 'usuario-1',
+      orden: 2,
+      titulo: 'Caminar 10 min',
+      descripcion: '',
+      duracion_min: 10,
+      duracion_reducida_min: 2,
+      dias_semana: [1, 3, 5],
+    });
+  });
+
+  it('un hábito quitado en la revisión no se guarda', () => {
+    const uno = { ...BORRADOR, habitos: [BORRADOR.habitos[1]!] };
+    expect(filas(uno).habits.map((h) => h.id)).toEqual(['habito-2']);
+  });
+});
+
+it('fechaLocal usa la fecha del teléfono', () => {
+  expect(fechaLocal(new Date(2026, 0, 5, 23, 59))).toBe('2026-01-05');
+});

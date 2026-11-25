@@ -19,7 +19,7 @@ import { DaySquares } from '@/comun/presentacion/ui/day-squares';
 import { Dialog } from '@/comun/presentacion/ui/dialog';
 import { Field } from '@/comun/presentacion/ui/field';
 import type { DatosBloque } from '@/zonas/recordatorios/logica/servicioAgenda';
-import { fechaDesdeHora, horaDesdeFecha } from '@/features/plan/domain/plan-review';
+import { fechaDesdeHora, horaDesdeFecha } from '@/zonas/planes/logica/plan-review';
 import { es, formatear } from '@/comun/i18n/es';
 
 import {

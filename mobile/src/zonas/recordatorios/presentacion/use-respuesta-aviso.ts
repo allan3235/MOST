@@ -13,25 +13,13 @@
  *   acción «Hecho» (RI-04).
  */
 
-import {
-  clearLastNotificationResponseAsync,
-  DEFAULT_ACTION_IDENTIFIER,
-  dismissNotificationAsync,
-  useLastNotificationResponse,
-} from 'expo-notifications';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 
-import { completarDesdeAviso } from '@/zonas/habitos/logica/servicioRegistros';
-
 import {
-  ACCION_COMPLETAR,
-  RUTA_AVISO_MOTIVACIONAL,
+  atenderRespuestaAviso,
+  useUltimaRespuestaAviso,
 } from '@/zonas/recordatorios/logica/servicioAvisos';
-
-// ===== Constantes =====
-
-const RUTA_HOY = '/hoy' as const;
 
 // ===== Principal =====
 
@@ -41,32 +29,14 @@ const RUTA_HOY = '/hoy' as const;
  * @param activo true cuando ya se ven las pestañas (con sesión y perfil completo).
  */
 export function useRespuestaAviso(userId: string | null, activo: boolean): void {
-  const respuesta = useLastNotificationResponse();
+  const respuesta = useUltimaRespuestaAviso();
   useEffect(() => {
     if (!activo || !userId || !respuesta) {
       return;
     }
-    const { request } = respuesta.notification;
-    const datos = request.content.data ?? {};
-    // Se limpia para no repetirla en cada render o al regresar a la app.
-    clearLastNotificationResponseAsync().catch(() => {});
-
-    if (respuesta.actionIdentifier === ACCION_COMPLETAR) {
-      const { habitId, fecha } = datos as { habitId?: unknown; fecha?: unknown };
-      dismissNotificationAsync(request.identifier).catch(() => {});
-      if (typeof habitId === 'string' && typeof fecha === 'string') {
-        completarDesdeAviso(userId, habitId, fecha).catch((causa: unknown) => {
-          console.warn('No se pudo marcar desde el aviso', causa);
-        });
-      }
-      router.navigate(RUTA_HOY);
-      return;
-    }
-    if (
-      respuesta.actionIdentifier === DEFAULT_ACTION_IDENTIFIER &&
-      datos.ruta === RUTA_AVISO_MOTIVACIONAL
-    ) {
-      router.navigate(RUTA_AVISO_MOTIVACIONAL);
+    const destino = atenderRespuestaAviso(userId, respuesta);
+    if (destino) {
+      router.navigate(destino);
     }
   }, [activo, respuesta, userId]);
 }

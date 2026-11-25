@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, Linking, Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 
 import { ConfirmDialog } from '@/comun/presentacion/ui/confirm-dialog';
 import { es } from '@/comun/i18n/es';
 
 import {
+  abrirAjustesDeLaApp,
   alarmasExactasPermitidas,
   leerPermiso,
   pedirAlarmasExactas,
@@ -118,7 +119,7 @@ export function usePermisoAvisos() {
       }
     } else if (activar) {
       // Al volver de Ajustes se revisa otra vez (AppState).
-      void Linking.openSettings();
+      void abrirAjustesDeLaApp();
     }
     if (dado) {
       accion(true);
