@@ -1,5 +1,5 @@
 import { es } from '@/comun/i18n/es';
-import { ErrorApi, ErrorSinRed } from '@/comun/datos/clienteApi';
+import { ErrorApi, ErrorSinRed } from '@/comun/logica/errores';
 
 import { authErrorMessage } from '@/zonas/cuenta/logica/auth-error-message';
 

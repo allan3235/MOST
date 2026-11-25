@@ -47,7 +47,7 @@ import {
 } from '../datos/repositorioHabitos';
 import { actualizarFila, getDb, guardarFilas, leerFilas } from '@/comun/datos/database';
 import { leerConfig, leerEstado } from './servicioRegistros';
-import { descartarMovidasDelPatron } from '@/db/occurrences-repository';
+import { descartarMovidasDelPatron } from '@/zonas/reajuste/logica/servicioReprogramacion';
 
 // Repositorio de hábitos (SDD 3.4). Todo se lee y se escribe en SQLite, así que funciona sin
 // conexión. Cada cambio guarda la fila local y su operación en la cola de salida dentro de la

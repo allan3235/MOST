@@ -18,16 +18,16 @@ import { useCheckIn } from './use-check-in';
 import { CoinBalance } from '@/zonas/plantas/presentacion/componentes/coin-balance';
 import { CoinBurst } from '@/zonas/plantas/presentacion/componentes/coin-burst';
 import { PhaseCelebration } from '@/zonas/plantas/presentacion/componentes/phase-celebration';
-import { DialogoIntrospeccion } from '@/features/introspeccion/components/DialogoIntrospeccion';
-import { TarjetaReflexion } from '@/features/introspeccion/components/TarjetaReflexion';
-import { useIntrospeccion } from '@/features/introspeccion/use-introspeccion';
+import { DialogoIntrospeccion } from '@/zonas/reajuste/presentacion/componentes/DialogoIntrospeccion';
+import { TarjetaReflexion } from '@/zonas/reajuste/presentacion/componentes/TarjetaReflexion';
+import { useIntrospeccion } from '@/zonas/reajuste/presentacion/use-introspeccion';
 import { CelebracionHito } from '@/zonas/plantas/presentacion/componentes/CelebracionHito';
-import { ProgressionCard } from '@/features/progression/components/progression-card';
-import { useProgresion } from '@/features/progression/use-progresion';
-import { DayDialog } from '@/features/reschedule/components/day-dialog';
-import { RescheduleCard } from '@/features/reschedule/components/reschedule-card';
-import { TarjetaBarreras } from '@/features/reschedule/components/TarjetaBarreras';
-import { useReprogramacion } from '@/features/reschedule/use-reprogramacion';
+import { ProgressionCard } from '@/zonas/reajuste/presentacion/componentes/progression-card';
+import { useProgresion } from '@/zonas/reajuste/presentacion/use-progresion';
+import { DayDialog } from '@/zonas/reajuste/presentacion/componentes/day-dialog';
+import { RescheduleCard } from '@/zonas/reajuste/presentacion/componentes/reschedule-card';
+import { TarjetaBarreras } from '@/zonas/reajuste/presentacion/componentes/TarjetaBarreras';
+import { useReprogramacion } from '@/zonas/reajuste/presentacion/use-reprogramacion';
 import {
   descripcionPlanta,
   PlantImage,

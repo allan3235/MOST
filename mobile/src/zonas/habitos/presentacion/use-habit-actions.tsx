@@ -13,8 +13,8 @@ import { es, formatear } from '@/comun/i18n/es';
 import { useFechaHoy } from '@/comun/logica/fecha-hoy';
 import { navegar } from '@/comun/presentacion/navegar';
 
-import { DialogoIntrospeccion } from '@/features/introspeccion/components/DialogoIntrospeccion';
-import { useIntrospeccion } from '@/features/introspeccion/use-introspeccion';
+import { DialogoIntrospeccion } from '@/zonas/reajuste/presentacion/componentes/DialogoIntrospeccion';
+import { useIntrospeccion } from '@/zonas/reajuste/presentacion/use-introspeccion';
 import { CelebracionHito } from '@/zonas/plantas/presentacion/componentes/CelebracionHito';
 import { PhaseCelebration } from '@/zonas/plantas/presentacion/componentes/phase-celebration';
 import type { HabitCheckCardProps } from '@/zonas/habitos/presentacion/componentes/habit-check-card';

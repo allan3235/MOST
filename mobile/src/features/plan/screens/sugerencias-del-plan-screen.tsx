@@ -8,7 +8,11 @@ import { BackButton } from '@/comun/presentacion/ui/back-button';
 import { ConfirmDialog } from '@/comun/presentacion/ui/confirm-dialog';
 import { Screen } from '@/comun/presentacion/ui/screen';
 import { Snackbar } from '@/comun/presentacion/ui/snackbar';
-import { agregarAlPlan, pedirTextosIa, sugerenciasParaPlan } from '@/db/progression-repository';
+import {
+  agregarAlPlan,
+  pedirTextosIa,
+  sugerenciasParaPlan,
+} from '@/zonas/reajuste/logica/servicioReajuste';
 import {
   guardarAjustes,
   leerAjustes,

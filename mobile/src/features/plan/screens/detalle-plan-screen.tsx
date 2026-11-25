@@ -16,14 +16,14 @@ import {
   leerDetallePlan,
   pedirTextosIa,
   type HabitoDelDetalle,
-} from '@/db/progression-repository';
+} from '@/zonas/reajuste/logica/servicioReajuste';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { ICONO_CATEGORIA } from '@/zonas/habitos/presentacion/categoria-icono';
 import { textoDuracion } from '@/zonas/habitos/logica/formato';
 import { useHabitActions } from '@/zonas/habitos/presentacion/use-habit-actions';
-import { ProgressionCard } from '@/features/progression/components/progression-card';
-import { useProgresion } from '@/features/progression/use-progresion';
+import { ProgressionCard } from '@/zonas/reajuste/presentacion/componentes/progression-card';
+import { useProgresion } from '@/zonas/reajuste/presentacion/use-progresion';
 import { es, formatear } from '@/comun/i18n/es';
 import { cardShadow, colors, tintes } from '@/comun/tema';
 import { navegar } from '@/comun/presentacion/navegar';

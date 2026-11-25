@@ -12,7 +12,7 @@ import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { HabitWizard } from '@/zonas/habitos/presentacion/componentes/habit-wizard';
 import { textoDuracion } from '@/zonas/habitos/logica/formato';
 import { valoresDeHabito } from '@/zonas/habitos/logica/valores-formulario';
-import { MINUTOS_MINIMOS } from '@/features/progression/domain/progresion';
+import { MINUTOS_MINIMOS } from '@/zonas/reajuste/logica/progresion';
 import { es, formatear } from '@/comun/i18n/es';
 import { fechaLocal } from '@/comun/util/dates';
 import type { HabitoFormValues } from '@/zonas/habitos/logica/esquema-habito';
