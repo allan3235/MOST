@@ -13,8 +13,8 @@ import {
   rachasPorHabito,
   resumenDelPeriodo,
   type DatosEstadisticas,
-} from '../cumplimiento';
-import { periodo } from '../periodos';
+} from '@/zonas/progreso/logica/cumplimiento';
+import { periodo } from '@/zonas/progreso/logica/periodos';
 
 // Hoy es miércoles 2026-11-18. Los hábitos empiezan el lunes 9.
 const HOY = '2026-11-18';

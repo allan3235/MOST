@@ -2,7 +2,7 @@ import { Sprout } from 'lucide-react-native';
 import { View } from 'react-native';
 
 import { AppText } from '@/comun/presentacion/ui/app-text';
-import { lineaDeRacha, pildoraDeRacha, type Racha } from '@/features/stats/domain/rachas';
+import { lineaDeRacha, pildoraDeRacha, type Racha } from '@/zonas/progreso/logica/rachas';
 import { es, formatear } from '@/comun/i18n/es';
 import { colors } from '@/comun/tema';
 

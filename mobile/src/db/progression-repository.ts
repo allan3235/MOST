@@ -32,8 +32,8 @@ import {
 import type { Barrera, PasoLigero } from '@/features/reschedule/domain/barreras';
 import type { Propuesta } from '@/features/reschedule/domain/reprogramar';
 import { avanceDelPaso, type AvancePaso } from '@/features/progression/domain/hitos';
-import { historial, type Pausa } from '@/features/stats/domain/cumplimiento';
-import { rachaDeHabito } from '@/features/stats/domain/rachas';
+import { historial, type Pausa } from '@/zonas/progreso/logica/cumplimiento';
+import { rachaDeHabito } from '@/zonas/progreso/logica/rachas';
 import { pedirApi } from '@/comun/datos/clienteApi';
 import { fechaLocal } from '@/comun/logica/dates';
 import {

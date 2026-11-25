@@ -2,9 +2,9 @@ import { View } from 'react-native';
 
 import { AppText } from '@/comun/presentacion/ui/app-text';
 import { Card } from '@/comun/presentacion/ui/card';
-import type { Conteo } from '@/features/stats/domain/cumplimiento';
-import type { Vista } from '@/features/stats/domain/periodos';
-import type { EtiquetaDivision } from '@/features/stats/domain/texto-periodo';
+import type { Conteo } from '@/zonas/progreso/logica/cumplimiento';
+import type { Vista } from '@/zonas/progreso/logica/periodos';
+import type { EtiquetaDivision } from '@/zonas/progreso/logica/texto-periodo';
 
 import { BarChart } from './bar-chart';
 import { YearLineChart } from './year-line-chart';

@@ -1,14 +1,25 @@
+/**
+ * @file repositorioProgreso.ts
+ * @proyecto most.
+ * @descripcion Capa de datos de Progreso: lee de SQLite los hábitos, horarios, registros, pausas y
+ *   ajustes que usan las estadísticas. Solo lee; las reglas están en la capa de lógica.
+ * @autor Equipo most. (código heredado de Habit Green; reorganizado por Allan con Claude Code)
+ * @fecha 2026-11-24
+ * @version 1.1.0
+ * @historial 1.1.0 (2026-11-24): pasa a zonas/progreso/datos (antes db/stats-repository.ts).
+ */
+
 import type {
   Habito,
   Horario,
   Ocurrencia,
   Registro,
 } from '@/features/habits/domain/habitos-del-dia';
-import type { DatosEstadisticas, Pausa } from '@/features/stats/domain/cumplimiento';
+import type { DatosEstadisticas, Pausa } from '@/zonas/progreso/logica/cumplimiento';
 
 import { getDb, leerFilas } from '@/comun/datos/database';
-import { categoriasPorId } from './habits-repository';
-import { leerAjustesEn } from './settings-repository';
+import { categoriasPorId } from '@/db/habits-repository';
+import { leerAjustesEn } from '@/db/settings-repository';
 
 // Progreso (SDD 8): todo sale de SQLite, así que funciona sin conexión. Se leen también los
 // hábitos archivados, porque su historial sigue contando en los periodos pasados. La carga

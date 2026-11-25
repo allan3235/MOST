@@ -1,8 +1,8 @@
 import { View } from 'react-native';
 
 import { AppText } from '@/comun/presentacion/ui/app-text';
-import type { Conteo } from '@/features/stats/domain/cumplimiento';
-import type { EtiquetaDivision } from '@/features/stats/domain/texto-periodo';
+import type { Conteo } from '@/zonas/progreso/logica/cumplimiento';
+import type { EtiquetaDivision } from '@/zonas/progreso/logica/texto-periodo';
 
 // Barras de la semana (por día) y del mes (por semana). Cada barra es una pista `divisor` de toda
 // la altura con el relleno `accent` de hechos / programados. Sin días que contar (o en el futuro)

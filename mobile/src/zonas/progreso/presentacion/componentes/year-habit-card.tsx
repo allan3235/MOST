@@ -3,8 +3,8 @@ import { View } from 'react-native';
 
 import { AppText } from '@/comun/presentacion/ui/app-text';
 import { Card } from '@/comun/presentacion/ui/card';
-import type { Celda, Conteo } from '@/features/stats/domain/cumplimiento';
-import type { Racha } from '@/features/stats/domain/rachas';
+import type { Celda, Conteo } from '@/zonas/progreso/logica/cumplimiento';
+import type { Racha } from '@/zonas/progreso/logica/rachas';
 import { es, formatear } from '@/comun/i18n/es';
 
 import { StreakPill, textoRacha } from './streak-pill';

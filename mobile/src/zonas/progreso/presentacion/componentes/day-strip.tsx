@@ -1,7 +1,7 @@
 import { Pressable, View } from 'react-native';
 
 import { AppText } from '@/comun/presentacion/ui/app-text';
-import { fichaDia } from '@/features/stats/domain/texto-periodo';
+import { fichaDia } from '@/zonas/progreso/logica/texto-periodo';
 import { cardShadow } from '@/comun/tema';
 
 // Fichas de la semana en Diario: los 7 días de lunes a domingo, fijos. La semana se cambia con las

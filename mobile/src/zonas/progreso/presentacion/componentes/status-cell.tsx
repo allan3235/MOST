@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react-native';
 import { View } from 'react-native';
 
-import type { EstadoDia } from '@/features/stats/domain/cumplimiento';
+import type { EstadoDia } from '@/zonas/progreso/logica/cumplimiento';
 import { colors } from '@/comun/tema';
 
 // Celda de un día en las cuadrículas de Progreso. Cada estado tiene su forma, no solo su color:

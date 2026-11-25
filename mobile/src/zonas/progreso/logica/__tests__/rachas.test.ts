@@ -8,7 +8,7 @@
  * @historial 1.0.0: rachas seguidas. 2.0.0 (2026-11-23): total acumulado.
  */
 
-import { lineaDeRacha, pildoraDeRacha, rachaDeHabito } from '../rachas';
+import { lineaDeRacha, pildoraDeRacha, rachaDeHabito } from '@/zonas/progreso/logica/rachas';
 
 const serie = (texto: string) => [...texto].map((c) => ({ hecho: c === '1' }));
 

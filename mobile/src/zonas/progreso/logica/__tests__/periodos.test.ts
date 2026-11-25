@@ -5,7 +5,7 @@ import {
   periodo,
   semanasDeCalendario,
   semanasDeTira,
-} from '../periodos';
+} from '@/zonas/progreso/logica/periodos';
 
 // Hoy es miércoles 2026-11-18.
 const HOY = '2026-11-18';

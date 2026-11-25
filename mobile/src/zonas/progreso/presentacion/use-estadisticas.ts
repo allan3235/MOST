@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { leerDatosEstadisticas } from '@/db/stats-repository';
+import { leerProgreso } from '../logica/servicioProgreso';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { estaVisible } from '@/features/habits/domain/habitos-del-dia';
 import { fechaLocal } from '@/comun/logica/dates';
@@ -14,7 +14,7 @@ import {
   rachasPorHabito,
   resumenDelPeriodo,
   type Estados,
-} from './domain/cumplimiento';
+} from '@/zonas/progreso/logica/cumplimiento';
 import {
   hayAnterior,
   haySiguiente,
@@ -22,7 +22,7 @@ import {
   periodo,
   semanasDeTira,
   type Vista,
-} from './domain/periodos';
+} from '@/zonas/progreso/logica/periodos';
 
 // Estado de Progreso: la pestaña (Diario, Semanal o Mensual), Mes o Año dentro de Mensual, cuántos
 // periodos atrás y el día elegido en Diario. Las pestañas son estado de esta pantalla y no rutas:
@@ -40,7 +40,7 @@ const SIN_ESTADOS: Estados = new Map();
 
 export function useEstadisticas(userId: string) {
   const hoy = fechaLocal();
-  const consulta = useLocalQuery(`estadisticas-${userId}`, () => leerDatosEstadisticas(userId));
+  const consulta = useLocalQuery(`estadisticas-${userId}`, () => leerProgreso(userId));
   const [pestana, setPestana] = useState<Pestana>('dia');
   const [escala, setEscala] = useState<Escala>('mes');
   const [desplazamiento, setDesplazamiento] = useState(0);

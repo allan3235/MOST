@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 
 import { AppText } from '@/comun/presentacion/ui/app-text';
-import type { EstadoDia } from '@/features/stats/domain/cumplimiento';
+import type { EstadoDia } from '@/zonas/progreso/logica/cumplimiento';
 import { es } from '@/comun/i18n/es';
 
 import { StatusCell } from './status-cell';

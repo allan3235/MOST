@@ -1,4 +1,4 @@
-import { periodo } from '../periodos';
+import { periodo } from '@/zonas/progreso/logica/periodos';
 import {
   detalleGrafica,
   encabezadosSemana,
@@ -8,7 +8,7 @@ import {
   fichaDia,
   fraseDia,
   fraseResumen,
-} from '../texto-periodo';
+} from '@/zonas/progreso/logica/texto-periodo';
 
 // Hoy es miércoles 2026-11-18.
 const HOY = '2026-11-18';

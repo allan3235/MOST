@@ -16,7 +16,7 @@ import {
   contar,
   type Conteo,
   type OcurrenciaEstadistica,
-} from '@/features/stats/domain/cumplimiento';
+} from '@/zonas/progreso/logica/cumplimiento';
 import { ajustarMinutosEnTitulo } from '@most/compartido/textos';
 
 import { diasEntre, sumarDias } from '@/comun/logica/dates';
