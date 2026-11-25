@@ -376,6 +376,17 @@ export const es = {
   habitos: {
     vacio: 'Todavía no tienes hábitos. Crea el primero.',
     agregar: 'Agregar hábito',
+    // El «+» de Hábitos: dos formas de crear uno.
+    agregarOpciones: {
+      titulo: '¿Cómo quieres crear tu hábito?',
+      microPasos: 'Con micro-pasos',
+      recomendado: 'Recomendado',
+      microPasosAyuda:
+        'Escribe lo que quieres lograr y lo dividimos en pasos pequeños que crecen contigo.',
+      aMiManera: 'A mi manera',
+      aMiManeraAyuda: 'Tú eliges el nombre, los días, la hora y cuánto dura.',
+      cancelar: 'Cancelar',
+    },
     todas: 'Todas',
     enPausa: 'En pausa',
     noTocaHoy: 'No toca hoy',

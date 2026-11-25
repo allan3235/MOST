@@ -1,4 +1,4 @@
-import { Plus, Sparkles } from 'lucide-react-native';
+import { Plus } from 'lucide-react-native';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 
 import { ActionSquare } from '@/comun/presentacion/ui/action-square';
@@ -20,8 +20,9 @@ import { colors, tintes } from '@/comun/tema';
 
 // Hábitos (SDD 9.4 y mockup «Hábitos #1»): una sección por categoría que tenga hábitos, con
 // casilla para marcar los que tocan hoy y el menú ⋮ (editar, pausar o reanudar, eliminar). El
-// título y el botón «+», única acción principal, quedan fijos y solo se desplaza la lista. Sin
-// filtros por ahora (decisión del usuario).
+// título y el botón «+», única acción principal, quedan fijos y solo se desplaza la lista. El «+»
+// pregunta si se crea con micro-pasos o a su manera (decisión del usuario: un solo botón con las
+// dos opciones explicadas). Sin filtros por ahora (decisión del usuario).
 
 export default function HabitosScreen() {
   const t = es.habitos;
@@ -43,16 +44,8 @@ export default function HabitosScreen() {
       <Screen edges={['top']} contentClassName="gap-4 pt-6">
         <View className="flex-row items-center justify-between">
           <AppText variant="h1">{es.tabs.habitos}</AppText>
-          <ActionSquare label={t.agregar} icon={Plus} onPress={() => void agregar.abrir()} />
+          <ActionSquare label={t.agregar} icon={Plus} onPress={agregar.elegir} />
         </View>
-
-        {/* RF-03: escribir una meta y que la IA la divida en micro-pasos. */}
-        <Button
-          variant="secondary"
-          label={es.crearMeta.abrir}
-          icon={<Sparkles size={20} color={colors.ink} />}
-          onPress={() => void agregar.abrirMeta()}
-        />
 
         {/* Márgenes negativos: la sombra de las tarjetas no se corta en los bordes de la lista. */}
         <ScrollView
