@@ -782,7 +782,8 @@ export const es = {
     // Mis planes (varios planes por usuario, uno por área).
     planes: {
       titulo: 'Mis planes',
-      vacio: 'Todavía no tienes un plan. Crea uno y te proponemos pasos pequeños para un área.',
+      vacio:
+        'Todavía no tienes un plan. Puedes crear hábitos con micro-pasos desde la pestaña Hábitos.',
       planDe: 'Plan de {area}',
       verPlan: 'Ver el plan de {area}',
       sinHabitos: 'Este plan se quedó sin hábitos. Ábrelo para agregar uno.',

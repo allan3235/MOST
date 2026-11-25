@@ -1,25 +1,19 @@
-import { ChevronRight, Plus } from 'lucide-react-native';
-import { useState } from 'react';
+import { ChevronRight } from 'lucide-react-native';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 
 import { AppText } from '@/comun/presentacion/ui/app-text';
-import { Button } from '@/comun/presentacion/ui/button';
-import { leerGlobalesFormulario, leerMisPlanes } from '@/zonas/planes/logica/servicioPlanes';
+import { leerMisPlanes } from '@/zonas/planes/logica/servicioPlanes';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { ICONO_CATEGORIA } from '@/zonas/habitos/presentacion/categoria-icono';
-import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
 import { es, formatear } from '@/comun/i18n/es';
 import { useAccionUnica } from '@/comun/presentacion/use-accion-unica';
-import { AREAS } from '@/comun/modelo/esquemas/onboarding';
 import { cardShadow, colors, tintes } from '@/comun/tema';
 import { navegar } from '@/comun/presentacion/navegar';
 
-import { usePlanReviewStore } from '@/zonas/planes/logica/plan-review-store';
-
 // «Mis planes» en Perfil (varios planes por usuario, decisión del usuario): un plan por área, con
-// sus hábitos. Tocar un plan abre su detalle (donde también se termina). «Crear plan» abre el
-// formulario (los 7 pasos si nunca lo hizo; si no, 3). No hay modo fijo: cualquiera
-// puede tener planes y hábitos propios.
+// sus hábitos. Tocar un plan abre su detalle (donde también se termina). Ya no se crean planes
+// desde aquí (decisión del usuario): los hábitos nuevos se crean desde Hábitos, con micro-pasos o
+// a su manera.
 
 export type MisPlanesProps = {
   userId: string;
@@ -29,31 +23,12 @@ export function MisPlanes({ userId }: MisPlanesProps) {
   const t = es.perfil.planes;
   const areas = es.onboarding.formulario.areas;
   const planes = useLocalQuery(`mis-planes-${userId}`, () => leerMisPlanes(userId));
-  const [abriendo, setAbriendo] = useState(false);
 
   const lista = planes.data ?? [];
   // Un toque doble rápido no abre el detalle dos veces.
   const abrirPlan = useAccionUnica((id: string) =>
     navegar.push({ pathname: '/detalle-plan/[id]', params: { id } }),
   );
-  const todasOcupadas = lista.length >= AREAS.length;
-
-  const crear = async () => {
-    setAbriendo(true);
-    try {
-      const globales = await leerGlobalesFormulario(userId);
-      useOnboardingStore.getState().prepararNuevoPlan(
-        userId,
-        globales,
-        lista.map((p) => p.area),
-      );
-      usePlanReviewStore.getState().limpiar();
-      navegar.push({ pathname: '/plan-nuevo/[paso]', params: { paso: '1' } });
-    } finally {
-      setAbriendo(false);
-    }
-  };
-
   if (planes.cargando && !planes.data) {
     return <ActivityIndicator color={colors.ink} accessibilityLabel={es.comun.cargando} />;
   }
@@ -98,24 +73,6 @@ export function MisPlanes({ userId }: MisPlanesProps) {
           </Pressable>
         );
       })}
-
-      <Button
-        variant="secondary"
-        label={t.crear}
-        icon={<Plus size={20} color={todasOcupadas ? colors['ink-soft'] : colors.ink} />}
-        disabled={todasOcupadas}
-        loading={abriendo}
-        onPress={() => void crear()}
-      />
-      {todasOcupadas ? (
-        <AppText variant="small" tone="ink-soft" className="text-center">
-          {t.todasOcupadas}
-        </AppText>
-      ) : (
-        <AppText variant="small" tone="ink-soft" className="text-center">
-          {t.necesitaConexion}
-        </AppText>
-      )}
     </View>
   );
 }
