@@ -1,0 +1,52 @@
+# Despliegue de most. en Dokploy (aplicación tipo Compose desde GitHub).
+#
+#   Teléfono (Expo Go) ─HTTPS─▶ Cloudflare ─túnel─▶ cloudflared ─┬─▶ metro:8081 (most-expo.<dominio>)
+#                                                                └─▶ api:3001   (most-api.<dominio>)
+#
+# No se publica ningún puerto en el servidor. La base es el Postgres "most-db" de Dokploy, al que
+# api llega por la red dokploy-network. Los valores van solo en el Environment de Dokploy:
+#   DATABASE_URL, JWT_SECRETO, ANTHROPIC_API_KEY (api)
+#   EXPO_PACKAGER_PROXY_URL, EXPO_PUBLIC_API_URL, EXPO_TOKEN (metro)
+#   CLOUDFLARE_TUNNEL_TOKEN y COMPOSE_PROFILES=tunel (cloudflared; sin el perfil no arranca)
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: despliegue/backend.Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRETO: ${JWT_SECRETO}
+      JWT_EXPIRA: ${JWT_EXPIRA:-60d}
+      PUERTO: '3001'
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    networks:
+      - default
+      - dokploy-network
+
+  metro:
+    build:
+      context: ..
+      dockerfile: despliegue/metro.Dockerfile
+    restart: unless-stopped
+    environment:
+      # Sin esto, el manifiesto anuncia la IP interna del contenedor en lugar del dominio público.
+      EXPO_PACKAGER_PROXY_URL: ${EXPO_PACKAGER_PROXY_URL}
+      # Se incrusta en el JavaScript que recibe el teléfono.
+      EXPO_PUBLIC_API_URL: ${EXPO_PUBLIC_API_URL}
+      # Sesión de Expo sin "expo login"; sin él el manifiesto sale anónimo.
+      EXPO_TOKEN: ${EXPO_TOKEN:-}
+
+  cloudflared:
+    image: cloudflare/cloudflared:2026.11.2
+    profiles: [tunel]
+    restart: unless-stopped
+    command: ['tunnel', '--no-autoupdate', 'run']
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+    depends_on: [api, metro]
+
+networks:
+  dokploy-network:
+    external: true
