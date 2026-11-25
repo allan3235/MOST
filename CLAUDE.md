@@ -10,6 +10,7 @@
 - El usuario tiene poca experiencia con este stack: al implementar cada parte, explica qué hace, por qué se hizo así y cómo probarla.
 - Código nuevo o modificado: estándar ECM-TS (sección 9 de `docs/MOST_CONTEXTO.md`) y reglas de tono (sección 7).
 - Si un requisito es ambiguo o contradice al código, pregunta antes de decidir.
+- Despliegue temporal (Expo Go + backend en Dokploy, rama `main`): ver `docs/despliegue-temporal.md`. No sustituye la build de desarrollo.
 - Validación: los casos CP-01 a CP-16 y el formato del reporte están en `docs/pruebas/instrucciones.md`; los resultados van en `docs/pruebas/resultados.md`.
 
 ## Arquitectura del front (capas, no cebolla)
