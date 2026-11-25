@@ -6,11 +6,13 @@
  *   alcanzó y si suena; la capa de datos solo lee y guarda, y la de dispositivo suena y vibra.
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-24
- * @version 1.0.0
+ * @version 1.1.0
  * @historial 1.0.0 (2026-11-24): creación (antes mezclado en db/rewards-repository.ts y
  *   db/hitos-repository.ts).
+ *   1.1.0 (2026-11-25): elegir la planta que se muestra en Hoy.
  */
 
+import { avisarCambioLocal } from '@/comun/logica/cambios-locales';
 import { sincronizarAhora } from '@/comun/logica/sync/sync-engine';
 import type { Area } from '@/comun/modelo/esquemas/onboarding';
 
@@ -30,7 +32,9 @@ import {
   type Jardin,
   type ResultadoCompra,
 } from '../datos/repositorioPlantas';
+import { guardarPlantaElegida, leerPlantaElegida } from '../datos/repositorioPlantaHoy';
 import { reproducirSonidoHito, vibrarLogro } from '../dispositivo/celebracion';
+import { plantaDestacada } from './planta-destacada';
 import { cambiosAlEquipar, plantaParaEquipar, type TipoAccesorio } from './equipar';
 import { avanceDelPaso, hitoAlcanzado, type AvancePaso, type PorcentajeHito } from './hitos';
 
@@ -42,6 +46,9 @@ export type HitoAlcanzado = {
   avance: AvancePaso;
 };
 
+/** El jardín y la planta que se muestra en Hoy (la elegida o, si no hay, la más avanzada). */
+export type JardinConHoy = Jardin & { plantaEnHoy: Area | null };
+
 export type { Accesorio, Jardin, ResultadoCompra };
 
 // ===== Jardín y tienda =====
@@ -49,10 +56,22 @@ export type { Accesorio, Jardin, ResultadoCompra };
 /**
  * Las 5 plantas (aunque el área no tenga hábitos), su fase, lo que llevan puesto y el saldo.
  * @param userId Usuario con sesión.
- * @returns El jardín.
+ * @returns El jardín, con la planta que se muestra en Hoy.
  */
-export function leerMiJardin(userId: string): Promise<Jardin> {
-  return leerJardin(userId);
+export async function leerMiJardin(userId: string): Promise<JardinConHoy> {
+  const [jardin, elegida] = await Promise.all([leerJardin(userId), leerPlantaElegida(userId)]);
+  return { ...jardin, plantaEnHoy: plantaDestacada(jardin.plantas, elegida)?.area ?? null };
+}
+
+/**
+ * «Mostrar en Hoy»: esa planta aparece en Hoy hasta que elija otra.
+ * @param userId Usuario con sesión.
+ * @param area Área de la planta.
+ */
+export async function mostrarPlantaEnHoy(userId: string, area: Area): Promise<void> {
+  await guardarPlantaElegida(userId, area);
+  // Hoy y el Jardín vuelven a leer el jardín.
+  avisarCambioLocal();
 }
 
 /**

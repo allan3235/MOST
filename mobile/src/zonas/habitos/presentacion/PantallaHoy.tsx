@@ -35,7 +35,6 @@ import {
   descripcionPlanta,
   PlantImage,
 } from '@/zonas/plantas/presentacion/componentes/plant-image';
-import { plantaDestacada } from '@/zonas/plantas/logica/planta-destacada';
 import { es, formatear } from '@/comun/i18n/es';
 import { colors } from '@/comun/tema';
 import { navegar } from '@/comun/presentacion/navegar';
@@ -88,7 +87,8 @@ export default function HoyScreen() {
   const hechos = items.filter((i) => i.hecho).length;
   const avance = items.length === 0 ? 0 : (hechos / items.length) * 100;
   const todoHecho = items.length > 0 && hechos === items.length;
-  const planta = plantaDestacada(jardin.data?.plantas ?? []);
+  // La que eligió en el Jardín o, si no eligió, la más avanzada.
+  const planta = jardin.data?.plantas.find((p) => p.area === jardin.data?.plantaEnHoy) ?? null;
   const tamanoPlanta = height < ALTO_PLANTA_GRANDE ? PLANTA_CHICA : PLANTA_GRANDE;
 
   const encabezado = (

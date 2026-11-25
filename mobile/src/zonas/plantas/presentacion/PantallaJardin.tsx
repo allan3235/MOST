@@ -19,6 +19,7 @@ import { navegar } from '@/comun/presentacion/navegar';
 // Jardín (SDD 9.4 y mockup «Plantas #1»): las 5 plantas desde el primer día, con su fase y sus
 // accesorios, sin números de nivel ni XP. Tocar una planta abre sus detalles; la bolsa, única
 // acción principal de la pantalla, abre la Tienda, y el saldo junto a ella dice si alcanza para algo.
+// La planta que sale en Hoy lleva «En Hoy»; se cambia desde sus detalles («Mostrar en Hoy»).
 // El encabezado queda fijo y solo se desplazan las plantas.
 
 export default function JardinScreen() {
@@ -61,6 +62,7 @@ export default function JardinScreen() {
               <View key={planta.area} className="w-[48%]">
                 <PlantPanel
                   planta={planta}
+                  enHoy={planta.area === jardin.data?.plantaEnHoy}
                   onPress={() =>
                     navegar.push({
                       pathname: '/planta/[categoria]',

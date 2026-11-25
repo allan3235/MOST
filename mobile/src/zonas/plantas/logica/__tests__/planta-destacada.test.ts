@@ -21,4 +21,14 @@ describe('planta destacada de Hoy (SDD 9.4)', () => {
   it('sin plantas devuelve null', () => {
     expect(plantaDestacada([])).toBeNull();
   });
+
+  it('la que eligió en el Jardín gana aunque otra esté más avanzada', () => {
+    const plantas = [
+      { id: 'A', area: 'finanzas', fase: 1, tieneHabitos: true },
+      { id: 'B', area: 'trabajo', fase: 3, tieneHabitos: true },
+    ];
+    expect(plantaDestacada(plantas, 'finanzas')?.id).toBe('A');
+    // Si la elegida ya no está, vuelve a la más avanzada.
+    expect(plantaDestacada(plantas, 'salud_fisica')?.id).toBe('B');
+  });
 });

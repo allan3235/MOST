@@ -14,15 +14,18 @@ import { descripcionPlanta, PlantImage } from './plant-image';
 export type PlantPanelProps = {
   planta: PlantaJardin;
   onPress: () => void;
+  /** Es la planta que se muestra en Hoy. */
+  enHoy?: boolean;
 };
 
-export function PlantPanel({ planta, onPress }: PlantPanelProps) {
+export function PlantPanel({ planta, onPress, enHoy = false }: PlantPanelProps) {
   const t = es.jardin;
   const categoria = es.onboarding.formulario.areas[planta.area];
   const lleva = planta.equipados.map((a) => a.nombre).join(', ');
 
   const etiqueta = [
     descripcionPlanta(planta.area, planta.fase),
+    enHoy ? t.enHoy : null,
     lleva ? formatear(t.lleva, { lista: lleva }) : null,
     planta.tieneHabitos ? null : t.sinHabitos,
   ]
@@ -38,6 +41,13 @@ export function PlantPanel({ planta, onPress }: PlantPanelProps) {
       style={{ backgroundColor: tintes[planta.area] }}
       className="grow gap-2 rounded-card p-3 active:opacity-80"
     >
+      {enHoy ? (
+        <View className="self-start rounded-chip bg-campo px-2 py-0.5">
+          <AppText variant="small" weight="semibold" tone="acento">
+            {t.enHoy}
+          </AppText>
+        </View>
+      ) : null}
       <PlantImage area={planta.area} fase={planta.fase} equipados={planta.equipados} />
       <View className="gap-1">
         <AppText weight="medium" className="text-center">

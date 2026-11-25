@@ -1,4 +1,5 @@
 import { useLocalSearchParams } from 'expo-router';
+import { Check, Sun } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 import PagerView from 'react-native-pager-view';
@@ -12,7 +13,12 @@ import { Button } from '@/comun/presentacion/ui/button';
 import { Snackbar } from '@/comun/presentacion/ui/snackbar';
 import { StableBoldText } from '@/comun/presentacion/ui/stable-bold-text';
 import { leerHabitos } from '@/zonas/habitos/logica/servicioHabitos';
-import { equiparAccesorio, leerMiJardin, type Accesorio } from '../logica/servicioPlantas';
+import {
+  equiparAccesorio,
+  leerMiJardin,
+  mostrarPlantaEnHoy,
+  type Accesorio,
+} from '../logica/servicioPlantas';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { HabitCheckCard } from '@/zonas/habitos/presentacion/componentes/habit-check-card';
@@ -138,6 +144,16 @@ export default function PlantaScreen() {
   }
 
   const nombreArea = es.onboarding.formulario.areas[area];
+  const enHoy = jardin.data?.plantaEnHoy === area;
+  const mostrarEnHoy = async () => {
+    setAviso(null);
+    try {
+      await mostrarPlantaEnHoy(userId, area);
+      setAviso({ tipo: 'exito', texto: formatear(es.jardin.ahoraEnHoy, { area: nombreArea }) });
+    } catch {
+      setAviso({ tipo: 'error', texto: t.error });
+    }
+  };
 
   const parteSuperior = (
     <View>
@@ -149,6 +165,27 @@ export default function PlantaScreen() {
           <AppText variant="h2" className="text-center">
             {nombreArea}
           </AppText>
+          {/* Elegir qué planta sale en Hoy («equiparla»). */}
+          {enHoy ? (
+            <View className="mt-2 min-h-12 flex-row items-center gap-1">
+              <Check size={18} color={colors.accent} />
+              <AppText variant="small" weight="semibold" tone="acento">
+                {es.jardin.seMuestraEnHoy}
+              </AppText>
+            </View>
+          ) : (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={es.jardin.mostrarEnHoy}
+              onPress={() => void mostrarEnHoy()}
+              className="mt-2 min-h-12 flex-row items-center gap-2 rounded-chip border-2 border-accent bg-campo px-4 active:bg-accent-claro"
+            >
+              <Sun size={18} color={colors.accent} />
+              <AppText variant="small" weight="semibold" tone="acento">
+                {es.jardin.mostrarEnHoy}
+              </AppText>
+            </Pressable>
+          )}
         </View>
       </PhaseCarousel>
     </View>

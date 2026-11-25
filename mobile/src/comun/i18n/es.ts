@@ -658,6 +658,11 @@ export const es = {
     genial: '¡Genial!',
   },
   jardin: {
+    // Planta que se muestra en Hoy.
+    enHoy: 'En Hoy',
+    mostrarEnHoy: 'Mostrar en Hoy',
+    seMuestraEnHoy: 'Se muestra en Hoy',
+    ahoraEnHoy: 'Listo: tu planta de {area} ahora sale en Hoy.',
     vacio:
       'Todavía estamos trayendo tus plantas. Si no tienes conexión, aparecerán cuando te conectes.',
     sinHabitosCorto: 'Sin hábitos aún',
