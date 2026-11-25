@@ -9,7 +9,6 @@
  * @historial 1.0.0 (2026-11-24): creación.
  */
 
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useState } from 'react';
 import { View } from 'react-native';
 
@@ -18,8 +17,8 @@ import { Button } from '@/comun/presentacion/ui/button';
 import { DaySquares } from '@/comun/presentacion/ui/day-squares';
 import { Dialog } from '@/comun/presentacion/ui/dialog';
 import { Field } from '@/comun/presentacion/ui/field';
+import { useReloj } from '@/comun/presentacion/use-reloj';
 import type { DatosBloque } from '@/zonas/recordatorios/logica/servicioAgenda';
-import { fechaDesdeHora, horaDesdeFecha } from '@/zonas/planes/logica/plan-review';
 import { es, formatear } from '@/comun/i18n/es';
 
 import {
@@ -63,13 +62,9 @@ export function DialogoBloque({ bloque, onGuardar, onEliminar, onCerrar }: Dialo
 
   const error = validarBloque({ nombre, dias_semana: dias, hora_inicio: inicio, hora_fin: fin });
 
+  const { abrirReloj, reloj } = useReloj();
   const elegirHora = (actual: string, cambiar: (hora: string) => void) => {
-    DateTimePickerAndroid.open({
-      value: fechaDesdeHora(actual),
-      mode: 'time',
-      is24Hour: true,
-      onValueChange: (_evento, fecha) => cambiar(horaDesdeFecha(fecha)),
-    });
+    abrirReloj(actual, cambiar);
   };
 
   const guardar = () => {
@@ -120,6 +115,7 @@ export function DialogoBloque({ bloque, onGuardar, onEliminar, onCerrar }: Dialo
       <Button label={t.guardar} onPress={guardar} />
       {bloque ? <Button variant="tertiary" label={t.eliminar} onPress={onEliminar} /> : null}
       <Button variant="tertiary" label={t.cancelar} onPress={onCerrar} />
+      {reloj}
     </Dialog>
   );
 }

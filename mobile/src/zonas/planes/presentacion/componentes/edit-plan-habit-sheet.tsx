@@ -1,4 +1,3 @@
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { X } from 'lucide-react-native';
 import { useState } from 'react';
 import { Modal, Pressable, View } from 'react-native';
@@ -9,6 +8,7 @@ import { AppText } from '@/comun/presentacion/ui/app-text';
 import { Button } from '@/comun/presentacion/ui/button';
 import { ChoicePill } from '@/comun/presentacion/ui/choice-pill';
 import { Field } from '@/comun/presentacion/ui/field';
+import { useReloj } from '@/comun/presentacion/use-reloj';
 import { useRevisarAgenda } from '@/zonas/recordatorios/presentacion/use-revisar-agenda';
 import { es, formatear } from '@/comun/i18n/es';
 import { NOMBRE_MAX, NOMBRE_MIN, TODOS_LOS_DIAS } from '@/zonas/habitos/logica/esquema-habito';
@@ -16,7 +16,6 @@ import type { HabitoPlan } from '@/comun/modelo/esquemas/plan';
 import { colors } from '@/comun/tema';
 
 import type { CambiosHabitoPlan } from '@/zonas/planes/logica/plan-review';
-import { fechaDesdeHora, horaDesdeFecha } from '@/zonas/planes/logica/plan-review';
 
 // «Editar hábito» de la revisión del plan (mockup «Encuesta Inicial: Editar hábito»): nombre,
 // frecuencia y hora del recordatorio. La hora se elige con el reloj de Android (sujeto a cambio).
@@ -46,6 +45,7 @@ export function EditPlanHabitSheet({
   const [notificar, setNotificar] = useState(habito.notificar);
   const [intentado, setIntentado] = useState(false);
   const agenda = useRevisarAgenda();
+  const { abrirReloj, reloj } = useReloj();
 
   const nombre = titulo.trim();
   const errorNombre =
@@ -57,23 +57,19 @@ export function EditPlanHabitSheet({
   const errorDias = !todos && dias.length === 0 ? errores.dias : null;
   const horaVisible = hora ?? (habito.flexible ? null : habito.hora);
 
-  // Tocar la hora vuelve a activar el recordatorio y abre el reloj para cambiarla.
+  // Tocar la hora vuelve a activar el recordatorio y abre las ruedas para cambiarla.
   const elegirHora = () => {
     setNotificar(true);
-    DateTimePickerAndroid.open({
-      value: fechaDesdeHora(horaVisible ?? horaPorDefecto),
-      mode: 'time',
-      is24Hour: true,
-      // RF-02: si la hora choca con un bloque de la agenda, se sugiere la primera libre.
-      onValueChange: (_evento, fecha) =>
-        agenda.revisar(
-          horaDesdeFecha(fecha),
-          todos ? TODOS_LOS_DIAS : dias,
-          habito.duracion_min,
-          setHora,
-          elegirHora,
-        ),
-    });
+    // RF-02: si la hora choca con un bloque de la agenda, se sugiere la primera libre.
+    abrirReloj(horaVisible ?? horaPorDefecto, (elegida) =>
+      agenda.revisar(
+        elegida,
+        todos ? TODOS_LOS_DIAS : dias,
+        habito.duracion_min,
+        setHora,
+        elegirHora,
+      ),
+    );
   };
 
   const guardar = () => {
@@ -173,6 +169,7 @@ export function EditPlanHabitSheet({
         <Button label={t.guardar} onPress={guardar} className="mt-2" />
       </View>
       {agenda.dialogo}
+      {reloj}
     </Modal>
   );
 }

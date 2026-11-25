@@ -373,6 +373,14 @@ export const es = {
       crear: 'Crear mi primer hábito',
     },
   },
+  // Ruedas para elegir una hora (iguales en Android y iPhone).
+  reloj: {
+    titulo: 'Elegir hora',
+    horas: 'Horas',
+    minutos: 'Minutos',
+    cancelar: 'Cancelar',
+    aceptar: 'Aceptar',
+  },
   habitos: {
     vacio: 'Todavía no tienes hábitos. Crea el primero.',
     agregar: 'Agregar hábito',

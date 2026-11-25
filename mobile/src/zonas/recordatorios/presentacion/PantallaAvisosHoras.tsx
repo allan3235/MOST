@@ -1,4 +1,3 @@
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useState, type ReactNode } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
@@ -17,9 +16,9 @@ import {
   type CambiosAjustes,
 } from '@/zonas/cuenta/logica/servicioAjustes';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
+import { useReloj } from '@/comun/presentacion/use-reloj';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { SecondNoticeToggle } from '@/zonas/planes/presentacion/componentes/second-notice-toggle';
-import { fechaDesdeHora, horaDesdeFecha } from '@/zonas/planes/logica/plan-review';
 import { es } from '@/comun/i18n/es';
 import { cardShadow, colors } from '@/comun/tema';
 
@@ -77,15 +76,12 @@ export default function AvisosHorasScreen() {
     guardarAjustes(userId, cambios).catch(() => setErrorGuardar(true));
   };
 
+  const { abrirReloj, reloj } = useReloj();
   const elegirHora = (momento: MomentoAviso) => {
     if (!ajustes) return;
-    DateTimePickerAndroid.open({
-      value: fechaDesdeHora(ajustes.horas[momento]),
-      mode: 'time',
-      is24Hour: true,
-      onValueChange: (_evento, fecha) =>
-        guardar({ horas_por_momento: { ...ajustes.horas, [momento]: horaDesdeFecha(fecha) } }),
-    });
+    abrirReloj(ajustes.horas[momento], (hora) =>
+      guardar({ horas_por_momento: { ...ajustes.horas, [momento]: hora } }),
+    );
   };
 
   return (
@@ -195,6 +191,7 @@ export default function AvisosHorasScreen() {
             onCerrar={() => setEligiendoEstilo(false)}
           />
         ) : null}
+        {reloj}
       </Screen>
       <Snackbar
         mensaje={errorGuardar ? t.errorGuardar : null}
