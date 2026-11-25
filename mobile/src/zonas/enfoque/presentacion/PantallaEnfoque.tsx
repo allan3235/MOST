@@ -12,7 +12,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Linking, Platform, View } from 'react-native';
+import { View } from 'react-native';
 
 import { AppText } from '@/comun/presentacion/ui/app-text';
 import { BackButton } from '@/comun/presentacion/ui/back-button';
@@ -21,37 +21,39 @@ import { Card } from '@/comun/presentacion/ui/card';
 import { OptionChip } from '@/comun/presentacion/ui/option-chip';
 import { Screen } from '@/comun/presentacion/ui/screen';
 import { Snackbar } from '@/comun/presentacion/ui/snackbar';
-import { borrarEnfoque, leerEnfoqueHasta } from '@/db/enfoque-repository';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
-import { iniciarEnfoque, restaurarTrasEnfoque, terminarEnfoque } from '@/features/reminders/avisos';
 
-import { NoMolestar } from '../../../../modules/no-molestar';
 import { es, formatear } from '@/comun/i18n/es';
 
-import { DURACIONES_ENFOQUE, estaEnEnfoque, finDeEnfoque, textoRestante } from '../domain/enfoque';
-import { estadoNoMolestar } from '../domain/no-molestar';
+import {
+  DURACIONES_ENFOQUE,
+  estaEnEnfoque,
+  finDeEnfoque,
+  textoRestante,
+} from '@/zonas/enfoque/logica/enfoque';
+import {
+  abrirGuiaNoMolestar,
+  esAndroid,
+  estadoNoMolestarActual,
+  iniciarEnfoque,
+  leerFinEnfoque,
+  olvidarSesionVencida,
+  pedirPermisoNoMolestar,
+  restaurarTrasEnfoque,
+  terminarEnfoque,
+} from '../logica/servicioEnfoque';
 
 // ===== Constantes =====
 
 const MS_TICK = 1000;
 const DURACION_POR_DEFECTO = 25;
 const DIGITOS = 2;
-/** Ajustes de No Molestar de Android (CP-16: guía manual; no se activa desde la app). */
-const INTENT_NO_MOLESTAR = 'android.settings.ZEN_MODE_SETTINGS';
 
 // ===== Funciones auxiliares =====
 
 function horaDe(fecha: Date): string {
   return `${String(fecha.getHours()).padStart(DIGITOS, '0')}:${String(fecha.getMinutes()).padStart(DIGITOS, '0')}`;
-}
-
-async function abrirNoMolestar(): Promise<void> {
-  try {
-    await Linking.sendIntent(INTENT_NO_MOLESTAR);
-  } catch {
-    await Linking.openSettings();
-  }
 }
 
 // ===== Principal =====
@@ -64,12 +66,12 @@ export default function PantallaEnfoque() {
   const t = es.enfoque;
   const { session } = useSession();
   const userId = session?.user.id ?? '';
-  const guardado = useLocalQuery(`enfoque-${userId}`, () => leerEnfoqueHasta(userId));
+  const guardado = useLocalQuery(`enfoque-${userId}`, () => leerFinEnfoque(userId));
   const [minutos, setMinutos] = useState(DURACION_POR_DEFECTO);
   const [ahora, setAhora] = useState(() => new Date());
   const [terminadaAMano, setTerminadaAMano] = useState(false);
   // CP-15/16: con permiso en Android lo activa solo; si no, guía a hacerlo a mano.
-  const noMolestar = estadoNoMolestar(NoMolestar, Platform.OS);
+  const noMolestar = estadoNoMolestarActual();
   /**
    * Lo que se acaba de decidir, antes de que SQLite lo confirme: la pantalla cambia al momento
    * (RNF-01, ≤ 1.5 s). undefined = usar lo guardado.
@@ -149,19 +151,19 @@ export default function PantallaEnfoque() {
               </AppText>
               {noMolestar === 'activado' ? (
                 <AppText tone="ink-soft">{t.silenciaAuto}</AppText>
-              ) : Platform.OS === 'android' ? (
+              ) : esAndroid() ? (
                 <>
                   <AppText tone="ink-soft">{t.silenciaAndroid}</AppText>
                   <Button
                     variant="secondary"
                     label={t.abrirNoMolestar}
-                    onPress={() => void abrirNoMolestar()}
+                    onPress={() => void abrirGuiaNoMolestar()}
                   />
                   {noMolestar === 'sin_permiso' ? (
                     <Button
                       variant="tertiary"
                       label={t.darPermiso}
-                      onPress={() => NoMolestar?.abrirAjustePermiso()}
+                      onPress={pedirPermisoNoMolestar}
                     />
                   ) : null}
                 </>
@@ -189,7 +191,7 @@ export default function PantallaEnfoque() {
             </AppText>
             <AppText tone="ink-soft">{t.terminadaTexto}</AppText>
             {/* Si most. lo activó, ya lo regresó solo: no hay nada que quitar a mano. */}
-            {Platform.OS === 'android' && noMolestar !== 'activado' ? (
+            {esAndroid() && noMolestar !== 'activado' ? (
               <AppText tone="ink-soft">{t.recordatorioQuitar}</AppText>
             ) : null}
             <Button
@@ -200,7 +202,7 @@ export default function PantallaEnfoque() {
                   setOptimista(null);
                   setTerminadaAMano(false);
                   if (habiaExpirado) {
-                    await borrarEnfoque(userId);
+                    await olvidarSesionVencida(userId);
                   }
                 })
               }

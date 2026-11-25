@@ -1,5 +1,5 @@
 /**
- * @file enfoque-repository.ts
+ * @file repositorioEnfoque.ts
  * @proyecto most.
  * @descripcion Sesión de modo enfoque (RF-14) en SQLite: solo se guarda hasta cuándo dura, en
  *   `preferencias_locales`, para que siga aunque se cierre la app. Vive en el teléfono.
@@ -9,7 +9,7 @@
  * @historial 1.0.0 (2026-11-23): creación.
  */
 
-import type { GuardadoFiltro } from '@/features/enfoque/domain/no-molestar';
+import type { GuardadoFiltro } from '@/zonas/enfoque/logica/no-molestar';
 
 import { getDb } from '@/comun/datos/database';
 import { avisarCambioLocal } from '@/comun/datos/db-version-store';

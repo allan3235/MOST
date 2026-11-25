@@ -3,6 +3,8 @@ import { AppState } from 'react-native';
 
 import { useDbVersion } from '@/comun/logica/cambios-locales';
 
+import { restaurarSiVencio } from '@/zonas/enfoque/logica/servicioEnfoque';
+
 import { reprogramarAvisos } from './avisos';
 
 // Cuándo se recalculan los avisos (SDD 7.1): al abrir la app, al volver a primer plano y con cada
@@ -15,6 +17,10 @@ const ESPERA_MS = 1000;
 function recalcular(userId: string): void {
   reprogramarAvisos(userId).catch((causa: unknown) => {
     console.warn('No se pudieron programar los avisos', causa);
+  });
+  // CP-15: si la sesión de enfoque venció con la app cerrada, No Molestar vuelve como estaba.
+  restaurarSiVencio(userId).catch((causa: unknown) => {
+    console.warn('No se pudo restaurar No Molestar', causa);
   });
 }
 

@@ -13,24 +13,13 @@ import {
 } from 'expo-notifications';
 import { Platform } from 'react-native';
 
-import {
-  borrarEnfoque,
-  guardadoFiltroPrevio,
-  guardarEnfoqueHasta,
-  leerEnfoqueHasta,
-} from '@/db/enfoque-repository';
+import { leerEnfoqueHasta } from '@/zonas/enfoque/datos/repositorioEnfoque';
 import { leerDatosAvisos, revisarAvisoMotivacional } from '@/db/reminders-repository';
-import { estaEnEnfoque, quitarAvisosDuranteEnfoque } from '@/features/enfoque/domain/enfoque';
-import {
-  activarNoMolestar,
-  restaurarNoMolestar,
-  type EstadoNoMolestar,
-} from '@/features/enfoque/domain/no-molestar';
+import { estaEnEnfoque, quitarAvisosDuranteEnfoque } from '@/zonas/enfoque/logica/enfoque';
 import { es, formatear } from '@/comun/i18n/es';
 import { fechaLocal } from '@/comun/logica/dates';
 import { colors } from '@/comun/tema';
 
-import { NoMolestar } from '../../../modules/no-molestar';
 import { DIAS_PARA_AVISO } from './domain/aviso-motivacional';
 import { siguientePaso, type SiguientePaso } from './domain/permiso';
 import { planificarAvisos, type AvisoPlaneado } from './domain/planificar-avisos';
@@ -148,10 +137,6 @@ async function programar(userId: string): Promise<void> {
   const ahora = new Date();
   const guardado = await leerEnfoqueHasta(userId);
   enfoqueHasta = estaEnEnfoque(guardado, ahora) ? guardado : null;
-  if (!enfoqueHasta) {
-    // CP-15: si la sesión venció con la app cerrada, No Molestar vuelve como estaba al abrirla.
-    await restaurarNoMolestar(NoMolestar, Platform.OS, guardadoFiltroPrevio(userId));
-  }
   // RF-14: durante el enfoque no se programa ningún aviso propio; al terminar, uno de cierre.
   const avisos = quitarAvisosDuranteEnfoque(
     datos ? planificarAvisos(datos, ahora) : [],
@@ -247,43 +232,21 @@ export async function mandarAvisoMotivacional(userId: string): Promise<void> {
 }
 
 /** Recalcula los avisos sin esperar: reprogramar decenas de avisos tarda segundos (RNF-01). */
-function reprogramarEnSegundoPlano(userId: string): void {
+/**
+ * Reprograma los avisos sin esperar (por ejemplo, al empezar o terminar el modo enfoque).
+ * @param userId Usuario con sesión.
+ */
+export function reprogramarEnSegundoPlano(userId: string): void {
   reprogramarAvisos(userId).catch((causa: unknown) => {
     console.warn('No se pudieron reprogramar los avisos', causa);
   });
 }
 
 /**
- * Empieza una sesión de enfoque (RF-14): se guarda su fin y se recalculan los avisos sin los que
- * caerían durante ella. El silencio aplica al momento (el fin queda en memoria para el manejador);
- * la reprogramación sigue en segundo plano.
- * @param userId Usuario con sesión.
- * Con el permiso de Android, además pone el teléfono en No Molestar (CP-15); en iOS nunca.
- * @param hasta Fin de la sesión (finDeEnfoque).
- * @returns Qué pasó con No Molestar.
+ * Fin de la sesión de enfoque en memoria (RF-14): el manejador de avisos lo consulta al momento,
+ * sin esperar a SQLite. Lo fija el servicio del modo enfoque al empezar o terminar.
+ * @param hasta Fin de la sesión, o null si terminó.
  */
-export async function iniciarEnfoque(userId: string, hasta: Date): Promise<EstadoNoMolestar> {
+export function fijarEnfoqueEnMemoria(hasta: Date | null): void {
   enfoqueHasta = hasta;
-  await guardarEnfoqueHasta(userId, hasta);
-  reprogramarEnSegundoPlano(userId);
-  return activarNoMolestar(NoMolestar, Platform.OS, guardadoFiltroPrevio(userId));
-}
-
-/**
- * Termina o cancela la sesión: los avisos vuelven a programarse como antes.
- * @param userId Usuario con sesión.
- */
-export async function terminarEnfoque(userId: string): Promise<void> {
-  await borrarEnfoque(userId);
-  enfoqueHasta = null;
-  await restaurarNoMolestar(NoMolestar, Platform.OS, guardadoFiltroPrevio(userId));
-  reprogramarEnSegundoPlano(userId);
-}
-
-/**
- * Cuando la sesión vence con la pantalla abierta: No Molestar vuelve como estaba (CP-15).
- * @param userId Usuario con sesión.
- */
-export async function restaurarTrasEnfoque(userId: string): Promise<void> {
-  await restaurarNoMolestar(NoMolestar, Platform.OS, guardadoFiltroPrevio(userId));
 }

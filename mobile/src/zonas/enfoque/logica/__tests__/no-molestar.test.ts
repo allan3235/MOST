@@ -17,7 +17,7 @@ import {
   restaurarNoMolestar,
   type ControlNoMolestar,
   type GuardadoFiltro,
-} from '../no-molestar';
+} from '@/zonas/enfoque/logica/no-molestar';
 
 // ===== Datos de prueba =====
 

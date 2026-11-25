@@ -15,7 +15,7 @@ import {
   finDeEnfoque,
   quitarAvisosDuranteEnfoque,
   textoRestante,
-} from '../enfoque';
+} from '@/zonas/enfoque/logica/enfoque';
 
 const INICIO = new Date(2026, 10, 23, 10, 0, 0);
 const aviso = (h: number, m: number) => ({ id: `${h}:${m}`, fecha: new Date(2026, 10, 23, h, m) });
