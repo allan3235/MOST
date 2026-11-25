@@ -10,7 +10,7 @@ import { Screen } from '@/comun/presentacion/ui/screen';
 import { SettingsRow } from '@/comun/presentacion/ui/settings-row';
 import { SwitchRow } from '@/comun/presentacion/ui/switch-row';
 import { Snackbar } from '@/comun/presentacion/ui/snackbar';
-import { guardarSonidoHitos, leerSonidoHitos } from '@/db/hitos-repository';
+import { guardarSonidoLogros, leerSonidoLogros } from '@/zonas/plantas/logica/servicioPlantas';
 import { guardarAjustes, leerAjustesPerfil, type CambiosAjustes } from '@/db/settings-repository';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
@@ -59,7 +59,7 @@ export default function AvisosHorasScreen() {
   const { session } = useSession();
   const userId = session?.user.id ?? '';
   const perfil = useLocalQuery(`perfil-${userId}`, () => leerAjustesPerfil(userId));
-  const sonido = useLocalQuery(`sonido-hitos-${userId}`, () => leerSonidoHitos(userId));
+  const sonido = useLocalQuery(`sonido-hitos-${userId}`, () => leerSonidoLogros(userId));
   const avisosActivos = useAvisosActivos();
   const [eligiendoEstilo, setEligiendoEstilo] = useState(false);
   const [errorGuardar, setErrorGuardar] = useState(false);
@@ -174,7 +174,7 @@ export default function AvisosHorasScreen() {
                     help={es.hitos.sonidoAyuda}
                     value={sonido.data ?? true}
                     onChange={(activo) => {
-                      guardarSonidoHitos(userId, activo).catch(() => setErrorGuardar(true));
+                      guardarSonidoLogros(userId, activo).catch(() => setErrorGuardar(true));
                     }}
                   />
                 </View>

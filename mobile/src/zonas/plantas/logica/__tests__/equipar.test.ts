@@ -3,7 +3,7 @@ import {
   plantaParaEquipar,
   type AccesorioPropio,
   type PlantaCandidata,
-} from '../equipar';
+} from '@/zonas/plantas/logica/equipar';
 
 const gorra: AccesorioPropio = { id: 'gorra', tipo: 'sombrero', categorias_equipadas: [] };
 const boina: AccesorioPropio = { id: 'boina', tipo: 'sombrero', categorias_equipadas: ['A'] };

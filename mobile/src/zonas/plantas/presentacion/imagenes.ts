@@ -1,6 +1,6 @@
-import type { Area } from '@/comun/logica/esquemas/onboarding';
+import type { Area } from '@/comun/modelo/esquemas/onboarding';
 
-import type { TipoAccesorio } from './domain/equipar';
+import type { TipoAccesorio } from '@/zonas/plantas/logica/equipar';
 
 // Arte de plantas y accesorios (SDD 9.8). Metro necesita un require fijo por archivo, así que
 // cada imagen se nombra aquí. Para cambiar el arte basta reemplazar el PNG con el mismo nombre.
@@ -12,29 +12,29 @@ type Fases = Record<1 | 2 | 3, ImagenLocal>;
 
 export const PLANTAS: Record<Area, Fases> = {
   salud_fisica: {
-    1: require('../../../assets/plants/salud_fisica/fase1.png'),
-    2: require('../../../assets/plants/salud_fisica/fase2.png'),
-    3: require('../../../assets/plants/salud_fisica/fase3.png'),
+    1: require('../../../../assets/plants/salud_fisica/fase1.png'),
+    2: require('../../../../assets/plants/salud_fisica/fase2.png'),
+    3: require('../../../../assets/plants/salud_fisica/fase3.png'),
   },
   trabajo: {
-    1: require('../../../assets/plants/trabajo/fase1.png'),
-    2: require('../../../assets/plants/trabajo/fase2.png'),
-    3: require('../../../assets/plants/trabajo/fase3.png'),
+    1: require('../../../../assets/plants/trabajo/fase1.png'),
+    2: require('../../../../assets/plants/trabajo/fase2.png'),
+    3: require('../../../../assets/plants/trabajo/fase3.png'),
   },
   salud_mental: {
-    1: require('../../../assets/plants/salud_mental/fase1.png'),
-    2: require('../../../assets/plants/salud_mental/fase2.png'),
-    3: require('../../../assets/plants/salud_mental/fase3.png'),
+    1: require('../../../../assets/plants/salud_mental/fase1.png'),
+    2: require('../../../../assets/plants/salud_mental/fase2.png'),
+    3: require('../../../../assets/plants/salud_mental/fase3.png'),
   },
   finanzas: {
-    1: require('../../../assets/plants/finanzas/fase1.png'),
-    2: require('../../../assets/plants/finanzas/fase2.png'),
-    3: require('../../../assets/plants/finanzas/fase3.png'),
+    1: require('../../../../assets/plants/finanzas/fase1.png'),
+    2: require('../../../../assets/plants/finanzas/fase2.png'),
+    3: require('../../../../assets/plants/finanzas/fase3.png'),
   },
   social: {
-    1: require('../../../assets/plants/social/fase1.png'),
-    2: require('../../../assets/plants/social/fase2.png'),
-    3: require('../../../assets/plants/social/fase3.png'),
+    1: require('../../../../assets/plants/social/fase1.png'),
+    2: require('../../../../assets/plants/social/fase2.png'),
+    3: require('../../../../assets/plants/social/fase3.png'),
   },
 };
 
@@ -42,25 +42,25 @@ type Ordenes = Record<1 | 2 | 3 | 4 | 5, ImagenLocal>;
 
 export const ACCESORIOS: Record<TipoAccesorio, Ordenes> = {
   sombrero: {
-    1: require('../../../assets/accessories/sombrero/1.png'),
-    2: require('../../../assets/accessories/sombrero/2.png'),
-    3: require('../../../assets/accessories/sombrero/3.png'),
-    4: require('../../../assets/accessories/sombrero/4.png'),
-    5: require('../../../assets/accessories/sombrero/5.png'),
+    1: require('../../../../assets/accessories/sombrero/1.png'),
+    2: require('../../../../assets/accessories/sombrero/2.png'),
+    3: require('../../../../assets/accessories/sombrero/3.png'),
+    4: require('../../../../assets/accessories/sombrero/4.png'),
+    5: require('../../../../assets/accessories/sombrero/5.png'),
   },
   lentes: {
-    1: require('../../../assets/accessories/lentes/1.png'),
-    2: require('../../../assets/accessories/lentes/2.png'),
-    3: require('../../../assets/accessories/lentes/3.png'),
-    4: require('../../../assets/accessories/lentes/4.png'),
-    5: require('../../../assets/accessories/lentes/5.png'),
+    1: require('../../../../assets/accessories/lentes/1.png'),
+    2: require('../../../../assets/accessories/lentes/2.png'),
+    3: require('../../../../assets/accessories/lentes/3.png'),
+    4: require('../../../../assets/accessories/lentes/4.png'),
+    5: require('../../../../assets/accessories/lentes/5.png'),
   },
   maceta: {
-    1: require('../../../assets/accessories/maceta/1.png'),
-    2: require('../../../assets/accessories/maceta/2.png'),
-    3: require('../../../assets/accessories/maceta/3.png'),
-    4: require('../../../assets/accessories/maceta/4.png'),
-    5: require('../../../assets/accessories/maceta/5.png'),
+    1: require('../../../../assets/accessories/maceta/1.png'),
+    2: require('../../../../assets/accessories/maceta/2.png'),
+    3: require('../../../../assets/accessories/maceta/3.png'),
+    4: require('../../../../assets/accessories/maceta/4.png'),
+    5: require('../../../../assets/accessories/maceta/5.png'),
   },
 };
 

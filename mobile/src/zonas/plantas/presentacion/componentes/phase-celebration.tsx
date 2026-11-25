@@ -4,9 +4,9 @@ import { Modal, View } from 'react-native';
 import { AppText } from '@/comun/presentacion/ui/app-text';
 import { Button } from '@/comun/presentacion/ui/button';
 import { es, formatear } from '@/comun/i18n/es';
-import type { Area } from '@/comun/logica/esquemas/onboarding';
+import type { Area } from '@/comun/modelo/esquemas/onboarding';
 
-import { imagenPlanta } from '../imagenes';
+import { imagenPlanta } from '@/zonas/plantas/presentacion/imagenes';
 
 // Celebración del cambio de fase de una planta (SDD 6.1 y textos 3). Es el único momento en que
 // el progreso oculto se hace visible, sin números.

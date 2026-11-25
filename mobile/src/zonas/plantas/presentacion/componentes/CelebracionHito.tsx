@@ -10,14 +10,12 @@
  * @historial 1.0.0 (2026-11-23): creación.
  */
 
-import { useAudioPlayer } from 'expo-audio';
-import { notificationAsync, NotificationFeedbackType } from 'expo-haptics';
 import { useEffect } from 'react';
 import { Modal, View } from 'react-native';
 
 import { AppText } from '@/comun/presentacion/ui/app-text';
 import { Button } from '@/comun/presentacion/ui/button';
-import type { HitoAlcanzado } from '@/db/hitos-repository';
+import { celebrarHito, type HitoAlcanzado } from '@/zonas/plantas/logica/servicioPlantas';
 import { es, formatear } from '@/comun/i18n/es';
 
 // ===== Tipos =====
@@ -31,9 +29,6 @@ export type CelebracionHitoProps = {
 
 // ===== Constantes =====
 
-// Metro necesita un require fijo por archivo.
-const SONIDO_HITO = require('../../../../assets/sounds/hito.wav') as number;
-
 const CIEN = 100;
 
 // ===== Principal =====
@@ -45,20 +40,13 @@ const CIEN = 100;
  */
 export function CelebracionHito({ hito, onCerrar }: CelebracionHitoProps) {
   const t = es.hitos;
-  const reproductor = useAudioPlayer(SONIDO_HITO);
 
+  // Vibra y, si está encendido, suena (lo hace la capa de dispositivo a través del servicio).
   useEffect(() => {
-    if (!hito) {
-      return;
+    if (hito) {
+      celebrarHito(hito.sonido);
     }
-    notificationAsync(NotificationFeedbackType.Success).catch(() => {});
-    if (hito.sonido) {
-      reproductor
-        .seekTo(0)
-        .then(() => reproductor.play())
-        .catch(() => {});
-    }
-  }, [hito, reproductor]);
+  }, [hito]);
 
   const ancho = hito ? `${(hito.avance.hechos / hito.avance.meta) * CIEN}%` : '0%';
 

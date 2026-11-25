@@ -1,11 +1,15 @@
 import { Image } from 'expo-image';
 import { View } from 'react-native';
 
-import type { Accesorio } from '@/db/rewards-repository';
+import type { Accesorio } from '@/zonas/plantas/datos/repositorioPlantas';
 import { es, formatear } from '@/comun/i18n/es';
-import type { Area } from '@/comun/logica/esquemas/onboarding';
+import type { Area } from '@/comun/modelo/esquemas/onboarding';
 
-import { cajaAccesorio, imagenAccesorio, imagenPlanta } from '../imagenes';
+import {
+  cajaAccesorio,
+  imagenAccesorio,
+  imagenPlanta,
+} from '@/zonas/plantas/presentacion/imagenes';
 
 // La planta con sus accesorios colocados encima (SDD 9.8). Es decorativa: quien la usa da la
 // descripción al lector de pantalla.

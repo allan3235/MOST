@@ -1,7 +1,7 @@
 import { Pressable, View } from 'react-native';
 
 import { AppText } from '@/comun/presentacion/ui/app-text';
-import type { PlantaJardin } from '@/db/rewards-repository';
+import type { PlantaJardin } from '@/zonas/plantas/datos/repositorioPlantas';
 import { es, formatear } from '@/comun/i18n/es';
 import { tintes } from '@/comun/tema';
 

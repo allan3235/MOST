@@ -9,27 +9,30 @@ import { Snackbar } from '@/comun/presentacion/ui/snackbar';
 import { avisarCambioLocal } from '@/comun/logica/cambios-locales';
 import { leerHoy } from '@/db/habits-repository';
 import { leerSemanaApoyo } from '@/db/reminders-repository';
-import { leerJardin } from '@/db/rewards-repository';
+import { leerMiJardin } from '@/zonas/plantas/logica/servicioPlantas';
 import { leerAjustesLocales } from '@/db/settings-repository';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
 import { HabitCheckCard } from '@/features/habits/components/habit-check-card';
 import { useCheckIn } from '@/features/habits/use-check-in';
-import { CoinBalance } from '@/features/rewards/components/coin-balance';
-import { CoinBurst } from '@/features/rewards/components/coin-burst';
-import { PhaseCelebration } from '@/features/rewards/components/phase-celebration';
+import { CoinBalance } from '@/zonas/plantas/presentacion/componentes/coin-balance';
+import { CoinBurst } from '@/zonas/plantas/presentacion/componentes/coin-burst';
+import { PhaseCelebration } from '@/zonas/plantas/presentacion/componentes/phase-celebration';
 import { DialogoIntrospeccion } from '@/features/introspeccion/components/DialogoIntrospeccion';
 import { TarjetaReflexion } from '@/features/introspeccion/components/TarjetaReflexion';
 import { useIntrospeccion } from '@/features/introspeccion/use-introspeccion';
-import { CelebracionHito } from '@/features/progression/components/CelebracionHito';
+import { CelebracionHito } from '@/zonas/plantas/presentacion/componentes/CelebracionHito';
 import { ProgressionCard } from '@/features/progression/components/progression-card';
 import { useProgresion } from '@/features/progression/use-progresion';
 import { DayDialog } from '@/features/reschedule/components/day-dialog';
 import { RescheduleCard } from '@/features/reschedule/components/reschedule-card';
 import { TarjetaBarreras } from '@/features/reschedule/components/TarjetaBarreras';
 import { useReprogramacion } from '@/features/reschedule/use-reprogramacion';
-import { descripcionPlanta, PlantImage } from '@/features/rewards/components/plant-image';
-import { plantaDestacada } from '@/features/rewards/domain/planta-destacada';
+import {
+  descripcionPlanta,
+  PlantImage,
+} from '@/zonas/plantas/presentacion/componentes/plant-image';
+import { plantaDestacada } from '@/zonas/plantas/logica/planta-destacada';
 import { es, formatear } from '@/comun/i18n/es';
 import { colors } from '@/comun/tema';
 import { navegar } from '@/comun/presentacion/navegar';
@@ -58,7 +61,7 @@ export default function HoyScreen() {
   const userId = session?.user.id ?? '';
   const hoy = useLocalQuery('hoy', leerHoy);
   const ajustes = useLocalQuery(`ajustes-${userId}`, () => leerAjustesLocales(userId));
-  const jardin = useLocalQuery(`jardin-${userId}`, () => leerJardin(userId));
+  const jardin = useLocalQuery(`jardin-${userId}`, () => leerMiJardin(userId));
   const semanaApoyo = useLocalQuery(`apoyo-${userId}`, () => leerSemanaApoyo(userId));
   const checkIn = useCheckIn(userId);
   const reprogramar = useReprogramacion(userId);

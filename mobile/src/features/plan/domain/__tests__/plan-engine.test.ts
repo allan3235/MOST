@@ -1,5 +1,5 @@
-import { disponibilidadIgual, MOMENTOS_CON_HORA } from '@/comun/logica/esquemas/onboarding';
-import type { Respuestas } from '@/comun/logica/esquemas/onboarding';
+import { disponibilidadIgual, MOMENTOS_CON_HORA } from '@/comun/modelo/esquemas/onboarding';
+import type { Respuestas } from '@/comun/modelo/esquemas/onboarding';
 
 import {
   alternativasDeNivel,

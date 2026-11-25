@@ -10,7 +10,7 @@ import {
   type LogDelDia,
   type Planta,
   type ResultadoRecompensa,
-} from '@/features/rewards/domain/recompensas';
+} from '@/zonas/plantas/logica/recompensas';
 import { fechaLocal } from '@/comun/logica/dates';
 import { pedirSincronizacion } from '@/comun/logica/sync/sync-engine';
 

@@ -1,17 +1,29 @@
+/**
+ * @file repositorioPlantas.ts
+ * @proyecto most.
+ * @descripcion Capa de datos del jardín y la tienda (SDD 6.4 y 9.4): lee de SQLite las plantas,
+ *   los accesorios y el saldo, guarda lo que se equipa (con la cola de salida, funciona sin
+ *   conexión) y pide la compra al servidor (necesita conexión: el servidor revisa el saldo real).
+ *   Las reglas de qué se equipa dónde viven en la capa de lógica.
+ * @autor Equipo most. (código heredado de Habit Green; reorganizado por Allan con Claude Code)
+ * @fecha 2026-11-24
+ * @version 1.1.0
+ * @historial 1.1.0 (2026-11-24): pasa a zonas/plantas/datos; equipar y comprar se orquestan en
+ *   servicioPlantas (antes db/rewards-repository.ts).
+ */
+
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-import {
-  cambiosAlEquipar,
-  plantaParaEquipar,
-  type TipoAccesorio,
-} from '@/features/rewards/domain/equipar';
+import { aplicar } from '@/comun/datos/aplicar-cambio';
 import { ErrorApi, pedirApi } from '@/comun/datos/clienteApi';
-import { AREAS, type Area } from '@/comun/logica/esquemas/onboarding';
-import { pedirSincronizacion, sincronizarAhora } from '@/comun/logica/sync/sync-engine';
-
-import { actualizarFila, enTransaccion, getDb, leerFilas } from '@/comun/datos/database';
-import { avisarCambioLocal } from '@/comun/datos/db-version-store';
-import { encolar } from '@/comun/datos/outbox';
+import { actualizarFila, getDb, leerFilas } from '@/comun/datos/database';
+import type { OperacionOutbox } from '@/comun/logica/sync/sync-rules';
+import { AREAS, type Area } from '@/comun/modelo/esquemas/onboarding';
+import type {
+  AccesorioPropio,
+  CambioEquipado,
+  TipoAccesorio,
+} from '@/zonas/plantas/logica/equipar';
 
 // Jardín y tienda (SDD 6.4 y 9.4). Se lee de SQLite. Equipar funciona sin conexión (cola de
 // salida); comprar no, porque el servidor revisa el saldo real.
@@ -103,29 +115,28 @@ export async function leerJardin(userId: string): Promise<Jardin> {
 }
 
 /**
- * Pone el accesorio en la planta (`poner` = true) o se lo quita solo a ella. Las demás plantas que
- * lo llevan no cambian.
+ * Accesorios que ya son de la persona, con las plantas que los llevan.
+ * @param userId Usuario con sesión.
+ * @returns Sus accesorios.
  */
-export async function equiparAccesorio(
-  userId: string,
-  accesorio: Accesorio,
-  categoryId: string,
-  poner: boolean,
-): Promise<void> {
-  if (accesorio.propioId === null) throw new Error('El accesorio no es del usuario');
-  const propioId = accesorio.propioId;
+export async function leerAccesoriosPropios(userId: string): Promise<AccesorioPropio[]> {
   const db = await getDb();
-  const propios = (await leerAccesorios(db, userId)).flatMap((a) =>
+  return (await leerAccesorios(db, userId)).flatMap((a) =>
     a.propioId === null
       ? []
       : [{ id: a.propioId, tipo: a.tipo, categorias_equipadas: a.categoriasEquipadas }],
   );
-  const actual = propios.find((p) => p.id === propioId);
-  if (!actual) throw new Error('El accesorio no es del usuario');
+}
 
-  await enTransaccion(db, async () => {
+/**
+ * Guarda en qué plantas queda cada accesorio (una transacción con su cola de salida).
+ * @param cambios Accesorios y sus plantas nuevas.
+ */
+export async function guardarEquipados(cambios: readonly CambioEquipado[]): Promise<void> {
+  await aplicar(async (db) => {
     const ahora = new Date().toISOString();
-    for (const cambio of cambiosAlEquipar(actual, categoryId, poner, propios)) {
+    const operaciones: OperacionOutbox[] = [];
+    for (const cambio of cambios) {
       const datos = { categorias_equipadas: cambio.categorias_equipadas };
       await actualizarFila(
         db,
@@ -133,73 +144,30 @@ export async function equiparAccesorio(
         { id: cambio.id },
         { ...datos, updated_at: ahora },
       );
-      await encolar(db, {
-        operacion: 'update',
+      operaciones.push({
+        operacion: 'update' as const,
         tabla: 'user_accessories',
         clave: cambio.id,
         payload: datos,
       });
     }
+    return operaciones;
   });
-  avisarCambioLocal();
-  pedirSincronizacion();
-}
-
-/**
- * «Equipar ahora» en la Tienda (SDD 9.4). Con `origen`, lo pone en la planta desde la que se abrió
- * la Tienda; si no, la app elige una que todavía no lo lleve. Devuelve dónde quedó, o
- * null si el objeto todavía no llega a este teléfono, para que el usuario pueda reintentar.
- */
-export async function equiparDesdeTienda(
-  userId: string,
-  accessoryId: string,
-  origen: Area | null,
-): Promise<{ area: Area; tipo: TipoAccesorio; puesto: string; quitado: string | null } | null> {
-  let jardin = await leerJardin(userId);
-  let accesorio = jardin.accesorios.find((a) => a.id === accessoryId);
-  if (accesorio?.propioId == null) {
-    await sincronizarAhora().catch(() => {});
-    jardin = await leerJardin(userId);
-    accesorio = jardin.accesorios.find((a) => a.id === accessoryId);
-  }
-  if (!accesorio || accesorio.propioId === null) return null;
-
-  const origenId = jardin.plantas.find((p) => p.area === origen)?.categoryId ?? null;
-  const destino = plantaParaEquipar(
-    accesorio.tipo,
-    jardin.plantas,
-    origenId,
-    accesorio.categoriasEquipadas,
-  );
-  const planta = jardin.plantas.find((p) => p.categoryId === destino);
-  if (!planta) return null;
-
-  // Si la planta ya llevaba otro del mismo tipo, se reemplaza: se avisa al llegar a sus detalles.
-  const quitado = jardin.accesorios.find(
-    (a) =>
-      a.id !== accesorio.id &&
-      a.tipo === accesorio.tipo &&
-      a.categoriasEquipadas.includes(planta.categoryId),
-  );
-  await equiparAccesorio(userId, accesorio, planta.categoryId, true);
-  return {
-    area: planta.area,
-    tipo: accesorio.tipo,
-    puesto: accesorio.nombre,
-    quitado: quitado?.nombre ?? null,
-  };
 }
 
 export type ResultadoCompra = 'comprado' | 'sin_conexion' | 'saldo_insuficiente' | 'error';
 
-/** Compra en el servidor (necesita conexión) y después descarga el saldo y el accesorio. */
-export async function comprarAccesorio(accessoryId: string): Promise<ResultadoCompra> {
+/**
+ * Pide la compra al servidor (necesita conexión). No descarga el saldo nuevo: eso es del servicio.
+ * @param accessoryId Accesorio a comprar.
+ * @returns Cómo salió.
+ */
+export async function comprarEnServidor(accessoryId: string): Promise<ResultadoCompra> {
   try {
     await pedirApi('/tienda/comprar', { metodo: 'POST', cuerpo: { accessory_id: accessoryId } });
+    return 'comprado';
   } catch (error) {
     if (!(error instanceof ErrorApi)) return 'sin_conexion';
     return error.message === 'saldo_insuficiente' ? 'saldo_insuficiente' : 'error';
   }
-  await sincronizarAhora().catch(() => {});
-  return 'comprado';
 }

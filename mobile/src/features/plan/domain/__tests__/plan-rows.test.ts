@@ -1,4 +1,4 @@
-import { VERSION_FORMULARIO } from '@/comun/logica/esquemas/onboarding';
+import { VERSION_FORMULARIO } from '@/comun/modelo/esquemas/onboarding';
 
 import { fechaLocal, filasDelPlan, type IdsPlan } from '../plan-rows';
 import { BORRADOR, habito, RESPUESTAS } from '../__fixtures__/plan';

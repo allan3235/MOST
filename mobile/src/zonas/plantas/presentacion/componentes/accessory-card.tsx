@@ -3,12 +3,12 @@ import { Check } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 
 import { AppText } from '@/comun/presentacion/ui/app-text';
-import type { Accesorio } from '@/db/rewards-repository';
+import type { Accesorio } from '@/zonas/plantas/datos/repositorioPlantas';
 import { es, formatear } from '@/comun/i18n/es';
 import { cardShadow, colors } from '@/comun/tema';
 
-import { estadoObjeto } from '../domain/estado-objeto';
-import { imagenAccesorio } from '../imagenes';
+import { estadoObjeto } from '@/zonas/plantas/logica/estado-objeto';
+import { imagenAccesorio } from '@/zonas/plantas/presentacion/imagenes';
 import { CoinIcon } from './coin-icon';
 
 // Tarjeta de un accesorio en la Tienda (mockup «Tienda #1»): imagen, nombre y precio. Lo que no

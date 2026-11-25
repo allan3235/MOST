@@ -2,7 +2,7 @@ import { View } from 'react-native';
 
 import { OptionChip } from '@/comun/presentacion/ui/option-chip';
 import { es } from '@/comun/i18n/es';
-import { AREAS } from '@/comun/logica/esquemas/onboarding';
+import { AREAS } from '@/comun/modelo/esquemas/onboarding';
 
 import { useOnboardingStore } from '../onboarding-store';
 

@@ -10,7 +10,7 @@ import {
   type Area,
   type Globales,
   type Respuestas,
-} from '@/comun/logica/esquemas/onboarding';
+} from '@/comun/modelo/esquemas/onboarding';
 import { borradorPlanSchema, type BorradorPlan } from '@/schemas/plan';
 import type { OperacionOutbox } from '@/comun/logica/sync/sync-rules';
 

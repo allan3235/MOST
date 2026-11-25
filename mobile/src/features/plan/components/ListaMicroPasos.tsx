@@ -17,7 +17,7 @@ import { View } from 'react-native';
 
 import { AppText, type TextTone } from '@/comun/presentacion/ui/app-text';
 import { textoDuracion } from '@/features/habits/domain/formato';
-import type { AvancePaso } from '@/features/progression/domain/hitos';
+import type { AvancePaso } from '@/zonas/plantas/logica/hitos';
 import { es, formatear } from '@/comun/i18n/es';
 import { colors } from '@/comun/tema';
 

@@ -4,7 +4,7 @@ import type {
   Ocurrencia,
   Registro,
 } from '@/features/habits/domain/habitos-del-dia';
-import type { Area } from '@/comun/logica/esquemas/onboarding';
+import type { Area } from '@/comun/modelo/esquemas/onboarding';
 
 import {
   estadosDelRango,

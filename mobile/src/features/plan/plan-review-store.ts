@@ -3,7 +3,7 @@ import Storage from 'expo-sqlite/kv-store';
 import { create } from 'zustand';
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
 
-import type { Objetivo } from '@/comun/logica/esquemas/onboarding';
+import type { Objetivo } from '@/comun/modelo/esquemas/onboarding';
 import type { BorradorPlan, HabitoPlan } from '@/schemas/plan';
 
 import * as revision from './domain/plan-review';

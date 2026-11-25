@@ -1,4 +1,4 @@
-import { plantaDestacada } from '../planta-destacada';
+import { plantaDestacada } from '@/zonas/plantas/logica/planta-destacada';
 
 const planta = (id: string, fase: number, tieneHabitos: boolean) => ({ id, fase, tieneHabitos });
 

@@ -20,7 +20,7 @@ import { valoresNuevos } from '@/features/habits/domain/valores-formulario';
 import { es, formatear } from '@/comun/i18n/es';
 import { fechaLocal } from '@/comun/logica/dates';
 import type { HabitoFormInput, HabitoFormValues } from '@/schemas/habit';
-import { AREAS, type Area } from '@/comun/logica/esquemas/onboarding';
+import { AREAS, type Area } from '@/comun/modelo/esquemas/onboarding';
 import { colors } from '@/comun/tema';
 import { navegar } from '@/comun/presentacion/navegar';
 

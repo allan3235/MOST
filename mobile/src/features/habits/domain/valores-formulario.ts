@@ -1,5 +1,5 @@
 import { TODOS_LOS_DIAS, type HabitoFormInput } from '@/schemas/habit';
-import type { Area } from '@/comun/logica/esquemas/onboarding';
+import type { Area } from '@/comun/modelo/esquemas/onboarding';
 
 import type { Habito, Horario } from './habitos-del-dia';
 import { horaCorta } from './horario';

@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { AppText } from '@/comun/presentacion/ui/app-text';
 import { ICONO_CATEGORIA } from '@/features/habits/categoria-icono';
 import { es } from '@/comun/i18n/es';
-import type { Area } from '@/comun/logica/esquemas/onboarding';
+import type { Area } from '@/comun/modelo/esquemas/onboarding';
 import { colors, tintes } from '@/comun/tema';
 
 // Sección de un área en Progreso, como en Hábitos: icono sobre el tinte del área y su nombre como

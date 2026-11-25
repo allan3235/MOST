@@ -1,5 +1,5 @@
-import { estadoFase } from '../estado-fase';
-import { estadoObjeto } from '../estado-objeto';
+import { estadoFase } from '@/zonas/plantas/logica/estado-fase';
+import { estadoObjeto } from '@/zonas/plantas/logica/estado-objeto';
 
 describe('estado de un objeto en la Tienda (SDD 6.4)', () => {
   it('con saldo suficiente es comprable y dice cuánto queda', () => {

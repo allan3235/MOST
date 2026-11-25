@@ -5,12 +5,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Alert, type AlertVariant } from '@/comun/presentacion/ui/alert';
 import { AppText } from '@/comun/presentacion/ui/app-text';
 import { Button } from '@/comun/presentacion/ui/button';
-import type { Accesorio } from '@/db/rewards-repository';
+import type { Accesorio } from '@/zonas/plantas/datos/repositorioPlantas';
 import { es, formatear } from '@/comun/i18n/es';
 import { cardShadow } from '@/comun/tema';
 
-import { estadoObjeto } from '../domain/estado-objeto';
-import { imagenAccesorio } from '../imagenes';
+import { estadoObjeto } from '@/zonas/plantas/logica/estado-objeto';
+import { imagenAccesorio } from '@/zonas/plantas/presentacion/imagenes';
 
 // Hoja inferior de la Tienda (mockups «Tienda #2» y «#3»). Según el objeto: comprarlo, decir cuánto
 // falta, o, si ya es tuyo, ofrecer «Equipar ahora». Se cierra tocando fuera o con «atrás».

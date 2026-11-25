@@ -4,7 +4,7 @@ import {
   tieneObstaculo,
   type Objetivo,
   type Respuestas,
-} from '@/comun/logica/esquemas/onboarding';
+} from '@/comun/modelo/esquemas/onboarding';
 import type { BorradorPlan, HabitoPlan } from '@/schemas/plan';
 
 // Cambios que el usuario hace en la revisión del plan (SDD 9.4) antes de pulsar «Empezar».

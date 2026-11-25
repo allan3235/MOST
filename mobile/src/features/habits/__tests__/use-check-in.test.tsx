@@ -15,9 +15,12 @@ import { act, fireEvent, render, renderHook, screen } from '@testing-library/rea
 import { notificationAsync } from 'expo-haptics';
 
 import { completarHabito } from '@/db/logs-repository';
-import { leerSonidoHitos, revisarHito } from '@/db/hitos-repository';
-import { CelebracionHito } from '@/features/progression/components/CelebracionHito';
-import { CoinBurst, DURACION_COIN_BURST } from '@/features/rewards/components/coin-burst';
+import { leerSonidoLogros, revisarHito } from '@/zonas/plantas/logica/servicioPlantas';
+import { CelebracionHito } from '@/zonas/plantas/presentacion/componentes/CelebracionHito';
+import {
+  CoinBurst,
+  DURACION_COIN_BURST,
+} from '@/zonas/plantas/presentacion/componentes/coin-burst';
 import { es, formatear } from '@/comun/i18n/es';
 
 import { useCheckIn } from '../use-check-in';
@@ -42,9 +45,12 @@ jest.mock('@/db/logs-repository', () => ({
   deshacerHabito: jest.fn(),
   RelojAtrasadoError: class extends Error {},
 }));
-jest.mock('@/db/hitos-repository', () => ({
+jest.mock('@/comun/config/env', () => ({ env: { urlApi: 'http://prueba' } }));
+// Solo se simulan las lecturas; celebrar (vibrar y sonar) es el real, con el dispositivo simulado.
+jest.mock('@/zonas/plantas/logica/servicioPlantas', () => ({
+  ...jest.requireActual('@/zonas/plantas/logica/servicioPlantas'),
   revisarHito: jest.fn(),
-  leerSonidoHitos: jest.fn(),
+  leerSonidoLogros: jest.fn(),
 }));
 jest.mock('@/features/reminders/avisos', () => ({
   mandarAvisoMotivacional: jest.fn(async () => undefined),
@@ -54,7 +60,7 @@ jest.mock('@/comun/logica/fecha-hoy', () => ({
 }));
 const mockReproducir = jest.fn(async () => undefined);
 jest.mock('expo-audio', () => ({
-  useAudioPlayer: () => ({ seekTo: async () => undefined, play: mockReproducir }),
+  createAudioPlayer: () => ({ seekTo: async () => undefined, play: mockReproducir }),
 }));
 jest.mock('expo-haptics', () => ({
   notificationAsync: jest.fn(async () => undefined),
@@ -82,7 +88,7 @@ describe('check-in de un micro-paso', () => {
     jest.useFakeTimers();
     completar.mockResolvedValue({ monedas: 10, sinMonedas: null, cambioFase: null });
     hito.mockResolvedValue(null);
-    (leerSonidoHitos as jest.Mock).mockResolvedValue(true);
+    (leerSonidoLogros as jest.Mock).mockResolvedValue(true);
   });
   afterEach(() => jest.useRealTimers());
 

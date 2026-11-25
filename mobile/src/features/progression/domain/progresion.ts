@@ -26,7 +26,7 @@ import {
   tieneObstaculo,
   type Objetivo,
   type Respuestas,
-} from '@/comun/logica/esquemas/onboarding';
+} from '@/comun/modelo/esquemas/onboarding';
 import type { HabitoPlan, Nivel } from '@/schemas/plan';
 
 // Progresión (SDD 6.3). Funciones puras: reciben lo que ya está en SQLite y deciden qué proponer.

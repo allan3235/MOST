@@ -7,7 +7,7 @@ import {
   type LucideIcon,
 } from 'lucide-react-native';
 
-import type { Area } from '@/comun/logica/esquemas/onboarding';
+import type { Area } from '@/comun/modelo/esquemas/onboarding';
 
 // Icono de línea de cada categoría, parecido a los del mockup de «Crear hábito».
 

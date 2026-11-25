@@ -22,7 +22,7 @@ import {
   type HabitoFormInput,
   type HabitoFormValues,
 } from '@/schemas/habit';
-import { AREAS } from '@/comun/logica/esquemas/onboarding';
+import { AREAS } from '@/comun/modelo/esquemas/onboarding';
 import { cardShadow, colors } from '@/comun/tema';
 
 import { usePermisoAvisos } from '@/features/reminders/use-permiso-avisos';

@@ -9,7 +9,7 @@ import {
   momentosComunes,
   normalizarRespuestas,
   type Disponibilidad,
-} from '@/comun/logica/esquemas/onboarding';
+} from '@/comun/modelo/esquemas/onboarding';
 
 const validas = {
   areas: ['salud_fisica', 'social'],

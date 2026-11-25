@@ -5,12 +5,12 @@ import { Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 import { AppText } from '@/comun/presentacion/ui/app-text';
 import { Button } from '@/comun/presentacion/ui/button';
 import { ChoicePill } from '@/comun/presentacion/ui/choice-pill';
-import type { Accesorio, PlantaJardin } from '@/db/rewards-repository';
+import type { Accesorio, PlantaJardin } from '@/zonas/plantas/datos/repositorioPlantas';
 import { es, formatear } from '@/comun/i18n/es';
 import { colors } from '@/comun/tema';
 
-import type { TipoAccesorio } from '../domain/equipar';
-import { imagenAccesorio } from '../imagenes';
+import type { TipoAccesorio } from '@/zonas/plantas/logica/equipar';
+import { imagenAccesorio } from '@/zonas/plantas/presentacion/imagenes';
 
 // Pestaña Objetos de Detalles (mockups «Detalles #2» y «#2.1»): los objetos comprados del tipo
 // elegido, en 3 columnas. Tocar uno lo equipa al instante y tocar el puesto lo quita, sin

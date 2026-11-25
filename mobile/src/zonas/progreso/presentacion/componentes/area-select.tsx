@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/comun/presentacion/ui/app-text';
 import { ICONO_CATEGORIA } from '@/features/habits/categoria-icono';
 import { es, formatear } from '@/comun/i18n/es';
-import type { Area } from '@/comun/logica/esquemas/onboarding';
+import type { Area } from '@/comun/modelo/esquemas/onboarding';
 import { cardShadow, colors, tintes } from '@/comun/tema';
 
 // Filtro por área de Semanal y Mensual (decisión del usuario: opción B de las maquetas). Un campo

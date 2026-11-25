@@ -31,7 +31,7 @@ import {
 } from '@/features/progression/domain/progresion';
 import type { Barrera, PasoLigero } from '@/features/reschedule/domain/barreras';
 import type { Propuesta } from '@/features/reschedule/domain/reprogramar';
-import { avanceDelPaso, type AvancePaso } from '@/features/progression/domain/hitos';
+import { avanceDelPaso, type AvancePaso } from '@/zonas/plantas/logica/hitos';
 import { historial, type Pausa } from '@/zonas/progreso/logica/cumplimiento';
 import { rachaDeHabito } from '@/zonas/progreso/logica/rachas';
 import { pedirApi } from '@/comun/datos/clienteApi';
@@ -42,7 +42,7 @@ import {
   type Area,
   type Objetivo,
   type Respuestas,
-} from '@/comun/logica/esquemas/onboarding';
+} from '@/comun/modelo/esquemas/onboarding';
 import { type HabitoPlan, type PeticionAjuste } from '@/schemas/plan';
 import type { OperacionOutbox } from '@/comun/logica/sync/sync-rules';
 
@@ -50,7 +50,7 @@ import { aplicar } from '@/comun/datos/aplicar-cambio';
 import { actualizarFila, getDb, guardarFilas, leerFilas } from '@/comun/datos/database';
 import { avisarCambioLocal } from '@/comun/datos/db-version-store';
 import { categoriasPorId, guardarVersionHorario, idCategoria } from './habits-repository';
-import { leerAvancesDePasos } from './hitos-repository';
+import { contarHechosDePasos } from '@/zonas/plantas/datos/repositorioHitos';
 import { descartarMovidasDelPatron, filasDe, guardarOcurrencias } from './occurrences-repository';
 import { leerAjustesEn, leerConfigProgresion, leerPresupuestos } from './settings-repository';
 
@@ -552,7 +552,7 @@ export async function leerDetallePlan(userId: string, planId: string): Promise<D
   const entrada = entradaDelPlan(comunes, plan);
 
   const suyos = entrada.habitos.filter((h) => h.plan_id === plan.id && h.archivado_en === null);
-  const avances = await leerAvancesDePasos(db, suyos);
+  const hechos = await contarHechosDePasos(db, suyos);
   const ids = new Set(suyos.map((h) => h.id));
   const habitos = suyos.map((habito): HabitoDelDetalle => {
     const horarios = entrada.horarios.filter((x) => x.habit_id === habito.id);
@@ -575,7 +575,7 @@ export async function leerDetallePlan(userId: string, planId: string): Promise<D
       horario,
       racha: rachaDeHabito(ocurrencias).actual,
       pasos: pasosDe(entrada.microPasos, habito.id),
-      avancePaso: avances[habito.id] ?? avanceDelPaso(0),
+      avancePaso: avanceDelPaso(hechos[habito.id] ?? 0),
       masLigero,
       sugerirMasLigero:
         masLigero !== null &&

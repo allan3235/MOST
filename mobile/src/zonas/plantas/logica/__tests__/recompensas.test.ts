@@ -7,7 +7,7 @@ import {
   RECOMPENSAS_POR_DEFECTO as C,
   type EstadoDia,
   type LogDelDia,
-} from '../recompensas';
+} from '@/zonas/plantas/logica/recompensas';
 
 function log(habit: string, cambios: Partial<LogDelDia> = {}): LogDelDia {
   return {

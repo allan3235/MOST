@@ -2,16 +2,16 @@ import { useEffect, useState } from 'react';
 import { AccessibilityInfo } from 'react-native';
 
 import { completarHabito, deshacerHabito, RelojAtrasadoError } from '@/db/logs-repository';
-import { leerSonidoHitos, revisarHito } from '@/db/hitos-repository';
-import type { HitoParaCelebrar } from '@/features/progression/components/CelebracionHito';
+import { leerSonidoLogros, revisarHito } from '@/zonas/plantas/logica/servicioPlantas';
+import type { HitoParaCelebrar } from '@/zonas/plantas/presentacion/componentes/CelebracionHito';
 import { mandarAvisoMotivacional } from '@/features/reminders/avisos';
 import { es, formatear } from '@/comun/i18n/es';
 import { fechaLocal } from '@/comun/logica/dates';
 import { useFechaHoy } from '@/comun/logica/fecha-hoy';
-import type { Area } from '@/comun/logica/esquemas/onboarding';
+import type { Area } from '@/comun/modelo/esquemas/onboarding';
 
-import { DURACION_COIN_BURST } from '../rewards/components/coin-burst';
-import type { Celebracion } from '../rewards/components/phase-celebration';
+import { DURACION_COIN_BURST } from '@/zonas/plantas/presentacion/componentes/coin-burst';
+import type { Celebracion } from '@/zonas/plantas/presentacion/componentes/phase-celebration';
 
 // Marcar y deshacer un hábito de hoy (SDD 6.1), compartido por Hoy y Hábitos: guarda el check-in,
 // lanza la moneda animada o el mensaje del tope del día, avisa al lector de pantalla y abre la
@@ -76,7 +76,7 @@ export function useCheckIn(userId: string) {
       // se muestra sin ella para no encimar dos celebraciones.
       const alcanzado = await revisarHito(userId, habito.id);
       if (alcanzado && !(r.cambioFase !== null && r.cambioFase > 1)) {
-        setHito({ ...alcanzado, sonido: await leerSonidoHitos(userId) });
+        setHito({ ...alcanzado, sonido: await leerSonidoLogros(userId) });
       }
       // RF-13: a los 3, 6, 9… días seguidos, un aviso de ánimo (máximo uno al día).
       mandarAvisoMotivacional(userId).catch((causa: unknown) => {

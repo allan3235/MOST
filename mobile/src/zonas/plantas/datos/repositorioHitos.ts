@@ -1,36 +1,28 @@
 /**
- * @file hitos-repository.ts
+ * @file repositorioHitos.ts
  * @proyecto most.
  * @descripcion Hitos de avance del micro-paso (RF-16) leídos de SQLite: cuántas veces se hizo el
- *   paso en curso, si un check-in cruzó el 50 % o el 80 % (una sola vez por paso) y la preferencia
+ *   paso en curso, qué hitos ya se celebraron (una sola vez por paso) y la preferencia
  *   de sonido de los logros (RI-03, audio opcional). Todo vive en el teléfono.
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-23
- * @version 1.0.0
+ * @version 1.1.0
  * @historial 1.0.0 (2026-11-23): creación.
+ *   1.1.0 (2026-11-24): pasa a zonas/plantas/datos; decidir el hito queda en servicioPlantas.
  */
 
 import type { SQLiteDatabase } from 'expo-sqlite';
-
-import {
-  avanceDelPaso,
-  hitoAlcanzado,
-  type AvancePaso,
-  type PorcentajeHito,
-} from '@/features/progression/domain/hitos';
 
 import { getDb } from '@/comun/datos/database';
 import { avisarCambioLocal } from '@/comun/datos/db-version-store';
 
 // ===== Tipos =====
 
-export type HitoAlcanzado = {
-  porcentaje: PorcentajeHito;
+export type HabitoDelHito = {
   titulo: string;
-  avance: AvancePaso;
+  nivel_desde: string | null;
+  paso_actual: number | null;
 };
-
-type HabitoDelHito = { titulo: string; nivel_desde: string | null; paso_actual: number | null };
 
 // ===== Constantes =====
 
@@ -41,7 +33,7 @@ const VALOR_ENCENDIDO = '1';
 // ===== Funciones auxiliares =====
 
 /** Veces hechas del paso en curso: registros no deshechos desde que empezó (`nivel_desde`). */
-async function contarHechosDelPaso(
+async function contarHechos(
   db: SQLiteDatabase,
   habitId: string,
   nivelDesde: string | null,
@@ -56,53 +48,61 @@ async function contarHechosDelPaso(
 // ===== Principal =====
 
 /**
- * Después de completar un hábito: si con este registro el paso llegó a 5 o a 8 de 10 y ese hito
- * no se celebró antes en este paso, lo deja celebrado y lo devuelve.
- * @param userId Usuario con sesión.
- * @param habitId Hábito recién completado.
- * @returns El hito, o null.
+ * Título, paso y fecha de inicio del paso de un hábito (para revisar si alcanzó un hito).
+ * @param habitId Hábito.
+ * @returns Sus datos, o null si no existe.
  */
-export async function revisarHito(userId: string, habitId: string): Promise<HitoAlcanzado | null> {
+export async function leerHabitoDelHito(habitId: string): Promise<HabitoDelHito | null> {
   const db = await getDb();
-  const habito = await db.getFirstAsync<HabitoDelHito>(
+  return db.getFirstAsync<HabitoDelHito>(
     'SELECT titulo, nivel_desde, paso_actual FROM habits WHERE id = ?',
     [habitId],
   );
-  if (!habito) {
-    return null;
+}
+
+/**
+ * Veces hechas del paso en curso: registros no deshechos desde que empezó (`nivel_desde`).
+ * @param habitId Hábito.
+ * @param nivelDesde Inicio del paso.
+ * @returns Cuántas veces.
+ */
+export async function contarHechosDelPaso(
+  habitId: string,
+  nivelDesde: string | null,
+): Promise<number> {
+  return contarHechos(await getDb(), habitId, nivelDesde);
+}
+
+/**
+ * Veces hechas del paso en curso de varios hábitos (para el indicador «5 de 10»).
+ * @param db Base local (dentro de otra lectura).
+ * @param habitos Hábitos con su `nivel_desde`.
+ * @returns habit_id → veces hechas.
+ */
+export async function contarHechosDePasos(
+  db: SQLiteDatabase,
+  habitos: readonly { id: string; nivel_desde?: string | null }[],
+): Promise<Record<string, number>> {
+  const resultado: Record<string, number> = {};
+  for (const h of habitos) {
+    resultado[h.id] = await contarHechos(db, h.id, h.nivel_desde ?? null);
   }
-  const despues = await contarHechosDelPaso(db, habitId, habito.nivel_desde);
-  const porcentaje = hitoAlcanzado(despues - 1, despues);
-  if (porcentaje === null) {
-    return null;
-  }
-  // Un hito por paso: desmarcar y volver a marcar no lo repite.
-  const clave = `${habitId}|${habito.paso_actual ?? ''}|${habito.nivel_desde ?? ''}|${porcentaje}`;
+  return resultado;
+}
+
+/**
+ * Anota un hito como celebrado. Si ya lo estaba (desmarcar y volver a marcar), no lo repite.
+ * @param userId Usuario con sesión.
+ * @param clave Hábito, paso y porcentaje.
+ * @returns true si es la primera vez.
+ */
+export async function celebrarHitoNuevo(userId: string, clave: string): Promise<boolean> {
+  const db = await getDb();
   const resultado = await db.runAsync(
     'INSERT OR IGNORE INTO hitos_celebrados (user_id, clave) VALUES (?, ?)',
     [userId, clave],
   );
-  if (resultado.changes === 0) {
-    return null;
-  }
-  return { porcentaje, titulo: habito.titulo, avance: avanceDelPaso(despues) };
-}
-
-/**
- * Avance del paso en curso de varios hábitos, para el indicador «5 de 10».
- * @param db Base local.
- * @param habitos Hábitos con su `nivel_desde`.
- * @returns habit_id → avance.
- */
-export async function leerAvancesDePasos(
-  db: SQLiteDatabase,
-  habitos: readonly { id: string; nivel_desde?: string | null }[],
-): Promise<Record<string, AvancePaso>> {
-  const resultado: Record<string, AvancePaso> = {};
-  for (const h of habitos) {
-    resultado[h.id] = avanceDelPaso(await contarHechosDelPaso(db, h.id, h.nivel_desde ?? null));
-  }
-  return resultado;
+  return resultado.changes > 0;
 }
 
 /**

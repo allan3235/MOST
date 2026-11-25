@@ -37,7 +37,7 @@ import { ListaMicroPasos } from '@/features/plan/components/ListaMicroPasos';
 import { es, formatear } from '@/comun/i18n/es';
 import { fechaLocal } from '@/comun/logica/dates';
 import { navegar } from '@/comun/presentacion/navegar';
-import { AREAS, momentoPrincipal, type Area } from '@/comun/logica/esquemas/onboarding';
+import { AREAS, momentoPrincipal, type Area } from '@/comun/modelo/esquemas/onboarding';
 
 // ===== Tipos =====
 

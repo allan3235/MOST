@@ -15,7 +15,7 @@ import { HabitCheckCard } from '@/features/habits/components/habit-check-card';
 import { useAgregarHabito } from '@/features/habits/use-agregar-habito';
 import { useHabitActions } from '@/features/habits/use-habit-actions';
 import { es } from '@/comun/i18n/es';
-import { AREAS } from '@/comun/logica/esquemas/onboarding';
+import { AREAS } from '@/comun/modelo/esquemas/onboarding';
 import { colors, tintes } from '@/comun/tema';
 
 // Hábitos (SDD 9.4 y mockup «Hábitos #1»): una sección por categoría que tenga hábitos, con

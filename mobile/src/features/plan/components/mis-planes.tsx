@@ -10,7 +10,7 @@ import { ICONO_CATEGORIA } from '@/features/habits/categoria-icono';
 import { useOnboardingStore } from '@/features/onboarding/onboarding-store';
 import { es, formatear } from '@/comun/i18n/es';
 import { useAccionUnica } from '@/comun/presentacion/use-accion-unica';
-import { AREAS } from '@/comun/logica/esquemas/onboarding';
+import { AREAS } from '@/comun/modelo/esquemas/onboarding';
 import { cardShadow, colors, tintes } from '@/comun/tema';
 import { navegar } from '@/comun/presentacion/navegar';
 

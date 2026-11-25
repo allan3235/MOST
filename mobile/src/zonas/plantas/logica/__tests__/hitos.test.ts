@@ -8,7 +8,7 @@
  * @historial 1.0.0 (2026-11-23): creación.
  */
 
-import { avanceDelPaso, hitoAlcanzado, META_REPETICIONES_PASO } from '../hitos';
+import { avanceDelPaso, hitoAlcanzado, META_REPETICIONES_PASO } from '@/zonas/plantas/logica/hitos';
 
 describe('hitos del micro-paso', () => {
   it('CP-09: a los 5 de 10 es el hito del 50 % y a los 8 de 10 el del 80 %', () => {

@@ -8,7 +8,7 @@ import {
   type Registro,
 } from '@/features/habits/domain/habitos-del-dia';
 import { fechaLocal, sumarDias } from '@/comun/logica/dates';
-import type { Area } from '@/comun/logica/esquemas/onboarding';
+import type { Area } from '@/comun/modelo/esquemas/onboarding';
 
 import type { Periodo, Rango } from './periodos';
 import { rachaDeHabito, type Racha } from './rachas';

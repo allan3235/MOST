@@ -1,5 +1,5 @@
-import { disponibilidadIgual } from '@/comun/logica/esquemas/onboarding';
-import type { Respuestas } from '@/comun/logica/esquemas/onboarding';
+import { disponibilidadIgual } from '@/comun/modelo/esquemas/onboarding';
+import type { Respuestas } from '@/comun/modelo/esquemas/onboarding';
 import type { BorradorPlan, HabitoPlan } from '@/schemas/plan';
 
 // Datos de prueba compartidos por las pruebas de la revisión y el guardado del plan.

@@ -1,5 +1,5 @@
-import { disponibilidadIgual } from '@/comun/logica/esquemas/onboarding';
-import type { Respuestas } from '@/comun/logica/esquemas/onboarding';
+import { disponibilidadIgual } from '@/comun/modelo/esquemas/onboarding';
+import type { Respuestas } from '@/comun/modelo/esquemas/onboarding';
 
 import { respuestasDelPlan } from '../respuestas-plan';
 

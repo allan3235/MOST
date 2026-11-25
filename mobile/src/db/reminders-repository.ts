@@ -18,7 +18,7 @@ import {
   type SemanaApoyo,
 } from '@/features/reminders/domain/semana-apoyo';
 import { fechaLocal, sumarDias } from '@/comun/logica/dates';
-import { globalesSchema, momentoPrincipal, type Momento } from '@/comun/logica/esquemas/onboarding';
+import { globalesSchema, momentoPrincipal, type Momento } from '@/comun/modelo/esquemas/onboarding';
 
 import { getDb, leerFilas } from '@/comun/datos/database';
 import { leerAjustesEn, leerConfigAvisos } from './settings-repository';

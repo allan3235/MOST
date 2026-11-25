@@ -6,12 +6,12 @@ import PagerView from 'react-native-pager-view';
 import { useReducedMotion } from 'react-native-reanimated';
 
 import { AppText } from '@/comun/presentacion/ui/app-text';
-import type { PlantaJardin } from '@/db/rewards-repository';
+import type { PlantaJardin } from '@/zonas/plantas/datos/repositorioPlantas';
 import { es, formatear } from '@/comun/i18n/es';
 import { colors } from '@/comun/tema';
 
-import { estadoFase, FASES } from '../domain/estado-fase';
-import { imagenPlanta } from '../imagenes';
+import { estadoFase, FASES } from '@/zonas/plantas/logica/estado-fase';
+import { imagenPlanta } from '@/zonas/plantas/presentacion/imagenes';
 import { descripcionPlanta, PlantImage } from './plant-image';
 
 // Carrusel de las 3 fases de una planta (SDD 9.4, mockups «Detalles»): abre en la fase actual y se

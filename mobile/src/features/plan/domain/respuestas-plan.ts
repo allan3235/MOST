@@ -6,7 +6,7 @@ import {
   objetivoSchema,
   type Area,
   type Respuestas,
-} from '@/comun/logica/esquemas/onboarding';
+} from '@/comun/modelo/esquemas/onboarding';
 
 // Varios planes por usuario (decisión del usuario): cada plan es de un área y guarda sus propias
 // respuestas de área (P2 objetivos y P3 historial) en `plans.respuestas`; las globales (P4 tiempo,

@@ -15,9 +15,9 @@ import {
 import { nuevaVersionHorario, type VersionHorario } from '@/features/habits/domain/horario';
 import { alcanzoLimiteHabitos, limiteHabitos } from '@/features/habits/domain/limite-habitos';
 import { ajustePresupuesto, minutosPorDia } from '@/features/habits/domain/presupuesto';
-import { aplicarArchivar } from '@/features/rewards/domain/recompensas';
+import { aplicarArchivar } from '@/zonas/plantas/logica/recompensas';
 import { fechaLocal, sumarDias } from '@/comun/logica/dates';
-import { AREAS, type Area } from '@/comun/logica/esquemas/onboarding';
+import { AREAS, type Area } from '@/comun/modelo/esquemas/onboarding';
 import type { HabitoFormValues } from '@/schemas/habit';
 import type { OperacionOutbox } from '@/comun/logica/sync/sync-rules';
 

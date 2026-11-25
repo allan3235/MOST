@@ -10,7 +10,7 @@ import { textoDuracion } from '@/features/habits/domain/formato';
 import { horaCorta } from '@/features/habits/domain/horario';
 import { es, formatear } from '@/comun/i18n/es';
 import { diaIso, fechaLocal, sumarDias } from '@/comun/logica/dates';
-import type { Acompanamiento, Momento, Obstaculo } from '@/comun/logica/esquemas/onboarding';
+import type { Acompanamiento, Momento, Obstaculo } from '@/comun/modelo/esquemas/onboarding';
 
 import { semanaDeApoyoEnPlanes, type PlanApoyo } from './semana-apoyo';
 

@@ -1,4 +1,4 @@
-import { areaDeObjetivo, type Objetivo, type Respuestas } from '@/comun/logica/esquemas/onboarding';
+import { areaDeObjetivo, type Objetivo, type Respuestas } from '@/comun/modelo/esquemas/onboarding';
 import type { HabitoPlan, Nivel } from '@/schemas/plan';
 
 import { habitoParaNivel, type ConfigPlan, type FilaCatalogo } from './plan-engine';

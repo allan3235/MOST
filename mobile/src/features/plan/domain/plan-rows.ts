@@ -3,7 +3,7 @@ import {
   type Area,
   type Objetivo,
   type Respuestas,
-} from '@/comun/logica/esquemas/onboarding';
+} from '@/comun/modelo/esquemas/onboarding';
 import type { BorradorPlan } from '@/schemas/plan';
 
 // Convierte el borrador confirmado en las filas que se guardan al pulsar «Empezar» (SDD 5.8).

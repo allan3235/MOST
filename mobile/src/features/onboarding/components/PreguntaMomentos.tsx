@@ -17,7 +17,7 @@ import { AppText } from '@/comun/presentacion/ui/app-text';
 import { Button } from '@/comun/presentacion/ui/button';
 import { OptionChip } from '@/comun/presentacion/ui/option-chip';
 import { es, formatear } from '@/comun/i18n/es';
-import { MOMENTOS_CON_HORA } from '@/comun/logica/esquemas/onboarding';
+import { MOMENTOS_CON_HORA } from '@/comun/modelo/esquemas/onboarding';
 
 import {
   alternarCelda,

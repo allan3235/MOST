@@ -15,8 +15,8 @@ import { navegar } from '@/comun/presentacion/navegar';
 
 import { DialogoIntrospeccion } from '../introspeccion/components/DialogoIntrospeccion';
 import { useIntrospeccion } from '../introspeccion/use-introspeccion';
-import { CelebracionHito } from '../progression/components/CelebracionHito';
-import { PhaseCelebration } from '../rewards/components/phase-celebration';
+import { CelebracionHito } from '@/zonas/plantas/presentacion/componentes/CelebracionHito';
+import { PhaseCelebration } from '@/zonas/plantas/presentacion/componentes/phase-celebration';
 import type { HabitCheckCardProps } from './components/habit-check-card';
 import { HabitMenu, type Ancla, type HabitMenuProps } from './components/habit-menu';
 import { LimiteHabitosDialog } from './components/limite-habitos-dialog';

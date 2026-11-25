@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { leerCupoHabitos } from '@/db/habits-repository';
 import { useSession } from '@/features/auth/session-context';
-import type { Area } from '@/comun/logica/esquemas/onboarding';
+import type { Area } from '@/comun/modelo/esquemas/onboarding';
 import { navegar } from '@/comun/presentacion/navegar';
 
 import { LimiteHabitosDialog } from './components/limite-habitos-dialog';

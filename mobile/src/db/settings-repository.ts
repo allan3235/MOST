@@ -19,7 +19,7 @@ import {
   type Acompanamiento,
   type Obstaculo,
   type Tiempo,
-} from '@/comun/logica/esquemas/onboarding';
+} from '@/comun/modelo/esquemas/onboarding';
 import { pedirSincronizacion } from '@/comun/logica/sync/sync-engine';
 
 import { actualizarFila, enTransaccion, getDb, leerFilas } from '@/comun/datos/database';
