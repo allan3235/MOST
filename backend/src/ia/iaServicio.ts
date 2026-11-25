@@ -26,7 +26,6 @@ import {
   momentoParaDias,
   momentosComunes,
   perfilSchema,
-  respuestasSchema,
   tieneObstaculo,
   type Area,
   type MomentoConHora,
