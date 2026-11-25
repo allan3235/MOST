@@ -11,7 +11,11 @@
 
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
-import { guardarBloque, leerBloques } from '@/zonas/recordatorios/logica/servicioAgenda';
+import {
+  guardarBloque,
+  guardarSoloUnDia,
+  leerBloques,
+} from '@/zonas/recordatorios/logica/servicioAgenda';
 import { cambiarHoraRecordatorio, leerHabitos } from '@/zonas/habitos/logica/servicioHabitos';
 import { es, formatear } from '@/comun/i18n/es';
 
@@ -29,11 +33,18 @@ jest.mock('@/comun/presentacion/ui/snackbar', () => ({
 jest.mock('@/zonas/cuenta/presentacion/session-context', () => ({
   useSession: () => ({ session: { user: { id: 'u1' } } }),
 }));
-jest.mock('@/comun/presentacion/use-local-query', () => ({ useLocalQuery: () => ({ data: [] }) }));
+const mockBloques: { data: unknown[] } = { data: [] };
+jest.mock('@/comun/presentacion/use-local-query', () => ({ useLocalQuery: () => mockBloques }));
+// Hoy es miércoles 25-nov-2026 (día 3).
+jest.mock('@/comun/logica/fecha-hoy', () => ({
+  useFechaHoy: (elegir: (f: { fecha: string }) => string) => elegir({ fecha: '2026-11-25' }),
+}));
 jest.mock('@/zonas/recordatorios/logica/servicioAgenda', () => ({
   leerBloques: jest.fn(),
   guardarBloque: jest.fn(async () => undefined),
+  guardarSoloUnDia: jest.fn(async () => undefined),
   eliminarBloque: jest.fn(),
+  eliminarSoloUnDia: jest.fn(async () => undefined),
 }));
 jest.mock('@/zonas/habitos/logica/servicioHabitos', () => ({
   leerHabitos: jest.fn(),
@@ -41,7 +52,13 @@ jest.mock('@/zonas/habitos/logica/servicioHabitos', () => ({
 }));
 // El diálogo real usa el reloj nativo; aquí basta con un botón que guarda la clase.
 jest.mock('@/zonas/recordatorios/presentacion/componentes/DialogoBloque', () => ({
-  DialogoBloque: ({ onGuardar }: { onGuardar: (d: unknown) => void }) => {
+  DialogoBloque: ({
+    onGuardar,
+    soloDia,
+  }: {
+    onGuardar: (d: unknown) => void;
+    soloDia?: number;
+  }) => {
     const { Pressable, Text } = jest.requireActual<typeof import('react-native')>('react-native');
     return (
       <Pressable
@@ -54,7 +71,7 @@ jest.mock('@/zonas/recordatorios/presentacion/componentes/DialogoBloque', () => 
           })
         }
       >
-        <Text>guardar-clase</Text>
+        <Text>{soloDia ? `guardar-solo-${soloDia}` : 'guardar-clase'}</Text>
       </Pressable>
     );
   },
@@ -121,5 +138,30 @@ describe('PantallaAgenda (D-04)', () => {
     await fireEvent.press(screen.getByText(t.dejar));
     expect(cambiarHoraRecordatorio).not.toHaveBeenCalled();
     expect(screen.queryByText(/quedó dentro de/)).toBeNull();
+  });
+
+  it('vista por día: el miércoles muestra la clase y los ratos libres; cambiar solo ese día', async () => {
+    mockBloques.data = [CLASE];
+    await render(<PantallaAgenda />);
+    expect(screen.getByText('Clase')).toBeTruthy();
+    expect(screen.getByText('10:00 – 11:00')).toBeTruthy();
+    expect(screen.getByText('11:00 – 23:00')).toBeTruthy();
+
+    await fireEvent.press(screen.getByText('Clase'));
+    expect(screen.getByText(formatear(t.alcanceTitulo, { nombre: 'Clase' }))).toBeTruthy();
+    await fireEvent.press(screen.getByText(formatear(t.soloEsteDia, { dia: 'miércoles' })));
+    await fireEvent.press(screen.getByText('guardar-solo-3'));
+    await act(async () => {});
+    expect(guardarSoloUnDia).toHaveBeenCalledWith('u1', CLASE, 3, expect.anything());
+    expect(guardarBloque).not.toHaveBeenCalled();
+    mockBloques.data = [];
+  });
+
+  it('en un día sin bloques dice que está libre', async () => {
+    mockBloques.data = [CLASE];
+    await render(<PantallaAgenda />);
+    await fireEvent.press(screen.getByLabelText('Sábado'));
+    expect(screen.getByText(t.diaLibre)).toBeTruthy();
+    mockBloques.data = [];
   });
 });

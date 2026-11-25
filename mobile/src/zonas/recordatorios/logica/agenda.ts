@@ -169,3 +169,105 @@ export function recordatoriosQueChocan(
     return [{ recordatorio, bloque, sugerida }];
   });
 }
+
+// ===== Vista por día =====
+
+/** Desde y hasta qué hora se muestra el día en «Mi agenda» (el tiempo libre se cuenta ahí). */
+export const HORA_INICIO_DIA = '06:00';
+export const HORA_FIN_DIA = '23:00';
+/** Un rato libre más corto que esto no se muestra (no alcanza para un hábito). */
+const MINUTOS_MINIMOS_LIBRE = 15;
+/** Días ISO de la semana: 1 = lunes … 7 = domingo. */
+const DIAS_SEMANA = 7;
+
+/** Una franja del día: un bloque ocupado o un rato libre entre bloques. */
+export type Franja =
+  | { tipo: 'ocupado'; bloque: BloqueAgenda; inicio: string; fin: string }
+  | { tipo: 'libre'; inicio: string; fin: string };
+
+/** Datos de un bloque sin su id. */
+export type DatosDeBloque = Pick<
+  BloqueAgenda,
+  'nombre' | 'dias_semana' | 'hora_inicio' | 'hora_fin'
+>;
+
+/** Cómo guardar un cambio que solo aplica a un día de un bloque que se repite. */
+export type CambioUnDia =
+  | { tipo: 'editar'; datos: DatosDeBloque }
+  | { tipo: 'separar'; diasRestantes: number[]; nuevo: DatosDeBloque };
+
+/**
+ * Día ISO de una fecha (1 = lunes … 7 = domingo).
+ * @param fecha Fecha.
+ * @returns El día.
+ */
+export function diaIso(fecha: Date): number {
+  return ((fecha.getDay() + DIAS_SEMANA - 1) % DIAS_SEMANA) + 1;
+}
+
+/**
+ * Bloques de un día, ordenados por hora de inicio (y de fin).
+ * @param bloques Agenda.
+ * @param dia Día ISO.
+ * @returns Los bloques de ese día.
+ */
+export function bloquesDelDia(bloques: readonly BloqueAgenda[], dia: number): BloqueAgenda[] {
+  return bloques
+    .filter((b) => b.dias_semana.includes(dia))
+    .sort(
+      (a, b) =>
+        aMinutos(a.hora_inicio) - aMinutos(b.hora_inicio) ||
+        aMinutos(a.hora_fin) - aMinutos(b.hora_fin),
+    );
+}
+
+/**
+ * El día en orden: bloques ocupados y, entre ellos, los ratos libres (de 06:00 a 23:00). Así se ve
+ * de un vistazo qué está ocupado y qué no, sin revisar bloque por bloque.
+ * @param bloques Agenda.
+ * @param dia Día ISO.
+ * @returns Las franjas en orden.
+ */
+export function franjasDelDia(bloques: readonly BloqueAgenda[], dia: number): Franja[] {
+  const franjas: Franja[] = [];
+  const finDia = aMinutos(HORA_FIN_DIA);
+  let cursor = aMinutos(HORA_INICIO_DIA);
+  const agregarLibre = (hasta: number) => {
+    const fin = Math.min(hasta, finDia);
+    if (fin - cursor >= MINUTOS_MINIMOS_LIBRE) {
+      franjas.push({ tipo: 'libre', inicio: aHora(cursor), fin: aHora(fin) });
+    }
+  };
+  for (const bloque of bloquesDelDia(bloques, dia)) {
+    agregarLibre(aMinutos(bloque.hora_inicio));
+    franjas.push({
+      tipo: 'ocupado',
+      bloque,
+      inicio: bloque.hora_inicio.slice(0, LARGO_HORA),
+      fin: bloque.hora_fin.slice(0, LARGO_HORA),
+    });
+    cursor = Math.max(cursor, aMinutos(bloque.hora_fin));
+  }
+  agregarLibre(finDia);
+  return franjas;
+}
+
+/**
+ * Cambiar un bloque solo en un día: si el bloque únicamente ocurre ese día, se edita; si se repite,
+ * ese día se separa en un bloque propio y los demás días quedan como estaban.
+ * @param bloque Bloque original.
+ * @param dia Día ISO que se cambia.
+ * @param datos Nombre y horas nuevos (los días se ignoran: queda solo `dia`).
+ * @returns Qué guardar.
+ */
+export function cambioSoloUnDia(
+  bloque: BloqueAgenda,
+  dia: number,
+  datos: DatosDeBloque,
+): CambioUnDia {
+  const nuevo = { ...datos, dias_semana: [dia] };
+  const diasRestantes = bloque.dias_semana.filter((d) => d !== dia);
+  return diasRestantes.length === 0
+    ? { tipo: 'editar', datos: nuevo }
+    : { tipo: 'separar', diasRestantes, nuevo };
+}

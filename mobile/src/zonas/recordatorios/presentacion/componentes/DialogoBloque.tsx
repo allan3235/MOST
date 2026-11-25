@@ -2,11 +2,13 @@
  * @file DialogoBloque.tsx
  * @proyecto most.
  * @descripcion Crear o editar un bloque ocupado de la agenda (RF-02): nombre corto, días y horas
- *   de inicio y fin (reloj de Android, como el resto de la app). Valida antes de guardar.
+ *   de inicio y fin (ruedas de hora). Valida antes de guardar. Con `soloDia`, el cambio es solo
+ *   para ese día y no se eligen días.
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-24
- * @version 1.0.0
+ * @version 1.1.0
  * @historial 1.0.0 (2026-11-24): creación.
+ *   1.1.0 (2026-11-25): `soloDia` y `diasIniciales` (vista por día de «Mi agenda»).
  */
 
 import { useState } from 'react';
@@ -35,6 +37,10 @@ export type DialogoBloqueProps = {
   onGuardar: (datos: DatosBloque) => void;
   onEliminar: () => void;
   onCerrar: () => void;
+  /** Días marcados al crear un bloque nuevo (el día que se está viendo). */
+  diasIniciales?: number[];
+  /** El cambio aplica solo a este día ISO: no se muestran los días. */
+  soloDia?: number;
 };
 
 // ===== Constantes =====
@@ -50,10 +56,19 @@ const LARGO_HORA = 5;
  * @param props Bloque y acciones.
  * @returns El diálogo.
  */
-export function DialogoBloque({ bloque, onGuardar, onEliminar, onCerrar }: DialogoBloqueProps) {
+export function DialogoBloque({
+  bloque,
+  onGuardar,
+  onEliminar,
+  onCerrar,
+  diasIniciales = [],
+  soloDia,
+}: DialogoBloqueProps) {
   const t = es.agenda;
   const [nombre, setNombre] = useState(bloque?.nombre ?? '');
-  const [dias, setDias] = useState<number[]>(bloque?.dias_semana ?? []);
+  const [dias, setDias] = useState<number[]>(
+    soloDia !== undefined ? [soloDia] : (bloque?.dias_semana ?? diasIniciales),
+  );
   const [inicio, setInicio] = useState(
     bloque?.hora_inicio.slice(0, LARGO_HORA) ?? INICIO_POR_DEFECTO,
   );
@@ -85,15 +100,21 @@ export function DialogoBloque({ bloque, onGuardar, onEliminar, onCerrar }: Dialo
         maxLength={LARGO_MAXIMO_NOMBRE}
         invalido={intentado && error === 'sin_nombre'}
       />
-      <View className="gap-2">
-        <AppText weight="bold">{t.dias}</AppText>
-        <DaySquares
-          value={dias}
-          onChange={setDias}
-          iniciales={es.habitForm.iniciales}
-          nombres={es.habitForm.dias}
-        />
-      </View>
+      {soloDia !== undefined ? (
+        <AppText tone="ink-soft">
+          {formatear(t.soloEsteDiaAyuda, { dia: es.habitForm.dias[soloDia - 1] ?? '' })}
+        </AppText>
+      ) : (
+        <View className="gap-2">
+          <AppText weight="bold">{t.dias}</AppText>
+          <DaySquares
+            value={dias}
+            onChange={setDias}
+            iniciales={es.habitForm.iniciales}
+            nombres={es.habitForm.dias}
+          />
+        </View>
+      )}
       {/* Uno debajo del otro: en dos columnas el texto no cabe en el botón. */}
       <View className="gap-2">
         <Button
@@ -113,7 +134,13 @@ export function DialogoBloque({ bloque, onGuardar, onEliminar, onCerrar }: Dialo
         </AppText>
       ) : null}
       <Button label={t.guardar} onPress={guardar} />
-      {bloque ? <Button variant="tertiary" label={t.eliminar} onPress={onEliminar} /> : null}
+      {bloque ? (
+        <Button
+          variant="tertiary"
+          label={soloDia !== undefined && bloque.dias_semana.length > 1 ? t.quitarDia : t.eliminar}
+          onPress={onEliminar}
+        />
+      ) : null}
       <Button variant="tertiary" label={t.cancelar} onPress={onCerrar} />
       {reloj}
     </Dialog>

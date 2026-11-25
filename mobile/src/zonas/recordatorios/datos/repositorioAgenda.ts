@@ -75,3 +75,56 @@ export function eliminarBloque(id: string): Promise<void> {
     return [{ operacion: 'update', tabla: 'agenda_bloques', clave: id, payload: cambios }];
   });
 }
+
+/**
+ * Cambia solo los días de un bloque (por ejemplo, al quitarle un día).
+ * @param id Bloque.
+ * @param dias Días que le quedan.
+ */
+export function cambiarDiasBloque(id: string, dias: number[]): Promise<void> {
+  return aplicar(async (db) => {
+    const cambios = { dias_semana: dias };
+    await actualizarFila(
+      db,
+      'agenda_bloques',
+      { id },
+      { ...cambios, updated_at: new Date().toISOString() },
+    );
+    return [{ operacion: 'update', tabla: 'agenda_bloques', clave: id, payload: cambios }];
+  });
+}
+
+/**
+ * Separa un día de un bloque que se repite: el original se queda con los demás días y se crea un
+ * bloque nuevo solo para ese día. Va en una sola transacción: o se guardan los dos o ninguno.
+ * @param userId Usuario con sesión.
+ * @param id Bloque original.
+ * @param diasRestantes Días que le quedan al original.
+ * @param nuevo Datos del bloque de ese día.
+ */
+export function separarDiaDeBloque(
+  userId: string,
+  id: string,
+  diasRestantes: number[],
+  nuevo: DatosBloque,
+): Promise<void> {
+  return aplicar(async (db) => {
+    const ahora = new Date().toISOString();
+    const cambios = { dias_semana: diasRestantes };
+    await actualizarFila(db, 'agenda_bloques', { id }, { ...cambios, updated_at: ahora });
+    const fila = {
+      id: randomUUID(),
+      user_id: userId,
+      nombre: nuevo.nombre.trim(),
+      dias_semana: nuevo.dias_semana,
+      hora_inicio: nuevo.hora_inicio,
+      hora_fin: nuevo.hora_fin,
+      eliminado_en: null,
+    };
+    await guardarFilas(db, 'agenda_bloques', [{ ...fila, updated_at: ahora }]);
+    return [
+      { operacion: 'update', tabla: 'agenda_bloques', clave: id, payload: cambios },
+      { operacion: 'upsert', tabla: 'agenda_bloques', clave: fila.id, payload: fila },
+    ];
+  });
+}
