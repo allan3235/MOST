@@ -16,6 +16,7 @@ import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
 import { HabitCheckCard } from '@/zonas/habitos/presentacion/componentes/habit-check-card';
+import { useAgregarHabito } from './use-agregar-habito';
 import { useCheckIn } from './use-check-in';
 import { CoinBalance } from '@/zonas/plantas/presentacion/componentes/coin-balance';
 import { CoinBurst } from '@/zonas/plantas/presentacion/componentes/coin-burst';
@@ -66,6 +67,7 @@ export default function HoyScreen() {
   const jardin = useLocalQuery(`jardin-${userId}`, () => leerMiJardin(userId));
   const semanaApoyo = useLocalQuery(`apoyo-${userId}`, () => leerSemanaApoyo(userId));
   const checkIn = useCheckIn(userId);
+  const agregar = useAgregarHabito();
   const reprogramar = useReprogramacion(userId);
   const introspeccion = useIntrospeccion(userId);
   const progresion = useProgresion(userId);
@@ -303,12 +305,10 @@ export default function HoyScreen() {
           <AppText tone="ink-soft" className="text-center">
             {t.sinHabitos.descripcion}
           </AppText>
-          <Button
-            label={t.sinHabitos.crear}
-            onPress={() => navegar.push('/habit/nuevo')}
-            className="mt-2"
-          />
+          {/* Igual que el «+» de Hábitos: con micro-pasos o a su manera. */}
+          <Button label={t.sinHabitos.crear} onPress={agregar.elegir} className="mt-2" />
         </View>
+        {agregar.dialogo}
       </Screen>
     );
   }
