@@ -26,9 +26,9 @@ import {
   restaurarNoMolestar,
   type EstadoNoMolestar,
 } from '@/features/enfoque/domain/no-molestar';
-import { es, formatear } from '@/i18n/es';
-import { fechaLocal } from '@/lib/dates';
-import { colors } from '@/theme';
+import { es, formatear } from '@/comun/i18n/es';
+import { fechaLocal } from '@/comun/logica/dates';
+import { colors } from '@/comun/tema';
 
 import { NoMolestar } from '../../../modules/no-molestar';
 import { DIAS_PARA_AVISO } from './domain/aviso-motivacional';

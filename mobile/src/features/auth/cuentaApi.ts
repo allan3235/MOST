@@ -9,8 +9,8 @@
  * @historial 1.0.0 (2026-11-23): creación (reemplaza supabase.auth).
  */
 
-import { pedirApi } from '@/lib/clienteApi';
-import { establecerSesion } from '@/lib/sesionGuardada';
+import { pedirApi } from '@/comun/datos/clienteApi';
+import { establecerSesion } from '@/comun/datos/sesionGuardada';
 
 // ===== Tipos =====
 

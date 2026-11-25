@@ -1,9 +1,9 @@
-import { es } from '@/i18n/es';
-import { ErrorApi, ErrorSinRed } from '@/lib/clienteApi';
+import { es } from '@/comun/i18n/es';
+import { ErrorApi, ErrorSinRed } from '@/comun/datos/clienteApi';
 
 import { authErrorMessage } from '../auth-error-message';
 
-jest.mock('@/lib/env', () => ({ env: { urlApi: 'http://prueba' } }));
+jest.mock('@/comun/config/env', () => ({ env: { urlApi: 'http://prueba' } }));
 
 describe('authErrorMessage', () => {
   it('traduce los estados conocidos del backend', () => {

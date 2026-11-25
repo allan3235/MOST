@@ -16,14 +16,14 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { crearHabito } from '@/db/habits-repository';
 import { leerGlobalesFormulario } from '@/db/plan-repository';
 import { descomponerMeta } from '@/db/metasRepositorio';
-import { ESPERA_TOQUE_MS } from '@/lib/candado';
-import { es } from '@/i18n/es';
-import { navegar } from '@/lib/navegar';
+import { ESPERA_TOQUE_MS } from '@/comun/presentacion/candado';
+import { es } from '@/comun/i18n/es';
+import { navegar } from '@/comun/presentacion/navegar';
 
 import { PantallaCrearMeta } from '../PantallaCrearMeta';
 
 jest.mock('lucide-react-native', () => new Proxy({}, { get: () => () => null }));
-jest.mock('@/components/ui/back-button', () => ({ BackButton: () => null }));
+jest.mock('@/comun/presentacion/ui/back-button', () => ({ BackButton: () => null }));
 jest.mock('@/db/habits-repository', () => ({ crearHabito: jest.fn() }));
 jest.mock('@/db/metasRepositorio', () => ({ descomponerMeta: jest.fn() }));
 jest.mock('@/db/settings-repository', () => ({
@@ -44,7 +44,9 @@ jest.mock('@/db/plan-repository', () => ({
 jest.mock('@/features/auth/session-context', () => ({
   useSession: () => ({ session: { user: { id: 'u1' } } }),
 }));
-jest.mock('@/lib/navegar', () => ({ navegar: { back: jest.fn(), replace: jest.fn() } }));
+jest.mock('@/comun/presentacion/navegar', () => ({
+  navegar: { back: jest.fn(), replace: jest.fn() },
+}));
 
 // ===== Datos de prueba =====
 

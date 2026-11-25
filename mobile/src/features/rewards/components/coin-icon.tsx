@@ -1,6 +1,6 @@
 import Svg, { Circle, Path } from 'react-native-svg';
 
-import { colors } from '@/theme';
+import { colors } from '@/comun/tema';
 
 // Moneda rellena: la recompensa se distingue de los iconos de línea de la interfaz. Es decorativa;
 // quien la usa dice la cantidad al lector de pantalla.

@@ -16,13 +16,13 @@ import { nuevaVersionHorario, type VersionHorario } from '@/features/habits/doma
 import { alcanzoLimiteHabitos, limiteHabitos } from '@/features/habits/domain/limite-habitos';
 import { ajustePresupuesto, minutosPorDia } from '@/features/habits/domain/presupuesto';
 import { aplicarArchivar } from '@/features/rewards/domain/recompensas';
-import { fechaLocal, sumarDias } from '@/lib/dates';
-import { AREAS, type Area } from '@/schemas/onboarding';
+import { fechaLocal, sumarDias } from '@/comun/logica/dates';
+import { AREAS, type Area } from '@/comun/logica/esquemas/onboarding';
 import type { HabitoFormValues } from '@/schemas/habit';
-import type { OperacionOutbox } from '@/sync/domain/sync-rules';
+import type { OperacionOutbox } from '@/comun/logica/sync/sync-rules';
 
-import { aplicar } from './aplicar-cambio';
-import { actualizarFila, getDb, guardarFilas, leerFilas } from './database';
+import { aplicar } from '@/comun/datos/aplicar-cambio';
+import { actualizarFila, getDb, guardarFilas, leerFilas } from '@/comun/datos/database';
 import { leerConfig, leerEstado } from './logs-repository';
 import { descartarMovidasDelPatron } from './occurrences-repository';
 

@@ -1,5 +1,5 @@
-import { diasEntre } from '@/lib/dates';
-import type { Historial } from '@/schemas/onboarding';
+import { diasEntre } from '@/comun/logica/dates';
+import type { Historial } from '@/comun/logica/esquemas/onboarding';
 
 // Apoyo de las semanas 3 y 4 (SDD 7.1): quien suele soltar un hábito a las pocas semanas
 // (`semanas_y_suelta`) recibe un mensaje en esas semanas, contadas desde que creó su plan. Con

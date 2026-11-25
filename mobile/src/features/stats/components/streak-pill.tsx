@@ -1,10 +1,10 @@
 import { Sprout } from 'lucide-react-native';
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
+import { AppText } from '@/comun/presentacion/ui/app-text';
 import { lineaDeRacha, pildoraDeRacha, type Racha } from '@/features/stats/domain/rachas';
-import { es, formatear } from '@/i18n/es';
-import { colors } from '@/theme';
+import { es, formatear } from '@/comun/i18n/es';
+import { colors } from '@/comun/tema';
 
 // Avance de un hábito (maqueta «Piezas», opción C con el verde rocío de A): un cuadro de 36 dp con
 // el total de veces completado y un brote. El número nunca baja (most. no tiene rachas que se

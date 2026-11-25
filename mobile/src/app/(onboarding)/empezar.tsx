@@ -4,16 +4,16 @@ import { CommonActions } from 'expo-router/react-navigation';
 import { useEffect } from 'react';
 import { Alert as AlertNativo, View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { BackButton } from '@/components/ui/back-button';
-import { Button } from '@/components/ui/button';
-import { Screen } from '@/components/ui/screen';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { BackButton } from '@/comun/presentacion/ui/back-button';
+import { Button } from '@/comun/presentacion/ui/button';
+import { Screen } from '@/comun/presentacion/ui/screen';
 import { useSession } from '@/features/auth/session-context';
 import { pilaParaRetomar } from '@/features/onboarding/domain/retomar';
 import { useOnboardingStore } from '@/features/onboarding/onboarding-store';
 import { usePlanReviewStore } from '@/features/plan/plan-review-store';
-import { es } from '@/i18n/es';
-import { navegar } from '@/lib/navegar';
+import { es } from '@/comun/i18n/es';
+import { navegar } from '@/comun/presentacion/navegar';
 
 // UC-01: «Empezar» lleva directo a la encuesta de 7 preguntas (ya no hay elección de modo): sin
 // perfil no se pueden armar micro-pasos a la medida. Una cuenta que entró antes sin encuesta

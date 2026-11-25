@@ -12,7 +12,7 @@ import {
   type Objetivo,
   type Obstaculo,
   type Respuestas,
-} from '@/schemas/onboarding';
+} from '@/comun/logica/esquemas/onboarding';
 
 // Reglas del formulario de 7 pasos (SDD 5.3), separadas de las pantallas para poder probarlas.
 

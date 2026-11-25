@@ -13,8 +13,8 @@ import { randomUUID } from 'expo-crypto';
 
 import type { BloqueAgenda } from '@/features/agenda/domain/agenda';
 
-import { aplicar } from './aplicar-cambio';
-import { actualizarFila, getDb, guardarFilas, leerFilas } from './database';
+import { aplicar } from '@/comun/datos/aplicar-cambio';
+import { actualizarFila, getDb, guardarFilas, leerFilas } from '@/comun/datos/database';
 
 // ===== Tipos =====
 

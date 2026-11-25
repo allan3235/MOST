@@ -1,9 +1,9 @@
 import { View } from 'react-native';
 
-import { Alert } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Screen } from '@/components/ui/screen';
-import { es } from '@/i18n/es';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { Button } from '@/comun/presentacion/ui/button';
+import { Screen } from '@/comun/presentacion/ui/screen';
+import { es } from '@/comun/i18n/es';
 
 import { useSession } from '../session-context';
 

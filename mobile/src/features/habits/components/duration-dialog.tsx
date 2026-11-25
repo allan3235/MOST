@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
-import { Alert } from '@/components/ui/alert';
-import { Dialog } from '@/components/ui/dialog';
-import { es, formatear } from '@/i18n/es';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { Dialog } from '@/comun/presentacion/ui/dialog';
+import { es, formatear } from '@/comun/i18n/es';
 
 import { textoDuracion } from '../domain/formato';
 import { DialogActions } from './dialog-actions';

@@ -1,9 +1,9 @@
 import { CalendarDays } from 'lucide-react-native';
 import { Pressable } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { es } from '@/i18n/es';
-import { colors } from '@/theme';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { es } from '@/comun/i18n/es';
+import { colors } from '@/comun/tema';
 
 // Botón «Hoy» del encabezado de Progreso: regresa a hoy en Diario y al periodo actual en Semanal y
 // Mensual. Píldora `campo` con borde, icono de calendario y texto en negritas, del mismo tipo que

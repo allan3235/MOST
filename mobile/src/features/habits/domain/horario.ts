@@ -1,4 +1,4 @@
-import { sumarDias } from '@/lib/dates';
+import { sumarDias } from '@/comun/logica/dates';
 
 import type { Horario } from './habitos-del-dia';
 

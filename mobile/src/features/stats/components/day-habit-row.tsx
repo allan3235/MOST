@@ -2,11 +2,11 @@ import { Check } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { Card } from '@/components/ui/card';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Card } from '@/comun/presentacion/ui/card';
 import type { EstadoDia } from '@/features/stats/domain/cumplimiento';
-import { es } from '@/i18n/es';
-import { colors } from '@/theme';
+import { es } from '@/comun/i18n/es';
+import { colors } from '@/comun/tema';
 
 // Un hábito de un día que no es hoy, en Diario (solo consulta: el check-in es solo para hoy).
 // Círculo verde con ✓ y «Hecho», contorno y «Sin marcar», o contorno punteado y «Te toca». Si

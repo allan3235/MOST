@@ -1,8 +1,8 @@
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
+import { AppText } from '@/comun/presentacion/ui/app-text';
 import type { EstadoDia } from '@/features/stats/domain/cumplimiento';
-import { es } from '@/i18n/es';
+import { es } from '@/comun/i18n/es';
 
 import { StatusCell } from './status-cell';
 

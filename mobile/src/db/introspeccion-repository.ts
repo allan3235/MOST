@@ -16,10 +16,10 @@ import {
   type MotivoIntrospeccion,
   type Respuestas,
 } from '@/features/introspeccion/domain/introspeccion';
-import { fechaLocal } from '@/lib/dates';
+import { fechaLocal } from '@/comun/logica/dates';
 
-import { getDb } from './database';
-import { avisarCambioLocal } from './db-version-store';
+import { getDb } from '@/comun/datos/database';
+import { avisarCambioLocal } from '@/comun/datos/db-version-store';
 
 // ===== Principal =====
 

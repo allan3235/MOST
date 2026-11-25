@@ -1,11 +1,11 @@
 import { CircleCheck } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 
-import { AppText, type TextTone } from '@/components/ui/app-text';
-import { es } from '@/i18n/es';
-import { useAccionUnica } from '@/lib/use-accion-unica';
+import { AppText, type TextTone } from '@/comun/presentacion/ui/app-text';
+import { es } from '@/comun/i18n/es';
+import { useAccionUnica } from '@/comun/presentacion/use-accion-unica';
 import type { BorradorPlan, HabitoPlan } from '@/schemas/plan';
-import { cardShadow, colors } from '@/theme';
+import { cardShadow, colors } from '@/comun/tema';
 
 import { textoHorario } from '../domain/plan-format';
 import { ListaMicroPasos } from './ListaMicroPasos';

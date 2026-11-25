@@ -2,11 +2,11 @@ import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback } from 'react';
 import { ScrollView, View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { BackButton } from '@/components/ui/back-button';
-import { Button } from '@/components/ui/button';
-import { ProgressSteps } from '@/components/ui/progress-steps';
-import { Screen } from '@/components/ui/screen';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { BackButton } from '@/comun/presentacion/ui/back-button';
+import { Button } from '@/comun/presentacion/ui/button';
+import { ProgressSteps } from '@/comun/presentacion/ui/progress-steps';
+import { Screen } from '@/comun/presentacion/ui/screen';
 import { FormQuestion } from '@/features/onboarding/components/form-question';
 import {
   leerPaso,
@@ -16,8 +16,8 @@ import {
 } from '@/features/onboarding/domain/form-rules';
 import { useOnboardingStore } from '@/features/onboarding/onboarding-store';
 import { useRutasPlan } from '@/features/plan/use-rutas-plan';
-import { es } from '@/i18n/es';
-import { navegar } from '@/lib/navegar';
+import { es } from '@/comun/i18n/es';
+import { navegar } from '@/comun/presentacion/navegar';
 
 // Formulario (SDD 5.1): una pregunta por pantalla. Cada paso es una entrada de la pila de
 // navegación, así que «atrás» regresa al paso anterior y las respuestas siguen en el almacén. En la

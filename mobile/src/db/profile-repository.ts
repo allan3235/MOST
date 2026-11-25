@@ -1,6 +1,6 @@
-import { pedirApi } from '@/lib/clienteApi';
+import { pedirApi } from '@/comun/datos/clienteApi';
 
-import { getDb, guardarFilas } from './database';
+import { getDb, guardarFilas } from '@/comun/datos/database';
 
 // Repositorio del perfil. Se lee del backend y se guarda una copia en SQLite: si no hay conexión
 // al abrir la app, se usa la copia local para llegar a las pestañas (SDD 3.4). El modo y el

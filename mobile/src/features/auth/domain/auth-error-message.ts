@@ -9,8 +9,8 @@
  * @historial 1.0.0: códigos de Supabase Auth. 2.0.0 (2026-11-23): estados del backend de most.
  */
 
-import { es } from '@/i18n/es';
-import { ErrorApi, ErrorSinRed } from '@/lib/clienteApi';
+import { es } from '@/comun/i18n/es';
+import { ErrorApi, ErrorSinRed } from '@/comun/datos/clienteApi';
 
 // ===== Constantes =====
 

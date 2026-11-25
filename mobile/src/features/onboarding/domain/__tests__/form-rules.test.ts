@@ -3,7 +3,7 @@ import {
   MOMENTOS_CON_HORA,
   OBSTACULOS,
   type Obstaculo,
-} from '@/schemas/onboarding';
+} from '@/comun/logica/esquemas/onboarding';
 import {
   alternarArea,
   alternarObjetivo,

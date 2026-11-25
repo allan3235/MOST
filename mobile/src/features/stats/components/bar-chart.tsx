@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
+import { AppText } from '@/comun/presentacion/ui/app-text';
 import type { Conteo } from '@/features/stats/domain/cumplimiento';
 import type { EtiquetaDivision } from '@/features/stats/domain/texto-periodo';
 

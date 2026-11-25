@@ -2,11 +2,11 @@ import { Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
-import { Alert } from '@/components/ui/alert';
-import { AppText } from '@/components/ui/app-text';
-import { BackButton } from '@/components/ui/back-button';
-import { Button } from '@/components/ui/button';
-import { Screen } from '@/components/ui/screen';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { BackButton } from '@/comun/presentacion/ui/back-button';
+import { Button } from '@/comun/presentacion/ui/button';
+import { Screen } from '@/comun/presentacion/ui/screen';
 import { generarBorrador } from '@/db/plan-repository';
 import { leerMinutosPorDia } from '@/db/settings-repository';
 import { respuestasCompletas } from '@/features/onboarding/domain/form-rules';
@@ -15,8 +15,8 @@ import { GrowingPlant } from '@/features/plan/components/growing-plant';
 import { PreparingSteps } from '@/features/plan/components/preparing-steps';
 import { usePlanReviewStore } from '@/features/plan/plan-review-store';
 import { useRutasPlan } from '@/features/plan/use-rutas-plan';
-import { es } from '@/i18n/es';
-import { navegar } from '@/lib/navegar';
+import { es } from '@/comun/i18n/es';
+import { navegar } from '@/comun/presentacion/navegar';
 
 // «Generando plan» (SDD 5.8 y 9.4): pide el borrador a generate-plan y pasa a la revisión.
 // Sin conexión muestra el mensaje y «Reintentar»; si la IA falla, el servidor ya responde con el

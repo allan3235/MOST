@@ -2,22 +2,22 @@ import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Alert as AlertNativo, View } from 'react-native';
 
-import { Alert } from '@/components/ui/alert';
-import { BackButton } from '@/components/ui/back-button';
-import { Screen } from '@/components/ui/screen';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { BackButton } from '@/comun/presentacion/ui/back-button';
+import { Screen } from '@/comun/presentacion/ui/screen';
 import { editarHabito, leerHabito } from '@/db/habits-repository';
 import { leerLimiteDuracion } from '@/db/settings-repository';
-import { useLocalQuery } from '@/db/use-local-query';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
 import { HabitWizard } from '@/features/habits/components/habit-wizard';
 import { textoDuracion } from '@/features/habits/domain/formato';
 import { valoresDeHabito } from '@/features/habits/domain/valores-formulario';
 import { MINUTOS_MINIMOS } from '@/features/progression/domain/progresion';
-import { es, formatear } from '@/i18n/es';
-import { fechaLocal } from '@/lib/dates';
+import { es, formatear } from '@/comun/i18n/es';
+import { fechaLocal } from '@/comun/logica/dates';
 import type { HabitoFormValues } from '@/schemas/habit';
-import { colors } from '@/theme';
-import { navegar } from '@/lib/navegar';
+import { colors } from '@/comun/tema';
+import { navegar } from '@/comun/presentacion/navegar';
 
 // Editar un hábito (mockups «Editar hábito #1–#3»): mismo asistente que al crear. La categoría no
 // cambia (definición 6) y la fecha de inicio solo si el hábito todavía no empieza. El horario se

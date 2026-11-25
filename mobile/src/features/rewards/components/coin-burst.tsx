@@ -9,8 +9,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { AppText } from '@/components/ui/app-text';
-import { formatear } from '@/i18n/es';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { formatear } from '@/comun/i18n/es';
 
 import { CoinIcon } from './coin-icon';
 

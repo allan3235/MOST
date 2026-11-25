@@ -10,8 +10,8 @@
  * @historial 1.0.0 (2026-11-23): creación.
  */
 
-import { ErrorApi, ErrorSinRed, pedirApi } from '@/lib/clienteApi';
-import type { Area } from '@/schemas/onboarding';
+import { ErrorApi, ErrorSinRed, pedirApi } from '@/comun/datos/clienteApi';
+import type { Area } from '@/comun/logica/esquemas/onboarding';
 import type { MicroPaso } from '@/schemas/plan';
 
 // ===== Tipos =====

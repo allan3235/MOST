@@ -1,17 +1,17 @@
 import { Sun } from 'lucide-react-native';
 import { ActivityIndicator, ScrollView, useWindowDimensions, View } from 'react-native';
 
-import { Alert } from '@/components/ui/alert';
-import { AppText } from '@/components/ui/app-text';
-import { Button } from '@/components/ui/button';
-import { Screen } from '@/components/ui/screen';
-import { Snackbar } from '@/components/ui/snackbar';
-import { avisarCambioLocal } from '@/db/db-version-store';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Button } from '@/comun/presentacion/ui/button';
+import { Screen } from '@/comun/presentacion/ui/screen';
+import { Snackbar } from '@/comun/presentacion/ui/snackbar';
+import { avisarCambioLocal } from '@/comun/logica/cambios-locales';
 import { leerHoy } from '@/db/habits-repository';
 import { leerSemanaApoyo } from '@/db/reminders-repository';
 import { leerJardin } from '@/db/rewards-repository';
 import { leerAjustesLocales } from '@/db/settings-repository';
-import { useLocalQuery } from '@/db/use-local-query';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
 import { HabitCheckCard } from '@/features/habits/components/habit-check-card';
 import { useCheckIn } from '@/features/habits/use-check-in';
@@ -30,9 +30,9 @@ import { TarjetaBarreras } from '@/features/reschedule/components/TarjetaBarrera
 import { useReprogramacion } from '@/features/reschedule/use-reprogramacion';
 import { descripcionPlanta, PlantImage } from '@/features/rewards/components/plant-image';
 import { plantaDestacada } from '@/features/rewards/domain/planta-destacada';
-import { es, formatear } from '@/i18n/es';
-import { colors } from '@/theme';
-import { navegar } from '@/lib/navegar';
+import { es, formatear } from '@/comun/i18n/es';
+import { colors } from '@/comun/tema';
+import { navegar } from '@/comun/presentacion/navegar';
 
 // Hoy (SDD 9.4 y mockup «Pantalla Dashboard»): monedas, tu planta más avanzada, la barra de avance
 // de los hábitos de hoy y sus tarjetas con casilla. De la barra hacia arriba queda fijo y solo se

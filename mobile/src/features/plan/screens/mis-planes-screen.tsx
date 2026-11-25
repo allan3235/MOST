@@ -1,10 +1,10 @@
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { BackButton } from '@/components/ui/back-button';
-import { Screen } from '@/components/ui/screen';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { BackButton } from '@/comun/presentacion/ui/back-button';
+import { Screen } from '@/comun/presentacion/ui/screen';
 import { useSession } from '@/features/auth/session-context';
-import { es } from '@/i18n/es';
+import { es } from '@/comun/i18n/es';
 
 import { MisPlanes } from '../components/mis-planes';
 

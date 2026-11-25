@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import Animated, { FadeOut } from 'react-native-reanimated';
 
-import { Alert } from '@/components/ui/alert';
-import { es } from '@/i18n/es';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { es } from '@/comun/i18n/es';
 
 import { msRestantesAviso, SEGUNDOS_AVISO_CADUCADA } from '../domain/sesion-caducada';
 import { marcarSesionCaducada, sesionCaducada } from '../sesion-caducada-store';

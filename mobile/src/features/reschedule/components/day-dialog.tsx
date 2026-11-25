@@ -1,9 +1,9 @@
 import { View } from 'react-native';
 
-import { Button } from '@/components/ui/button';
-import { ChoicePill } from '@/components/ui/choice-pill';
-import { Dialog } from '@/components/ui/dialog';
-import { es } from '@/i18n/es';
+import { Button } from '@/comun/presentacion/ui/button';
+import { ChoicePill } from '@/comun/presentacion/ui/choice-pill';
+import { Dialog } from '@/comun/presentacion/ui/dialog';
+import { es } from '@/comun/i18n/es';
 
 import { diaCorto } from '../domain/texto-dia';
 

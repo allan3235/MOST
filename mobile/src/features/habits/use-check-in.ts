@@ -5,10 +5,10 @@ import { completarHabito, deshacerHabito, RelojAtrasadoError } from '@/db/logs-r
 import { leerSonidoHitos, revisarHito } from '@/db/hitos-repository';
 import type { HitoParaCelebrar } from '@/features/progression/components/CelebracionHito';
 import { mandarAvisoMotivacional } from '@/features/reminders/avisos';
-import { es, formatear } from '@/i18n/es';
-import { fechaLocal } from '@/lib/dates';
-import { useFechaHoy } from '@/lib/fecha-hoy';
-import type { Area } from '@/schemas/onboarding';
+import { es, formatear } from '@/comun/i18n/es';
+import { fechaLocal } from '@/comun/logica/dates';
+import { useFechaHoy } from '@/comun/logica/fecha-hoy';
+import type { Area } from '@/comun/logica/esquemas/onboarding';
 
 import { DURACION_COIN_BURST } from '../rewards/components/coin-burst';
 import type { Celebracion } from '../rewards/components/phase-celebration';

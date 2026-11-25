@@ -1,4 +1,4 @@
-import type { Area } from '@/schemas/onboarding';
+import type { Area } from '@/comun/logica/esquemas/onboarding';
 
 import type { TipoAccesorio } from './domain/equipar';
 

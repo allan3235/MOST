@@ -8,13 +8,13 @@
  * @historial 1.0.0 (2026-11-23): creación.
  */
 
-import { ErrorApi, ErrorSinRed, pedirApi } from '@/lib/clienteApi';
+import { ErrorApi, ErrorSinRed, pedirApi } from '@/comun/datos/clienteApi';
 
 import { descomponerMeta } from '../metasRepositorio';
 
-jest.mock('@/lib/env', () => ({ env: { urlApi: 'http://prueba' } }));
-jest.mock('@/lib/clienteApi', () => {
-  const real = jest.requireActual('@/lib/clienteApi');
+jest.mock('@/comun/config/env', () => ({ env: { urlApi: 'http://prueba' } }));
+jest.mock('@/comun/datos/clienteApi', () => {
+  const real = jest.requireActual('@/comun/datos/clienteApi');
   return { ...real, pedirApi: jest.fn() };
 });
 

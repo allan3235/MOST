@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
-import { Alert } from '@/components/ui/alert';
-import { AppText } from '@/components/ui/app-text';
-import { Dialog } from '@/components/ui/dialog';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Dialog } from '@/comun/presentacion/ui/dialog';
 import { DialogActions } from '@/features/habits/components/dialog-actions';
 import { DurationWheels } from '@/features/habits/components/duration-wheels';
 import { textoDuracion } from '@/features/habits/domain/formato';
 import { limiteTiempoDiario } from '@/features/habits/domain/presupuesto';
-import { es, formatear } from '@/i18n/es';
+import { es, formatear } from '@/comun/i18n/es';
 
 // Tiempo diario (`presupuesto_min`) en Perfil: las mismas ruedas de Horas y Minutos que la
 // duración de un hábito, de 1 min a 8 h. Debajo se ve cuánto suma el día con más hábitos; bajar

@@ -11,7 +11,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { colors } from '@/theme';
+import { colors } from '@/comun/tema';
 
 // Planta que crece mientras se prepara el plan (SDD 9.4). Movimiento sobrio y suave; si el
 // teléfono tiene «reducir movimiento», la planta se queda quieta.

@@ -1,9 +1,9 @@
 import { ChevronRight, Pause, Pencil, Play, Trash2, type LucideIcon } from 'lucide-react-native';
 import { Modal, Pressable, useWindowDimensions, View } from 'react-native';
 
-import { AppText, type TextTone } from '@/components/ui/app-text';
-import { es } from '@/i18n/es';
-import { cardShadow, colors } from '@/theme';
+import { AppText, type TextTone } from '@/comun/presentacion/ui/app-text';
+import { es } from '@/comun/i18n/es';
+import { cardShadow, colors } from '@/comun/tema';
 
 // Menú ⋮ de un hábito (mockups «Hábitos #2» y «#3.1 Reanudar hábito»): un globo pegado a los
 // tres puntos con Editar, Pausar o Reanudar y Eliminar. Se abre hacia abajo y, si no cabe, hacia

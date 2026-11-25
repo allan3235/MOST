@@ -1,9 +1,9 @@
 import { CircleCheck, Clock } from 'lucide-react-native';
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { es } from '@/i18n/es';
-import { colors } from '@/theme';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { es } from '@/comun/i18n/es';
+import { colors } from '@/comun/tema';
 
 // Pasos de «Estamos preparando algo único…» (mockup «Encuesta Inicial: Preparando»): cada paso
 // cambia de reloj a verificación cuando termina. El estado también se dice con texto para el

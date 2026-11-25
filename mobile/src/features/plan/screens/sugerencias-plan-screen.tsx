@@ -3,10 +3,10 @@ import { RefreshCw } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { BackButton } from '@/components/ui/back-button';
-import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { Screen } from '@/components/ui/screen';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { BackButton } from '@/comun/presentacion/ui/back-button';
+import { ConfirmDialog } from '@/comun/presentacion/ui/confirm-dialog';
+import { Screen } from '@/comun/presentacion/ui/screen';
 import { PlanHabitCard } from '@/features/plan/components/plan-habit-card';
 import {
   paginaDeSugerencias,
@@ -15,10 +15,10 @@ import {
 } from '@/features/plan/domain/plan-review';
 import { usePlanReviewStore } from '@/features/plan/plan-review-store';
 import { useRutasPlan } from '@/features/plan/use-rutas-plan';
-import { es, formatear } from '@/i18n/es';
+import { es, formatear } from '@/comun/i18n/es';
 import type { HabitoPlan } from '@/schemas/plan';
-import { colors } from '@/theme';
-import { navegar } from '@/lib/navegar';
+import { colors } from '@/comun/tema';
+import { navegar } from '@/comun/presentacion/navegar';
 
 // «Sugerencias de hábitos» (mockups «Agregar otro hábito»): 4 hábitos de nivel 1 de objetivos que
 // no están en el plan, solo de su área (un plan por área). «Sugerir otros hábitos» muestra los 4

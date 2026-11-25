@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { Snackbar } from '@/components/ui/snackbar';
+import { ConfirmDialog } from '@/comun/presentacion/ui/confirm-dialog';
+import { Snackbar } from '@/comun/presentacion/ui/snackbar';
 import {
   archivarHabito,
   cambiarActivo,
@@ -9,9 +9,9 @@ import {
   type HabitoConHorario,
 } from '@/db/habits-repository';
 import { useSession } from '@/features/auth/session-context';
-import { es, formatear } from '@/i18n/es';
-import { useFechaHoy } from '@/lib/fecha-hoy';
-import { navegar } from '@/lib/navegar';
+import { es, formatear } from '@/comun/i18n/es';
+import { useFechaHoy } from '@/comun/logica/fecha-hoy';
+import { navegar } from '@/comun/presentacion/navegar';
 
 import { DialogoIntrospeccion } from '../introspeccion/components/DialogoIntrospeccion';
 import { useIntrospeccion } from '../introspeccion/use-introspeccion';

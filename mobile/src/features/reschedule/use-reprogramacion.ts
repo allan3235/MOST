@@ -7,9 +7,9 @@ import {
   reprogramarEnSilencio,
 } from '@/db/occurrences-repository';
 import { aliviarConPasoLigero, leerPasosLigeros } from '@/db/progression-repository';
-import { useLocalQuery } from '@/db/use-local-query';
-import { es, formatear } from '@/i18n/es';
-import { fechaLocal } from '@/lib/dates';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
+import { es, formatear } from '@/comun/i18n/es';
+import { fechaLocal } from '@/comun/logica/dates';
 
 import { alternativasPara, type Barrera } from './domain/barreras';
 import type { Propuesta } from './domain/reprogramar';

@@ -19,14 +19,14 @@ import {
 } from '@/features/stats/domain/cumplimiento';
 import { ajustarMinutosEnTitulo } from '@most/compartido/textos';
 
-import { diasEntre, sumarDias } from '@/lib/dates';
+import { diasEntre, sumarDias } from '@/comun/logica/dates';
 import {
   areaDeObjetivo,
   OBJETIVOS,
   tieneObstaculo,
   type Objetivo,
   type Respuestas,
-} from '@/schemas/onboarding';
+} from '@/comun/logica/esquemas/onboarding';
 import type { HabitoPlan, Nivel } from '@/schemas/plan';
 
 // Progresión (SDD 6.3). Funciones puras: reciben lo que ya está en SQLite y deciden qué proponer.

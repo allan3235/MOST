@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { View } from 'react-native';
 
-import { Alert } from '@/components/ui/alert';
-import { AppText } from '@/components/ui/app-text';
-import { Button } from '@/components/ui/button';
-import { Field } from '@/components/ui/field';
-import { Screen } from '@/components/ui/screen';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Button } from '@/comun/presentacion/ui/button';
+import { Field } from '@/comun/presentacion/ui/field';
+import { Screen } from '@/comun/presentacion/ui/screen';
 import { AuthHeader } from '@/features/auth/components/auth-header';
 import { SessionExpiredNotice } from '@/features/auth/components/session-expired-notice';
 import { iniciarSesion } from '@/features/auth/cuentaApi';
@@ -19,8 +19,8 @@ import {
   type LoginInput,
   type LoginValues,
 } from '@/features/auth/domain/auth-schemas';
-import { es } from '@/i18n/es';
-import { navegar } from '@/lib/navegar';
+import { es } from '@/comun/i18n/es';
+import { navegar } from '@/comun/presentacion/navegar';
 
 export default function LoginScreen() {
   const t = es.auth;

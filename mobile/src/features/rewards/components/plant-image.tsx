@@ -2,8 +2,8 @@ import { Image } from 'expo-image';
 import { View } from 'react-native';
 
 import type { Accesorio } from '@/db/rewards-repository';
-import { es, formatear } from '@/i18n/es';
-import type { Area } from '@/schemas/onboarding';
+import { es, formatear } from '@/comun/i18n/es';
+import type { Area } from '@/comun/logica/esquemas/onboarding';
 
 import { cajaAccesorio, imagenAccesorio, imagenPlanta } from '../imagenes';
 

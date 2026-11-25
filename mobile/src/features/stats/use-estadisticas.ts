@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 
 import { leerDatosEstadisticas } from '@/db/stats-repository';
-import { useLocalQuery } from '@/db/use-local-query';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { estaVisible } from '@/features/habits/domain/habitos-del-dia';
-import { fechaLocal } from '@/lib/dates';
-import { AREAS, type Area } from '@/schemas/onboarding';
+import { fechaLocal } from '@/comun/logica/dates';
+import { AREAS, type Area } from '@/comun/logica/esquemas/onboarding';
 
 import {
   estadosDelRango,

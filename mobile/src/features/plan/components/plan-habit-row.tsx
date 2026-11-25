@@ -2,12 +2,12 @@ import { EllipsisVertical, Feather, Sprout } from 'lucide-react-native';
 import { useRef } from 'react';
 import { Pressable, View, type HostInstance } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
+import { AppText } from '@/comun/presentacion/ui/app-text';
 import type { Ancla } from '@/features/habits/components/habit-menu';
 import { textoHabito } from '@/features/habits/domain/formato';
-import { es, formatear } from '@/i18n/es';
-import { useAccionUnica } from '@/lib/use-accion-unica';
-import { colors } from '@/theme';
+import { es, formatear } from '@/comun/i18n/es';
+import { useAccionUnica } from '@/comun/presentacion/use-accion-unica';
+import { colors } from '@/comun/tema';
 
 // Fila de un hábito en el detalle del plan: título, días, hora y duración («Sin duración fija» si
 // es un recordatorio), sus veces completadas (nunca bajan) y «En pausa» si lo está. Tocarla abre la edición del hábito; el ⋮

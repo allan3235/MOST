@@ -1,8 +1,8 @@
 import { Pressable, View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
+import { AppText } from '@/comun/presentacion/ui/app-text';
 import { fichaDia } from '@/features/stats/domain/texto-periodo';
-import { cardShadow } from '@/theme';
+import { cardShadow } from '@/comun/tema';
 
 // Fichas de la semana en Diario: los 7 días de lunes a domingo, fijos. La semana se cambia con las
 // flechas de arriba (decisión del usuario: deslizar chocaba con el cambio de pantalla y rebotaba).

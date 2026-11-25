@@ -3,19 +3,19 @@ import type { SQLiteDatabase } from 'expo-sqlite';
 import type { Habito } from '@/features/habits/domain/habitos-del-dia';
 
 import { filasDelPlan, fechaLocal, type IdsPlan } from '@/features/plan/domain/plan-rows';
-import { ErrorSinRed, pedirApi } from '@/lib/clienteApi';
+import { ErrorSinRed, pedirApi } from '@/comun/datos/clienteApi';
 import {
   AREAS,
   globalesSchema,
   type Area,
   type Globales,
   type Respuestas,
-} from '@/schemas/onboarding';
+} from '@/comun/logica/esquemas/onboarding';
 import { borradorPlanSchema, type BorradorPlan } from '@/schemas/plan';
-import type { OperacionOutbox } from '@/sync/domain/sync-rules';
+import type { OperacionOutbox } from '@/comun/logica/sync/sync-rules';
 
-import { aplicar } from './aplicar-cambio';
-import { actualizarFila, getDb, leerFilas } from './database';
+import { aplicar } from '@/comun/datos/aplicar-cambio';
+import { actualizarFila, getDb, leerFilas } from '@/comun/datos/database';
 
 // Repositorio del plan. Habla directo con el backend: crear el plan exige conexión (definición 6),
 // así que no pasa por la cola de salida. Al llegar a las pestañas, la sincronización lo descarga

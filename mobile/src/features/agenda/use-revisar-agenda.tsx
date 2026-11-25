@@ -12,12 +12,12 @@
 
 import { useState, type ReactNode } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Dialog } from '@/components/ui/dialog';
+import { Button } from '@/comun/presentacion/ui/button';
+import { Dialog } from '@/comun/presentacion/ui/dialog';
 import { leerBloques } from '@/db/agenda-repository';
-import { useLocalQuery } from '@/db/use-local-query';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
-import { es, formatear } from '@/i18n/es';
+import { es, formatear } from '@/comun/i18n/es';
 
 import { bloqueQueChoca, primeraHoraLibre, type BloqueAgenda } from './domain/agenda';
 

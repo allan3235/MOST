@@ -6,7 +6,7 @@ import {
   type Ocurrencia,
   type Registro,
 } from '@/features/habits/domain/habitos-del-dia';
-import { diaIso, sumarDias } from '@/lib/dates';
+import { diaIso, sumarDias } from '@/comun/logica/dates';
 
 // Reprogramación de hábitos no hechos (SDD 6.2). Funciones puras: reciben las filas de SQLite y
 // deciden qué ofrecer mover y a qué día, sin consultar nada más.

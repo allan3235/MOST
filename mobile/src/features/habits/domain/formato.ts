@@ -1,4 +1,4 @@
-import { es, formatear } from '@/i18n/es';
+import { es, formatear } from '@/comun/i18n/es';
 
 import { horaCorta } from './horario';
 

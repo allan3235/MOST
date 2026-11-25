@@ -16,13 +16,13 @@ import { CalendarClock } from 'lucide-react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { BackButton } from '@/components/ui/back-button';
-import { Button } from '@/components/ui/button';
-import { Dialog } from '@/components/ui/dialog';
-import { MenuRow } from '@/components/ui/menu-row';
-import { Screen } from '@/components/ui/screen';
-import { Snackbar } from '@/components/ui/snackbar';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { BackButton } from '@/comun/presentacion/ui/back-button';
+import { Button } from '@/comun/presentacion/ui/button';
+import { Dialog } from '@/comun/presentacion/ui/dialog';
+import { MenuRow } from '@/comun/presentacion/ui/menu-row';
+import { Screen } from '@/comun/presentacion/ui/screen';
+import { Snackbar } from '@/comun/presentacion/ui/snackbar';
 import {
   eliminarBloque,
   guardarBloque,
@@ -34,10 +34,10 @@ import {
   leerHabitos,
   type HabitoConHorario,
 } from '@/db/habits-repository';
-import { useLocalQuery } from '@/db/use-local-query';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
-import { es, formatear } from '@/i18n/es';
-import { cardShadow } from '@/theme';
+import { es, formatear } from '@/comun/i18n/es';
+import { cardShadow } from '@/comun/tema';
 
 import { DialogoBloque } from '../components/DialogoBloque';
 import {

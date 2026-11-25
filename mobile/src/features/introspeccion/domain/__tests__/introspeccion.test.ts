@@ -9,7 +9,7 @@
  * @historial 1.0.0 (2026-11-23): creación.
  */
 
-import { es } from '@/i18n/es';
+import { es } from '@/comun/i18n/es';
 
 import { ESCALA, esRespuestaValida, PREGUNTAS, tocaReflexion } from '../introspeccion';
 

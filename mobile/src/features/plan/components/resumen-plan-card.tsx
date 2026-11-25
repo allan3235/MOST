@@ -2,9 +2,9 @@ import { CalendarClock, Sprout, type LucideIcon } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { es, formatear } from '@/i18n/es';
-import { cardShadow, colors } from '@/theme';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { es, formatear } from '@/comun/i18n/es';
+import { cardShadow, colors } from '@/comun/tema';
 
 import type { Avance } from '../domain/detalle-plan';
 

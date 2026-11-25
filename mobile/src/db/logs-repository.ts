@@ -11,12 +11,18 @@ import {
   type Planta,
   type ResultadoRecompensa,
 } from '@/features/rewards/domain/recompensas';
-import { fechaLocal } from '@/lib/dates';
-import { pedirSincronizacion } from '@/sync/sync-engine';
+import { fechaLocal } from '@/comun/logica/dates';
+import { pedirSincronizacion } from '@/comun/logica/sync/sync-engine';
 
-import { actualizarFila, enTransaccion, getDb, guardarFilas, leerFilas } from './database';
-import { avisarCambioLocal } from './db-version-store';
-import { encolar } from './outbox';
+import {
+  actualizarFila,
+  enTransaccion,
+  getDb,
+  guardarFilas,
+  leerFilas,
+} from '@/comun/datos/database';
+import { avisarCambioLocal } from '@/comun/datos/db-version-store';
+import { encolar } from '@/comun/datos/outbox';
 
 // Check-ins (habit_logs) con sus recompensas (SDD 6.1). Se marcan y se deshacen solo para hoy
 // (definición 6). En el teléfono se calcula al momento lo mismo que hará el servidor (XP de la

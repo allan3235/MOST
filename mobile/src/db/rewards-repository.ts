@@ -5,13 +5,13 @@ import {
   plantaParaEquipar,
   type TipoAccesorio,
 } from '@/features/rewards/domain/equipar';
-import { ErrorApi, pedirApi } from '@/lib/clienteApi';
-import { AREAS, type Area } from '@/schemas/onboarding';
-import { pedirSincronizacion, sincronizarAhora } from '@/sync/sync-engine';
+import { ErrorApi, pedirApi } from '@/comun/datos/clienteApi';
+import { AREAS, type Area } from '@/comun/logica/esquemas/onboarding';
+import { pedirSincronizacion, sincronizarAhora } from '@/comun/logica/sync/sync-engine';
 
-import { actualizarFila, enTransaccion, getDb, leerFilas } from './database';
-import { avisarCambioLocal } from './db-version-store';
-import { encolar } from './outbox';
+import { actualizarFila, enTransaccion, getDb, leerFilas } from '@/comun/datos/database';
+import { avisarCambioLocal } from '@/comun/datos/db-version-store';
+import { encolar } from '@/comun/datos/outbox';
 
 // Jardín y tienda (SDD 6.4 y 9.4). Se lee de SQLite. Equipar funciona sin conexión (cola de
 // salida); comprar no, porque el servidor revisa el saldo real.

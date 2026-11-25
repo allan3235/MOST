@@ -2,23 +2,23 @@ import { Bell, CalendarClock, Focus, LogOut, Sprout, Timer } from 'lucide-react-
 import { useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
-import { Alert } from '@/components/ui/alert';
-import { AppText } from '@/components/ui/app-text';
-import { Button } from '@/components/ui/button';
-import { MenuRow } from '@/components/ui/menu-row';
-import { Screen } from '@/components/ui/screen';
-import { Snackbar } from '@/components/ui/snackbar';
-import { avisarCambioLocal } from '@/db/db-version-store';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Button } from '@/comun/presentacion/ui/button';
+import { MenuRow } from '@/comun/presentacion/ui/menu-row';
+import { Screen } from '@/comun/presentacion/ui/screen';
+import { Snackbar } from '@/comun/presentacion/ui/snackbar';
+import { avisarCambioLocal } from '@/comun/logica/cambios-locales';
 import { leerMisPlanes } from '@/db/plan-repository';
 import { guardarAjustes, leerAjustesPerfil } from '@/db/settings-repository';
-import { useLocalQuery } from '@/db/use-local-query';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
 import { textoDuracion } from '@/features/habits/domain/formato';
 import { BudgetDialog } from '@/features/reminders/components/budget-dialog';
 import { useAvisosActivos } from '@/features/reminders/use-avisos-activos';
-import { es, formatear } from '@/i18n/es';
-import { navegar } from '@/lib/navegar';
-import { cardShadow, colors } from '@/theme';
+import { es, formatear } from '@/comun/i18n/es';
+import { navegar } from '@/comun/presentacion/navegar';
+import { cardShadow, colors } from '@/comun/tema';
 
 // Perfil (SDD 9.4; decisión del usuario, «índice con pantallas»): arriba la cuenta; debajo una
 // tarjeta con tres filas que resumen y abren lo suyo («Mis planes» y «Avisos y horas» abren su

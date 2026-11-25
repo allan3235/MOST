@@ -13,14 +13,14 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import { guardarBloque, leerBloques } from '@/db/agenda-repository';
 import { cambiarHoraRecordatorio, leerHabitos } from '@/db/habits-repository';
-import { es, formatear } from '@/i18n/es';
+import { es, formatear } from '@/comun/i18n/es';
 
 import PantallaAgenda from '../PantallaAgenda';
 
 jest.mock('lucide-react-native', () => new Proxy({}, { get: () => () => null }));
-jest.mock('@/components/ui/back-button', () => ({ BackButton: () => null }));
+jest.mock('@/comun/presentacion/ui/back-button', () => ({ BackButton: () => null }));
 // La barra animada usa Reanimated, que no corre en Jest: basta con ver su texto.
-jest.mock('@/components/ui/snackbar', () => ({
+jest.mock('@/comun/presentacion/ui/snackbar', () => ({
   Snackbar: ({ mensaje }: { mensaje: string | null }) => {
     const { Text } = jest.requireActual<typeof import('react-native')>('react-native');
     return mensaje ? <Text>{mensaje}</Text> : null;
@@ -29,7 +29,7 @@ jest.mock('@/components/ui/snackbar', () => ({
 jest.mock('@/features/auth/session-context', () => ({
   useSession: () => ({ session: { user: { id: 'u1' } } }),
 }));
-jest.mock('@/db/use-local-query', () => ({ useLocalQuery: () => ({ data: [] }) }));
+jest.mock('@/comun/presentacion/use-local-query', () => ({ useLocalQuery: () => ({ data: [] }) }));
 jest.mock('@/db/agenda-repository', () => ({
   leerBloques: jest.fn(),
   guardarBloque: jest.fn(async () => undefined),

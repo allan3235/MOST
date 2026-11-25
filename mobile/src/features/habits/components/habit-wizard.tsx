@@ -4,26 +4,26 @@ import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { BackHandler, Pressable, View } from 'react-native';
 
-import { Alert } from '@/components/ui/alert';
-import { AppText } from '@/components/ui/app-text';
-import { Button } from '@/components/ui/button';
-import { ChoiceDialog } from '@/components/ui/choice-dialog';
-import { DateWheelDialog } from '@/components/ui/date-wheel-dialog';
-import { DaySquares } from '@/components/ui/day-squares';
-import { Field } from '@/components/ui/field';
-import { OptionChip } from '@/components/ui/option-chip';
-import { ProgressSteps } from '@/components/ui/progress-steps';
-import { Screen } from '@/components/ui/screen';
-import { SettingsRow } from '@/components/ui/settings-row';
-import { es } from '@/i18n/es';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Button } from '@/comun/presentacion/ui/button';
+import { ChoiceDialog } from '@/comun/presentacion/ui/choice-dialog';
+import { DateWheelDialog } from '@/comun/presentacion/ui/date-wheel-dialog';
+import { DaySquares } from '@/comun/presentacion/ui/day-squares';
+import { Field } from '@/comun/presentacion/ui/field';
+import { OptionChip } from '@/comun/presentacion/ui/option-chip';
+import { ProgressSteps } from '@/comun/presentacion/ui/progress-steps';
+import { Screen } from '@/comun/presentacion/ui/screen';
+import { SettingsRow } from '@/comun/presentacion/ui/settings-row';
+import { es } from '@/comun/i18n/es';
 import {
   crearHabitoFormSchema,
   limitesDeTexto,
   type HabitoFormInput,
   type HabitoFormValues,
 } from '@/schemas/habit';
-import { AREAS } from '@/schemas/onboarding';
-import { cardShadow, colors } from '@/theme';
+import { AREAS } from '@/comun/logica/esquemas/onboarding';
+import { cardShadow, colors } from '@/comun/tema';
 
 import { usePermisoAvisos } from '@/features/reminders/use-permiso-avisos';
 

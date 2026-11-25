@@ -11,7 +11,7 @@
  * @historial 1.0.0 (2026-11-23): creación.
  */
 
-import { sumarDias } from '@/lib/dates';
+import { sumarDias } from '@/comun/logica/dates';
 
 // ===== Constantes =====
 

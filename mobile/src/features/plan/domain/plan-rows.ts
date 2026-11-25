@@ -3,7 +3,7 @@ import {
   type Area,
   type Objetivo,
   type Respuestas,
-} from '@/schemas/onboarding';
+} from '@/comun/logica/esquemas/onboarding';
 import type { BorradorPlan } from '@/schemas/plan';
 
 // Convierte el borrador confirmado en las filas que se guardan al pulsar «Empezar» (SDD 5.8).
@@ -178,4 +178,4 @@ export function filasDelPlan(input: {
   };
 }
 
-export { fechaLocal } from '@/lib/dates';
+export { fechaLocal } from '@/comun/logica/dates';

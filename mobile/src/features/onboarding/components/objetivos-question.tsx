@@ -1,8 +1,8 @@
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { OptionChip } from '@/components/ui/option-chip';
-import { es } from '@/i18n/es';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { OptionChip } from '@/comun/presentacion/ui/option-chip';
+import { es } from '@/comun/i18n/es';
 
 import { objetivosPorAreaElegida } from '../domain/form-rules';
 import { useOnboardingStore } from '../onboarding-store';

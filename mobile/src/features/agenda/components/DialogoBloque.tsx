@@ -13,14 +13,14 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { Button } from '@/components/ui/button';
-import { DaySquares } from '@/components/ui/day-squares';
-import { Dialog } from '@/components/ui/dialog';
-import { Field } from '@/components/ui/field';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Button } from '@/comun/presentacion/ui/button';
+import { DaySquares } from '@/comun/presentacion/ui/day-squares';
+import { Dialog } from '@/comun/presentacion/ui/dialog';
+import { Field } from '@/comun/presentacion/ui/field';
 import type { DatosBloque } from '@/db/agenda-repository';
 import { fechaDesdeHora, horaDesdeFecha } from '@/features/plan/domain/plan-review';
-import { es, formatear } from '@/i18n/es';
+import { es, formatear } from '@/comun/i18n/es';
 
 import { LARGO_MAXIMO_NOMBRE, validarBloque, type BloqueAgenda } from '../domain/agenda';
 

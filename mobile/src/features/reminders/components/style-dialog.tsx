@@ -1,9 +1,9 @@
 import { View } from 'react-native';
 
-import { Dialog } from '@/components/ui/dialog';
-import { OptionChip } from '@/components/ui/option-chip';
-import { es } from '@/i18n/es';
-import { ACOMPANAMIENTOS, type Acompanamiento } from '@/schemas/onboarding';
+import { Dialog } from '@/comun/presentacion/ui/dialog';
+import { OptionChip } from '@/comun/presentacion/ui/option-chip';
+import { es } from '@/comun/i18n/es';
+import { ACOMPANAMIENTOS, type Acompanamiento } from '@/comun/logica/esquemas/onboarding';
 
 // Estilo de los avisos en Perfil: las mismas opciones de la pregunta 7 del formulario (SDD 7.1).
 

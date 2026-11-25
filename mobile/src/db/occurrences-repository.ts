@@ -14,11 +14,11 @@ import {
   type Propuesta,
 } from '@/features/reschedule/domain/reprogramar';
 import type { Barrera } from '@/features/reschedule/domain/barreras';
-import { diaIso, fechaLocal, sumarDias } from '@/lib/dates';
-import type { OperacionOutbox } from '@/sync/domain/sync-rules';
+import { diaIso, fechaLocal, sumarDias } from '@/comun/logica/dates';
+import type { OperacionOutbox } from '@/comun/logica/sync/sync-rules';
 
-import { aplicar } from './aplicar-cambio';
-import { guardarFilas, getDb, leerFilas } from './database';
+import { aplicar } from '@/comun/datos/aplicar-cambio';
+import { guardarFilas, getDb, leerFilas } from '@/comun/datos/database';
 import { leerAjustesEn } from './settings-repository';
 
 // Reprogramación (SDD 6.2): qué ofrecer mover al abrir la app y cómo se guarda la decisión en

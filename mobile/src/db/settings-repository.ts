@@ -19,13 +19,13 @@ import {
   type Acompanamiento,
   type Obstaculo,
   type Tiempo,
-} from '@/schemas/onboarding';
-import { pedirSincronizacion } from '@/sync/sync-engine';
+} from '@/comun/logica/esquemas/onboarding';
+import { pedirSincronizacion } from '@/comun/logica/sync/sync-engine';
 
-import { actualizarFila, enTransaccion, getDb, leerFilas } from './database';
-import { avisarCambioLocal } from './db-version-store';
+import { actualizarFila, enTransaccion, getDb, leerFilas } from '@/comun/datos/database';
+import { avisarCambioLocal } from '@/comun/datos/db-version-store';
 import { leerHabitos } from './habits-repository';
-import { encolar } from './outbox';
+import { encolar } from '@/comun/datos/outbox';
 
 // Ajustes del usuario (`user_settings`). Se crean al confirmar el plan de la encuesta (UC-01); al
 // llegar a las pestañas, la sincronización los descarga a SQLite junto con `app_config`, y desde

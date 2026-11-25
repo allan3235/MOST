@@ -1,8 +1,8 @@
 import { Pressable, View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { es } from '@/i18n/es';
-import { useAccionUnica } from '@/lib/use-accion-unica';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { es } from '@/comun/i18n/es';
+import { useAccionUnica } from '@/comun/presentacion/use-accion-unica';
 
 // «Cancelar» y «Aceptar» de los diálogos de ruedas (duración y tiempo diario). «Aceptar» se apaga
 // con un valor no válido y no se puede tocar.

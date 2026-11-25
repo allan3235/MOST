@@ -15,12 +15,12 @@
 import { MessageCircleQuestionMark } from 'lucide-react-native';
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Button } from '@/comun/presentacion/ui/button';
+import { Card } from '@/comun/presentacion/ui/card';
 import { textoDuracion } from '@/features/habits/domain/formato';
-import { es, formatear } from '@/i18n/es';
-import { colors } from '@/theme';
+import { es, formatear } from '@/comun/i18n/es';
+import { colors } from '@/comun/tema';
 
 import { BARRERAS, type Alternativa, type Barrera } from '../domain/barreras';
 import type { Propuesta } from '../domain/reprogramar';

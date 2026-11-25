@@ -11,8 +11,8 @@
 
 import type { GuardadoFiltro } from '@/features/enfoque/domain/no-molestar';
 
-import { getDb } from './database';
-import { avisarCambioLocal } from './db-version-store';
+import { getDb } from '@/comun/datos/database';
+import { avisarCambioLocal } from '@/comun/datos/db-version-store';
 
 // ===== Constantes =====
 

@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { WheelColumn } from '@/components/ui/wheel-column';
-import { es } from '@/i18n/es';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { WheelColumn } from '@/comun/presentacion/ui/wheel-column';
+import { es } from '@/comun/i18n/es';
 
 import { textoDuracion } from '../domain/formato';
 

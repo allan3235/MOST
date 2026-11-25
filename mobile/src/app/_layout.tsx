@@ -20,6 +20,8 @@ import { useAppZone } from '@/features/auth/use-app-zone';
 import { prepararAvisos } from '@/features/reminders/avisos';
 import { useRespuestaAviso } from '@/features/reminders/use-respuesta-aviso';
 import { useSession } from '@/features/auth/session-context';
+// Se carga desde el arranque: cada escritura local pide una sincronización (se suscribe al cargar).
+import '@/comun/logica/sync/sync-engine';
 
 SplashScreen.preventAutoHideAsync().catch(() => {
   // En recargas rápidas la pantalla de carga ya puede estar oculta.

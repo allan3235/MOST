@@ -1,20 +1,20 @@
 import { ShoppingBag } from 'lucide-react-native';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 
-import { ActionSquare } from '@/components/ui/action-square';
-import { Alert } from '@/components/ui/alert';
-import { AppText } from '@/components/ui/app-text';
-import { Button } from '@/components/ui/button';
-import { Screen } from '@/components/ui/screen';
-import { avisarCambioLocal } from '@/db/db-version-store';
+import { ActionSquare } from '@/comun/presentacion/ui/action-square';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Button } from '@/comun/presentacion/ui/button';
+import { Screen } from '@/comun/presentacion/ui/screen';
+import { avisarCambioLocal } from '@/comun/logica/cambios-locales';
 import { leerJardin } from '@/db/rewards-repository';
-import { useLocalQuery } from '@/db/use-local-query';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
 import { CoinBalance } from '@/features/rewards/components/coin-balance';
 import { PlantPanel } from '@/features/rewards/components/plant-panel';
-import { es } from '@/i18n/es';
-import { colors } from '@/theme';
-import { navegar } from '@/lib/navegar';
+import { es } from '@/comun/i18n/es';
+import { colors } from '@/comun/tema';
+import { navegar } from '@/comun/presentacion/navegar';
 
 // Jardín (SDD 9.4 y mockup «Plantas #1»): las 5 plantas desde el primer día, con su fase y sus
 // accesorios, sin números de nivel ni XP. Tocar una planta abre sus detalles; la bolsa, única

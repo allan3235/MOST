@@ -5,15 +5,15 @@ import PagerView from 'react-native-pager-view';
 import { useReducedMotion } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Alert } from '@/components/ui/alert';
-import { AppText } from '@/components/ui/app-text';
-import { BackButton } from '@/components/ui/back-button';
-import { Button } from '@/components/ui/button';
-import { Snackbar } from '@/components/ui/snackbar';
-import { StableBoldText } from '@/components/ui/stable-bold-text';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { BackButton } from '@/comun/presentacion/ui/back-button';
+import { Button } from '@/comun/presentacion/ui/button';
+import { Snackbar } from '@/comun/presentacion/ui/snackbar';
+import { StableBoldText } from '@/comun/presentacion/ui/stable-bold-text';
 import { leerHabitos } from '@/db/habits-repository';
 import { equiparAccesorio, leerJardin, type Accesorio } from '@/db/rewards-repository';
-import { useLocalQuery } from '@/db/use-local-query';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
 import { HabitCheckCard } from '@/features/habits/components/habit-check-card';
 import { useAgregarHabito } from '@/features/habits/use-agregar-habito';
@@ -21,10 +21,10 @@ import { useHabitActions } from '@/features/habits/use-habit-actions';
 import { ObjectGrid, TIPOS_OBJETO } from '@/features/rewards/components/object-grid';
 import { PhaseCarousel } from '@/features/rewards/components/phase-carousel';
 import type { TipoAccesorio } from '@/features/rewards/domain/equipar';
-import { es, formatear } from '@/i18n/es';
-import { AREAS, type Area } from '@/schemas/onboarding';
-import { colors } from '@/theme';
-import { navegar } from '@/lib/navegar';
+import { es, formatear } from '@/comun/i18n/es';
+import { AREAS, type Area } from '@/comun/logica/esquemas/onboarding';
+import { colors } from '@/comun/tema';
+import { navegar } from '@/comun/presentacion/navegar';
 
 // Detalles de la planta (SDD 9.4, mockups «Detalles #1», «#2» y «#2.1»): la planta en sus 3 fases y un
 // panel con Hábitos y Objetos, que cambia tocando o deslizando. Equipar es instantáneo y funciona sin

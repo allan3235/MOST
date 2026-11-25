@@ -12,7 +12,7 @@
 import { createContext, useContext } from 'react';
 
 import type { AppMode, Profile } from '@/db/profile-repository';
-import type { Sesion } from '@/lib/sesionGuardada';
+import type { Sesion } from '@/comun/datos/sesionGuardada';
 
 // ===== Tipos =====
 

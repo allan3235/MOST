@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { useDbVersion } from '@/db/db-version-store';
+import { useDbVersion } from '@/comun/logica/cambios-locales';
 import {
   aceptarBajada,
   aplicarPasoLigeroIa,
@@ -11,12 +11,12 @@ import {
   pedirTextosIa,
   revisarProgresion,
 } from '@/db/progression-repository';
-import { useLocalQuery } from '@/db/use-local-query';
-import { es, formatear } from '@/i18n/es';
-import { ErrorSinRed } from '@/lib/clienteApi';
-import { fechaLocal } from '@/lib/dates';
-import { useSyncStore } from '@/sync/sync-store';
-import { navegar } from '@/lib/navegar';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
+import { es, formatear } from '@/comun/i18n/es';
+import { ErrorSinRed } from '@/comun/datos/clienteApi';
+import { fechaLocal } from '@/comun/logica/dates';
+import { useSyncStore } from '@/comun/logica/sync/sync-store';
+import { navegar } from '@/comun/presentacion/navegar';
 
 import type { Tarjeta } from './domain/progresion';
 

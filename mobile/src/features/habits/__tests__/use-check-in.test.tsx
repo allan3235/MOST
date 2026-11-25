@@ -18,7 +18,7 @@ import { completarHabito } from '@/db/logs-repository';
 import { leerSonidoHitos, revisarHito } from '@/db/hitos-repository';
 import { CelebracionHito } from '@/features/progression/components/CelebracionHito';
 import { CoinBurst, DURACION_COIN_BURST } from '@/features/rewards/components/coin-burst';
-import { es, formatear } from '@/i18n/es';
+import { es, formatear } from '@/comun/i18n/es';
 
 import { useCheckIn } from '../use-check-in';
 
@@ -49,7 +49,7 @@ jest.mock('@/db/hitos-repository', () => ({
 jest.mock('@/features/reminders/avisos', () => ({
   mandarAvisoMotivacional: jest.fn(async () => undefined),
 }));
-jest.mock('@/lib/fecha-hoy', () => ({
+jest.mock('@/comun/logica/fecha-hoy', () => ({
   useFechaHoy: { getState: () => ({ revisar: () => false }) },
 }));
 const mockReproducir = jest.fn(async () => undefined);

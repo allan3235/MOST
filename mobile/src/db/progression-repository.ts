@@ -34,21 +34,21 @@ import type { Propuesta } from '@/features/reschedule/domain/reprogramar';
 import { avanceDelPaso, type AvancePaso } from '@/features/progression/domain/hitos';
 import { historial, type Pausa } from '@/features/stats/domain/cumplimiento';
 import { rachaDeHabito } from '@/features/stats/domain/rachas';
-import { pedirApi } from '@/lib/clienteApi';
-import { fechaLocal } from '@/lib/dates';
+import { pedirApi } from '@/comun/datos/clienteApi';
+import { fechaLocal } from '@/comun/logica/dates';
 import {
   AREAS,
   respuestasSchema,
   type Area,
   type Objetivo,
   type Respuestas,
-} from '@/schemas/onboarding';
+} from '@/comun/logica/esquemas/onboarding';
 import { type HabitoPlan, type PeticionAjuste } from '@/schemas/plan';
-import type { OperacionOutbox } from '@/sync/domain/sync-rules';
+import type { OperacionOutbox } from '@/comun/logica/sync/sync-rules';
 
-import { aplicar } from './aplicar-cambio';
-import { actualizarFila, getDb, guardarFilas, leerFilas } from './database';
-import { avisarCambioLocal } from './db-version-store';
+import { aplicar } from '@/comun/datos/aplicar-cambio';
+import { actualizarFila, getDb, guardarFilas, leerFilas } from '@/comun/datos/database';
+import { avisarCambioLocal } from '@/comun/datos/db-version-store';
 import { categoriasPorId, guardarVersionHorario, idCategoria } from './habits-repository';
 import { leerAvancesDePasos } from './hitos-repository';
 import { descartarMovidasDelPatron, filasDe, guardarOcurrencias } from './occurrences-repository';

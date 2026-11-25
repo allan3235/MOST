@@ -6,7 +6,7 @@ import type {
 } from '@/features/habits/domain/habitos-del-dia';
 import type { DatosEstadisticas, Pausa } from '@/features/stats/domain/cumplimiento';
 
-import { getDb, leerFilas } from './database';
+import { getDb, leerFilas } from '@/comun/datos/database';
 import { categoriasPorId } from './habits-repository';
 import { leerAjustesEn } from './settings-repository';
 

@@ -1,4 +1,4 @@
-import { HISTORIALES, type Historial } from '@/schemas/onboarding';
+import { HISTORIALES, type Historial } from '@/comun/logica/esquemas/onboarding';
 
 // P3 (historial) de un plan: cada plan guarda el suyo en `plans.respuestas`. Los planes de antes de
 // este cambio no lo tienen: se usa el del formulario global.

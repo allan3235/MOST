@@ -1,10 +1,10 @@
 import { Image } from 'expo-image';
 import { Modal, View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { Button } from '@/components/ui/button';
-import { es, formatear } from '@/i18n/es';
-import type { Area } from '@/schemas/onboarding';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Button } from '@/comun/presentacion/ui/button';
+import { es, formatear } from '@/comun/i18n/es';
+import type { Area } from '@/comun/logica/esquemas/onboarding';
 
 import { imagenPlanta } from '../imagenes';
 

@@ -2,10 +2,10 @@ import { Check, EllipsisVertical, Pause } from 'lucide-react-native';
 import { useRef, useState, type ReactNode } from 'react';
 import { Pressable, View, type HostInstance } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { es, formatear } from '@/i18n/es';
-import { useAccionUnica } from '@/lib/use-accion-unica';
-import { cardShadow, colors } from '@/theme';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { es, formatear } from '@/comun/i18n/es';
+import { useAccionUnica } from '@/comun/presentacion/use-accion-unica';
+import { cardShadow, colors } from '@/comun/tema';
 
 import { textoDuracion } from '../domain/formato';
 import { horaCorta } from '../domain/horario';

@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { Card } from '@/components/ui/card';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Card } from '@/comun/presentacion/ui/card';
 import type { Conteo } from '@/features/stats/domain/cumplimiento';
 import type { Vista } from '@/features/stats/domain/periodos';
 import type { EtiquetaDivision } from '@/features/stats/domain/texto-periodo';

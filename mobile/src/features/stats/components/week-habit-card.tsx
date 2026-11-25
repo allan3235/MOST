@@ -1,10 +1,10 @@
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { Card } from '@/components/ui/card';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Card } from '@/comun/presentacion/ui/card';
 import type { Celda, Conteo } from '@/features/stats/domain/cumplimiento';
 import type { Racha } from '@/features/stats/domain/rachas';
-import { es, formatear } from '@/i18n/es';
+import { es, formatear } from '@/comun/i18n/es';
 
 import { StatusCell } from './status-cell';
 import { StreakPill, textoRacha } from './streak-pill';

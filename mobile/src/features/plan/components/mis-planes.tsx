@@ -2,17 +2,17 @@ import { ChevronRight, Plus } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { Button } from '@/components/ui/button';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Button } from '@/comun/presentacion/ui/button';
 import { leerGlobalesFormulario, leerMisPlanes } from '@/db/plan-repository';
-import { useLocalQuery } from '@/db/use-local-query';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { ICONO_CATEGORIA } from '@/features/habits/categoria-icono';
 import { useOnboardingStore } from '@/features/onboarding/onboarding-store';
-import { es, formatear } from '@/i18n/es';
-import { useAccionUnica } from '@/lib/use-accion-unica';
-import { AREAS } from '@/schemas/onboarding';
-import { cardShadow, colors, tintes } from '@/theme';
-import { navegar } from '@/lib/navegar';
+import { es, formatear } from '@/comun/i18n/es';
+import { useAccionUnica } from '@/comun/presentacion/use-accion-unica';
+import { AREAS } from '@/comun/logica/esquemas/onboarding';
+import { cardShadow, colors, tintes } from '@/comun/tema';
+import { navegar } from '@/comun/presentacion/navegar';
 
 import { usePlanReviewStore } from '../plan-review-store';
 

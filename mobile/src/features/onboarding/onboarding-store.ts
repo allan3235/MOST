@@ -8,7 +8,7 @@ import {
   type Disponibilidad,
   type Objetivo,
   type Obstaculo,
-} from '@/schemas/onboarding';
+} from '@/comun/logica/esquemas/onboarding';
 
 import {
   alternarArea,

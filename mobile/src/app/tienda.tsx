@@ -2,23 +2,23 @@ import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, ScrollView, useWindowDimensions, View } from 'react-native';
 
-import { Alert, type AlertVariant } from '@/components/ui/alert';
-import { AppText } from '@/components/ui/app-text';
-import { BackButton } from '@/components/ui/back-button';
-import { Button } from '@/components/ui/button';
-import { Screen } from '@/components/ui/screen';
-import { avisarCambioLocal } from '@/db/db-version-store';
+import { Alert, type AlertVariant } from '@/comun/presentacion/ui/alert';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { BackButton } from '@/comun/presentacion/ui/back-button';
+import { Button } from '@/comun/presentacion/ui/button';
+import { Screen } from '@/comun/presentacion/ui/screen';
+import { avisarCambioLocal } from '@/comun/logica/cambios-locales';
 import { comprarAccesorio, equiparDesdeTienda, leerJardin } from '@/db/rewards-repository';
-import { useLocalQuery } from '@/db/use-local-query';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
 import { AccessoryCard } from '@/features/rewards/components/accessory-card';
 import { CoinBalance } from '@/features/rewards/components/coin-balance';
 import { PurchaseSheet } from '@/features/rewards/components/purchase-sheet';
 import type { TipoAccesorio } from '@/features/rewards/domain/equipar';
-import { es } from '@/i18n/es';
-import { AREAS, type Area } from '@/schemas/onboarding';
-import { colors } from '@/theme';
-import { navegar } from '@/lib/navegar';
+import { es } from '@/comun/i18n/es';
+import { AREAS, type Area } from '@/comun/logica/esquemas/onboarding';
+import { colors } from '@/comun/tema';
+import { navegar } from '@/comun/presentacion/navegar';
 
 // Tienda (SDD 6.4 y 9.4, mockups «Tienda #1–#3»): los 15 accesorios con su precio. Regresar, título
 // y monedero quedan fijos y solo se desplaza la lista. Tocar un objeto abre la hoja de compra.

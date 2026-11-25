@@ -1,5 +1,5 @@
 import type { Habito, Horario } from '@/features/habits/domain/habitos-del-dia';
-import { es } from '@/i18n/es';
+import { es } from '@/comun/i18n/es';
 
 import {
   AVISOS_POR_DEFECTO,

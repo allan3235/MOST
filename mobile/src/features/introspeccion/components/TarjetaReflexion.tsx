@@ -12,11 +12,11 @@
 import { Heart } from 'lucide-react-native';
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { es } from '@/i18n/es';
-import { colors } from '@/theme';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Button } from '@/comun/presentacion/ui/button';
+import { Card } from '@/comun/presentacion/ui/card';
+import { es } from '@/comun/i18n/es';
+import { colors } from '@/comun/tema';
 
 // ===== Tipos =====
 

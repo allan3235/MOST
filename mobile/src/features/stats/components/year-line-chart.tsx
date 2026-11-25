@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import Svg, { Circle, Line, Polyline } from 'react-native-svg';
 
-import { AppText } from '@/components/ui/app-text';
+import { AppText } from '@/comun/presentacion/ui/app-text';
 import type { Conteo } from '@/features/stats/domain/cumplimiento';
 import type { EtiquetaDivision } from '@/features/stats/domain/texto-periodo';
-import { colors } from '@/theme';
+import { colors } from '@/comun/tema';
 
 // Línea del año (SDD 8): un punto por mes con hechos / programados. Los meses sin días que contar
 // y los futuros no tienen punto, y la línea se corta ahí para no inventar un valor. Guías

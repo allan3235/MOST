@@ -2,12 +2,12 @@ import { Image } from 'expo-image';
 import { Check } from 'lucide-react-native';
 import { Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { Button } from '@/components/ui/button';
-import { ChoicePill } from '@/components/ui/choice-pill';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Button } from '@/comun/presentacion/ui/button';
+import { ChoicePill } from '@/comun/presentacion/ui/choice-pill';
 import type { Accesorio, PlantaJardin } from '@/db/rewards-repository';
-import { es, formatear } from '@/i18n/es';
-import { colors } from '@/theme';
+import { es, formatear } from '@/comun/i18n/es';
+import { colors } from '@/comun/tema';
 
 import type { TipoAccesorio } from '../domain/equipar';
 import { imagenAccesorio } from '../imagenes';

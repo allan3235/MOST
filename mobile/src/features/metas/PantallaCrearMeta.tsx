@@ -16,14 +16,14 @@
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
-import { Alert } from '@/components/ui/alert';
-import { AppText } from '@/components/ui/app-text';
-import { BackButton } from '@/components/ui/back-button';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { ChoicePill } from '@/components/ui/choice-pill';
-import { Field } from '@/components/ui/field';
-import { Screen } from '@/components/ui/screen';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { BackButton } from '@/comun/presentacion/ui/back-button';
+import { Button } from '@/comun/presentacion/ui/button';
+import { Card } from '@/comun/presentacion/ui/card';
+import { ChoicePill } from '@/comun/presentacion/ui/choice-pill';
+import { Field } from '@/comun/presentacion/ui/field';
+import { Screen } from '@/comun/presentacion/ui/screen';
 import { crearHabito } from '@/db/habits-repository';
 import {
   descomponerMeta,
@@ -34,10 +34,10 @@ import { leerGlobalesFormulario } from '@/db/plan-repository';
 import { leerAjustesLocales } from '@/db/settings-repository';
 import { useSession } from '@/features/auth/session-context';
 import { ListaMicroPasos } from '@/features/plan/components/ListaMicroPasos';
-import { es, formatear } from '@/i18n/es';
-import { fechaLocal } from '@/lib/dates';
-import { navegar } from '@/lib/navegar';
-import { AREAS, momentoPrincipal, type Area } from '@/schemas/onboarding';
+import { es, formatear } from '@/comun/i18n/es';
+import { fechaLocal } from '@/comun/logica/dates';
+import { navegar } from '@/comun/presentacion/navegar';
+import { AREAS, momentoPrincipal, type Area } from '@/comun/logica/esquemas/onboarding';
 
 // ===== Tipos =====
 

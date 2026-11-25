@@ -4,16 +4,16 @@ import { useState } from 'react';
 import { Modal, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Alert } from '@/components/ui/alert';
-import { AppText } from '@/components/ui/app-text';
-import { Button } from '@/components/ui/button';
-import { ChoicePill } from '@/components/ui/choice-pill';
-import { Field } from '@/components/ui/field';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Button } from '@/comun/presentacion/ui/button';
+import { ChoicePill } from '@/comun/presentacion/ui/choice-pill';
+import { Field } from '@/comun/presentacion/ui/field';
 import { useRevisarAgenda } from '@/features/agenda/use-revisar-agenda';
-import { es, formatear } from '@/i18n/es';
+import { es, formatear } from '@/comun/i18n/es';
 import { NOMBRE_MAX, NOMBRE_MIN, TODOS_LOS_DIAS } from '@/schemas/habit';
 import type { HabitoPlan } from '@/schemas/plan';
-import { colors } from '@/theme';
+import { colors } from '@/comun/tema';
 
 import type { CambiosHabitoPlan } from '../domain/plan-review';
 import { fechaDesdeHora, horaDesdeFecha } from '../domain/plan-review';

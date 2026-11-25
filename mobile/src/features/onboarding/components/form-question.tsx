@@ -1,5 +1,5 @@
-import { es } from '@/i18n/es';
-import { ACOMPANAMIENTOS, HISTORIALES, TIEMPOS } from '@/schemas/onboarding';
+import { es } from '@/comun/i18n/es';
+import { ACOMPANAMIENTOS, HISTORIALES, TIEMPOS } from '@/comun/logica/esquemas/onboarding';
 
 import type { Paso } from '../domain/form-rules';
 import { AreasQuestion } from './areas-question';

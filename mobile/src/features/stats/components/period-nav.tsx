@@ -2,8 +2,8 @@ import { ChevronLeft, ChevronRight, type LucideIcon } from 'lucide-react-native'
 import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { colors } from '@/theme';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { colors } from '@/comun/tema';
 
 // «‹  16–22 nov  ›»: cambia de periodo. La flecha derecha se apaga en el periodo actual y la
 // izquierda antes del primer horario. El nombre del periodo se anuncia al cambiar.

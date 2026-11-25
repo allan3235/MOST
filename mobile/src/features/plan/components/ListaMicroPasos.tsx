@@ -15,11 +15,11 @@
 import { Circle, CircleCheck, Footprints, type LucideIcon } from 'lucide-react-native';
 import { View } from 'react-native';
 
-import { AppText, type TextTone } from '@/components/ui/app-text';
+import { AppText, type TextTone } from '@/comun/presentacion/ui/app-text';
 import { textoDuracion } from '@/features/habits/domain/formato';
 import type { AvancePaso } from '@/features/progression/domain/hitos';
-import { es, formatear } from '@/i18n/es';
-import { colors } from '@/theme';
+import { es, formatear } from '@/comun/i18n/es';
+import { colors } from '@/comun/tema';
 
 // ===== Tipos =====
 

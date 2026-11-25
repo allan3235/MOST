@@ -17,10 +17,10 @@ import {
   type PlanApoyo,
   type SemanaApoyo,
 } from '@/features/reminders/domain/semana-apoyo';
-import { fechaLocal, sumarDias } from '@/lib/dates';
-import { globalesSchema, momentoPrincipal, type Momento } from '@/schemas/onboarding';
+import { fechaLocal, sumarDias } from '@/comun/logica/dates';
+import { globalesSchema, momentoPrincipal, type Momento } from '@/comun/logica/esquemas/onboarding';
 
-import { getDb, leerFilas } from './database';
+import { getDb, leerFilas } from '@/comun/datos/database';
 import { leerAjustesEn, leerConfigAvisos } from './settings-repository';
 
 // Lo que necesitan los avisos (SDD 7.1), leído de SQLite: funciona sin conexión.

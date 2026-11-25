@@ -15,10 +15,10 @@ import { notificationAsync, NotificationFeedbackType } from 'expo-haptics';
 import { useEffect } from 'react';
 import { Modal, View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { Button } from '@/components/ui/button';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Button } from '@/comun/presentacion/ui/button';
 import type { HitoAlcanzado } from '@/db/hitos-repository';
-import { es, formatear } from '@/i18n/es';
+import { es, formatear } from '@/comun/i18n/es';
 
 // ===== Tipos =====
 

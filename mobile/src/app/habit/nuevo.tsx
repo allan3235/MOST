@@ -2,11 +2,11 @@ import { useLocalSearchParams } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
 import { ActivityIndicator, Alert as AlertNativo, View } from 'react-native';
 
-import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { Screen } from '@/components/ui/screen';
+import { ConfirmDialog } from '@/comun/presentacion/ui/confirm-dialog';
+import { Screen } from '@/comun/presentacion/ui/screen';
 import { crearHabito } from '@/db/habits-repository';
 import { leerAjustesLocales } from '@/db/settings-repository';
-import { useLocalQuery } from '@/db/use-local-query';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
 import {
   borrarBorradorHabito,
@@ -17,12 +17,12 @@ import { HabitWizard } from '@/features/habits/components/habit-wizard';
 import type { PasoAsistente } from '@/features/habits/domain/borrador-habito';
 import { textoDuracion } from '@/features/habits/domain/formato';
 import { valoresNuevos } from '@/features/habits/domain/valores-formulario';
-import { es, formatear } from '@/i18n/es';
-import { fechaLocal } from '@/lib/dates';
+import { es, formatear } from '@/comun/i18n/es';
+import { fechaLocal } from '@/comun/logica/dates';
 import type { HabitoFormInput, HabitoFormValues } from '@/schemas/habit';
-import { AREAS, type Area } from '@/schemas/onboarding';
-import { colors } from '@/theme';
-import { navegar } from '@/lib/navegar';
+import { AREAS, type Area } from '@/comun/logica/esquemas/onboarding';
+import { colors } from '@/comun/tema';
+import { navegar } from '@/comun/presentacion/navegar';
 
 // Crear un hábito manual (SDD 6.5, mockups «Crear hábito #1–#3»). Se guarda en el teléfono y se
 // sube al sincronizar, así que funciona sin conexión. Al terminar se vuelve a la pestaña Hábitos;

@@ -5,10 +5,10 @@ import { Pressable, View } from 'react-native';
 import PagerView from 'react-native-pager-view';
 import { useReducedMotion } from 'react-native-reanimated';
 
-import { AppText } from '@/components/ui/app-text';
+import { AppText } from '@/comun/presentacion/ui/app-text';
 import type { PlantaJardin } from '@/db/rewards-repository';
-import { es, formatear } from '@/i18n/es';
-import { colors } from '@/theme';
+import { es, formatear } from '@/comun/i18n/es';
+import { colors } from '@/comun/tema';
 
 import { estadoFase, FASES } from '../domain/estado-fase';
 import { imagenPlanta } from '../imagenes';

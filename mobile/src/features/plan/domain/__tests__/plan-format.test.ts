@@ -1,4 +1,4 @@
-import { es } from '@/i18n/es';
+import { es } from '@/comun/i18n/es';
 
 import { textoDias, textoHorario } from '../plan-format';
 import { BORRADOR, habito } from '../__fixtures__/plan';

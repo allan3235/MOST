@@ -1,8 +1,8 @@
 import { Pressable } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { Dialog } from '@/components/ui/dialog';
-import { es, formatear } from '@/i18n/es';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Dialog } from '@/comun/presentacion/ui/dialog';
+import { es, formatear } from '@/comun/i18n/es';
 
 // Aviso con el límite de hábitos alcanzado (usuario guiado; cuenta los del plan y los propios), al
 // tocar «+» o al reanudar un hábito en pausa. Solo explica: no se crea ni se reanuda nada. Tocar fuera, «atrás» o «Entendido» lo cierran.

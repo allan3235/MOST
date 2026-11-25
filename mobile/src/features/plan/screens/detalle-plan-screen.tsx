@@ -3,12 +3,12 @@ import { Feather, LogOut, Plus } from 'lucide-react-native';
 import { useState, type ReactNode } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { BackButton } from '@/components/ui/back-button';
-import { Button } from '@/components/ui/button';
-import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { Screen } from '@/components/ui/screen';
-import { Snackbar } from '@/components/ui/snackbar';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { BackButton } from '@/comun/presentacion/ui/back-button';
+import { Button } from '@/comun/presentacion/ui/button';
+import { ConfirmDialog } from '@/comun/presentacion/ui/confirm-dialog';
+import { Screen } from '@/comun/presentacion/ui/screen';
+import { Snackbar } from '@/comun/presentacion/ui/snackbar';
 import { leerHabitos, type HabitoConHorario } from '@/db/habits-repository';
 import { sacarDelPlan, terminarPlan } from '@/db/plan-repository';
 import {
@@ -17,16 +17,16 @@ import {
   pedirTextosIa,
   type HabitoDelDetalle,
 } from '@/db/progression-repository';
-import { useLocalQuery } from '@/db/use-local-query';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
 import { ICONO_CATEGORIA } from '@/features/habits/categoria-icono';
 import { textoDuracion } from '@/features/habits/domain/formato';
 import { useHabitActions } from '@/features/habits/use-habit-actions';
 import { ProgressionCard } from '@/features/progression/components/progression-card';
 import { useProgresion } from '@/features/progression/use-progresion';
-import { es, formatear } from '@/i18n/es';
-import { cardShadow, colors, tintes } from '@/theme';
-import { navegar } from '@/lib/navegar';
+import { es, formatear } from '@/comun/i18n/es';
+import { cardShadow, colors, tintes } from '@/comun/tema';
+import { navegar } from '@/comun/presentacion/navegar';
 
 import { ListaMicroPasos } from '../components/ListaMicroPasos';
 import { PlanHabitRow } from '../components/plan-habit-row';

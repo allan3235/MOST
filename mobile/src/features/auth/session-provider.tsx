@@ -12,7 +12,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
-import { asegurarDuenoBaseLocal, vaciarBaseLocal } from '@/db/database';
+import { asegurarDuenoBaseLocal, vaciarBaseLocal } from '@/comun/datos/database';
 import { getProfile, saveMode, type AppMode, type Profile } from '@/db/profile-repository';
 import { cancelarAvisos } from '@/features/reminders/avisos';
 import {
@@ -20,9 +20,9 @@ import {
   escucharSesion,
   establecerSesion,
   type Sesion,
-} from '@/lib/sesionGuardada';
-import { deviceTimeZone } from '@/lib/time-zone';
-import { sincronizarAhora } from '@/sync/sync-engine';
+} from '@/comun/datos/sesionGuardada';
+import { deviceTimeZone } from '@/comun/logica/time-zone';
+import { sincronizarAhora } from '@/comun/logica/sync/sync-engine';
 
 import { caducoSinConexion } from './domain/sesion-caducada';
 import { leerUltimaConexion, marcarConexion, marcarSesionCaducada } from './sesion-caducada-store';

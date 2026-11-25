@@ -1,13 +1,13 @@
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 
-import { Alert } from '@/components/ui/alert';
-import { AppText } from '@/components/ui/app-text';
-import { Button } from '@/components/ui/button';
-import { Screen } from '@/components/ui/screen';
-import { SegmentedControl } from '@/components/ui/segmented-control';
-import { avisarCambioLocal } from '@/db/db-version-store';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Button } from '@/comun/presentacion/ui/button';
+import { Screen } from '@/comun/presentacion/ui/screen';
+import { SegmentedControl } from '@/comun/presentacion/ui/segmented-control';
+import { avisarCambioLocal } from '@/comun/logica/cambios-locales';
 import { leerHabitos } from '@/db/habits-repository';
-import { useLocalQuery } from '@/db/use-local-query';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
 import { HabitCheckCard } from '@/features/habits/components/habit-check-card';
 import { useHabitActions } from '@/features/habits/use-habit-actions';
@@ -36,8 +36,8 @@ import {
   fraseResumen,
 } from '@/features/stats/domain/texto-periodo';
 import { useEstadisticas, type Escala, type Pestana } from '@/features/stats/use-estadisticas';
-import { es } from '@/i18n/es';
-import { colors } from '@/theme';
+import { es } from '@/comun/i18n/es';
+import { colors } from '@/comun/tema';
 
 // Progreso (SDD 8 y 9.4): diseño del usuario a partir de la pantalla vieja «Calendario» de Figma y
 // de las maquetas que eligió. Pestañas Diario / Semanal / Mensual (con Mes / Año) como estado de la

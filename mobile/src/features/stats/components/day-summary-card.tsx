@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { Card } from '@/components/ui/card';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Card } from '@/comun/presentacion/ui/card';
 
 // Resumen de un día en Diario: la frase («Llevas 1 de 3 hoy») y, si ese día hay algo hecho o por
 // hacer, una barra de avance como la de Hoy (pista `divisor`, relleno `accent`). En días futuros

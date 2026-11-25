@@ -3,15 +3,15 @@ import { Plus } from 'lucide-react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
-import { Alert } from '@/components/ui/alert';
-import { AppText } from '@/components/ui/app-text';
-import { BackButton } from '@/components/ui/back-button';
-import { Button } from '@/components/ui/button';
-import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { Screen } from '@/components/ui/screen';
+import { Alert } from '@/comun/presentacion/ui/alert';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { BackButton } from '@/comun/presentacion/ui/back-button';
+import { Button } from '@/comun/presentacion/ui/button';
+import { ConfirmDialog } from '@/comun/presentacion/ui/confirm-dialog';
+import { Screen } from '@/comun/presentacion/ui/screen';
 import { guardarPlan } from '@/db/plan-repository';
 import { leerAjustes, leerMinutosPorDia } from '@/db/settings-repository';
-import { useLocalQuery } from '@/db/use-local-query';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
 import { minutosPorDia } from '@/features/habits/domain/presupuesto';
 import { respuestasCompletas } from '@/features/onboarding/domain/form-rules';
@@ -30,11 +30,11 @@ import { excesoDeTiempo } from '@/features/plan/domain/tiempo-libre';
 import { usePlanReviewStore } from '@/features/plan/plan-review-store';
 import { useRutasPlan } from '@/features/plan/use-rutas-plan';
 import { usePermisoAvisos } from '@/features/reminders/use-permiso-avisos';
-import { es, formatear } from '@/i18n/es';
+import { es, formatear } from '@/comun/i18n/es';
 import type { HabitoPlan } from '@/schemas/plan';
-import { sincronizarAhora } from '@/sync/sync-engine';
-import { colors } from '@/theme';
-import { navegar } from '@/lib/navegar';
+import { sincronizarAhora } from '@/comun/logica/sync/sync-engine';
+import { colors } from '@/comun/tema';
+import { navegar } from '@/comun/presentacion/navegar';
 
 // «Tu plan está listo» (SDD 5.8 y 9.4, mockups de la revisión del plan). El usuario edita, quita o
 // agrega hábitos (hasta 3) y al pulsar «Confirmar plan» se guarda todo. Hasta entonces el borrador

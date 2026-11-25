@@ -1,5 +1,5 @@
-import { es, formatear } from '@/i18n/es';
-import { diaIso } from '@/lib/dates';
+import { es, formatear } from '@/comun/i18n/es';
+import { diaIso } from '@/comun/logica/dates';
 
 import type { Conteo } from './cumplimiento';
 import type { Periodo, Rango } from './periodos';

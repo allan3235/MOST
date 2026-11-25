@@ -14,15 +14,16 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { ProgressionCard } from '@/features/progression/components/progression-card';
 import type { Tarjeta } from '@/features/progression/domain/progresion';
-import { es } from '@/i18n/es';
+import { es } from '@/comun/i18n/es';
 
-import { actualizarFila, leerFilas } from '../database';
+import { actualizarFila, leerFilas } from '@/comun/datos/database';
 import { aceptarBajada } from '../progression-repository';
 
 jest.mock('lucide-react-native', () => new Proxy({}, { get: () => () => null }));
-jest.mock('@/lib/env', () => ({ env: { urlApi: 'http://prueba' } }));
+jest.mock('@/comun/config/env', () => ({ env: { urlApi: 'http://prueba' } }));
 const mockSql: string[] = [];
-jest.mock('../aplicar-cambio', () => ({
+jest.mock('@/comun/datos/aplicar-cambio', () => ({
+  suscribirseAEscrituras: () => () => undefined,
   aplicar: async (cambio: (db: unknown) => Promise<unknown>) =>
     cambio({
       runAsync: async (sql: string) => {
@@ -31,7 +32,7 @@ jest.mock('../aplicar-cambio', () => ({
       },
     }),
 }));
-jest.mock('../database', () => ({
+jest.mock('@/comun/datos/database', () => ({
   getDb: jest.fn(),
   leerFilas: jest.fn(),
   actualizarFila: jest.fn(async () => undefined),

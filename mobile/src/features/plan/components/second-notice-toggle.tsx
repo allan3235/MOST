@@ -1,5 +1,5 @@
-import { SwitchRow } from '@/components/ui/switch-row';
-import { es } from '@/i18n/es';
+import { SwitchRow } from '@/comun/presentacion/ui/switch-row';
+import { es } from '@/comun/i18n/es';
 
 // Interruptor «Segundo aviso» de la revisión del plan (SDD 5.6).
 

@@ -19,8 +19,8 @@ import {
   type PorcentajeHito,
 } from '@/features/progression/domain/hitos';
 
-import { getDb } from './database';
-import { avisarCambioLocal } from './db-version-store';
+import { getDb } from '@/comun/datos/database';
+import { avisarCambioLocal } from '@/comun/datos/db-version-store';
 
 // ===== Tipos =====
 

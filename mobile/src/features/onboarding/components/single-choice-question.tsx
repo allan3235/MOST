@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 
-import { OptionChip } from '@/components/ui/option-chip';
+import { OptionChip } from '@/comun/presentacion/ui/option-chip';
 
 import type { Borrador } from '../domain/form-rules';
 import { useOnboardingStore } from '../onboarding-store';

@@ -1,10 +1,10 @@
 import { Sprout } from 'lucide-react-native';
 import { View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { BackButton } from '@/components/ui/back-button';
-import { colors } from '@/theme';
-import { navegar } from '@/lib/navegar';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { BackButton } from '@/comun/presentacion/ui/back-button';
+import { colors } from '@/comun/tema';
+import { navegar } from '@/comun/presentacion/navegar';
 
 // Encabezado de las pantallas de cuenta (mockups Login y Registrar): botón de regresar,
 // logotipo (provisional hasta tener el definitivo) y título.

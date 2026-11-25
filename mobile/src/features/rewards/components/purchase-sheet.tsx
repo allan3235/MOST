@@ -2,12 +2,12 @@ import { Image } from 'expo-image';
 import { Modal, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Alert, type AlertVariant } from '@/components/ui/alert';
-import { AppText } from '@/components/ui/app-text';
-import { Button } from '@/components/ui/button';
+import { Alert, type AlertVariant } from '@/comun/presentacion/ui/alert';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { Button } from '@/comun/presentacion/ui/button';
 import type { Accesorio } from '@/db/rewards-repository';
-import { es, formatear } from '@/i18n/es';
-import { cardShadow } from '@/theme';
+import { es, formatear } from '@/comun/i18n/es';
+import { cardShadow } from '@/comun/tema';
 
 import { estadoObjeto } from '../domain/estado-objeto';
 import { imagenAccesorio } from '../imagenes';

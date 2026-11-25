@@ -11,7 +11,7 @@
 
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
-import { ESPERA_TOQUE_MS } from '@/lib/candado';
+import { ESPERA_TOQUE_MS } from '@/comun/presentacion/candado';
 
 import { DialogoIntrospeccion } from '../DialogoIntrospeccion';
 

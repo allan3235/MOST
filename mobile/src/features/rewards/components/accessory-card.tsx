@@ -2,10 +2,10 @@ import { Image } from 'expo-image';
 import { Check } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
+import { AppText } from '@/comun/presentacion/ui/app-text';
 import type { Accesorio } from '@/db/rewards-repository';
-import { es, formatear } from '@/i18n/es';
-import { cardShadow, colors } from '@/theme';
+import { es, formatear } from '@/comun/i18n/es';
+import { cardShadow, colors } from '@/comun/tema';
 
 import { estadoObjeto } from '../domain/estado-objeto';
 import { imagenAccesorio } from '../imagenes';

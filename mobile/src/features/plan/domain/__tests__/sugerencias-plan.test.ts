@@ -1,5 +1,5 @@
-import { disponibilidadIgual } from '@/schemas/onboarding';
-import type { Respuestas } from '@/schemas/onboarding';
+import { disponibilidadIgual } from '@/comun/logica/esquemas/onboarding';
+import type { Respuestas } from '@/comun/logica/esquemas/onboarding';
 
 import type { ConfigPlan, FilaCatalogo } from '../plan-engine';
 import { sugerenciasPorNiveles } from '../sugerencias-plan';

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { AppState } from 'react-native';
 
-import { useDbVersion } from '@/db/db-version-store';
+import { useDbVersion } from '@/comun/logica/cambios-locales';
 
 import { reprogramarAvisos } from './avisos';
 

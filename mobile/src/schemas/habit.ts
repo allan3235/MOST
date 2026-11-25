@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import { es, formatear } from '@/i18n/es';
+import { es, formatear } from '@/comun/i18n/es';
 
-import { AREAS } from './onboarding';
+import { AREAS } from '@/comun/logica/esquemas/onboarding';
 
 // Asistente de crear y editar hábito (SDD 6.5, mockups «Crear hábito #1–#3»). La frecuencia son
 // días de la semana: es lo que guarda `habit_schedules.dias_semana`. Las fechas de inicio y fin son

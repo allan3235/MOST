@@ -14,20 +14,20 @@
 import { useEffect, useState } from 'react';
 import { Linking, Platform, View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
-import { BackButton } from '@/components/ui/back-button';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { OptionChip } from '@/components/ui/option-chip';
-import { Screen } from '@/components/ui/screen';
-import { Snackbar } from '@/components/ui/snackbar';
+import { AppText } from '@/comun/presentacion/ui/app-text';
+import { BackButton } from '@/comun/presentacion/ui/back-button';
+import { Button } from '@/comun/presentacion/ui/button';
+import { Card } from '@/comun/presentacion/ui/card';
+import { OptionChip } from '@/comun/presentacion/ui/option-chip';
+import { Screen } from '@/comun/presentacion/ui/screen';
+import { Snackbar } from '@/comun/presentacion/ui/snackbar';
 import { borrarEnfoque, leerEnfoqueHasta } from '@/db/enfoque-repository';
-import { useLocalQuery } from '@/db/use-local-query';
+import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/features/auth/session-context';
 import { iniciarEnfoque, restaurarTrasEnfoque, terminarEnfoque } from '@/features/reminders/avisos';
 
 import { NoMolestar } from '../../../../modules/no-molestar';
-import { es, formatear } from '@/i18n/es';
+import { es, formatear } from '@/comun/i18n/es';
 
 import { DURACIONES_ENFOQUE, estaEnEnfoque, finDeEnfoque, textoRestante } from '../domain/enfoque';
 import { estadoNoMolestar } from '../domain/no-molestar';

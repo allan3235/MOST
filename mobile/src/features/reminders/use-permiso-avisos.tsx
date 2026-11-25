@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, Linking, Platform } from 'react-native';
 
-import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { es } from '@/i18n/es';
+import { ConfirmDialog } from '@/comun/presentacion/ui/confirm-dialog';
+import { es } from '@/comun/i18n/es';
 
 import { alarmasExactasPermitidas, leerPermiso, pedirAlarmasExactas, pedirPermiso } from './avisos';
 import { debePedirAlarmasExactas, type SiguientePaso } from './domain/permiso';

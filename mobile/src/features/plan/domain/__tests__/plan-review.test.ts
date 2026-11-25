@@ -1,4 +1,4 @@
-import { disponibilidadIgual, MOMENTOS_CON_HORA } from '@/schemas/onboarding';
+import { disponibilidadIgual, MOMENTOS_CON_HORA } from '@/comun/logica/esquemas/onboarding';
 
 import {
   bajarNivel,
