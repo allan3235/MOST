@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 import { avisarCambioLocal } from '@/comun/datos/db-version-store';
 
-import { fechaLocal } from './dates';
+import { fechaLocal } from '@/comun/util/dates';
 
 // Fecha que muestra la app (pulidos antes del APK, estados de inactividad). Las pantallas calculan
 // «hoy» al dibujarse; si la app queda abierta pasada la medianoche, nada las vuelve a dibujar.

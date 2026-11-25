@@ -1,4 +1,4 @@
-import { diasEntre, sumarDias } from '@/comun/logica/dates';
+import { diasEntre, sumarDias } from '@/comun/util/dates';
 
 // Detalle del plan (decisión del usuario): «Cómo vas» y «Próxima revisión». Son reglas puras para
 // poder probarlas sin la app. Nunca se muestran niveles ni XP: solo hechos y días.

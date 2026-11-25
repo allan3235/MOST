@@ -8,7 +8,7 @@ import { Screen } from '@/comun/presentacion/ui/screen';
 import { Snackbar } from '@/comun/presentacion/ui/snackbar';
 import { avisarCambioLocal } from '@/comun/logica/cambios-locales';
 import { leerHoy } from '@/db/habits-repository';
-import { leerSemanaApoyo } from '@/db/reminders-repository';
+import { leerSemanaApoyo } from '@/zonas/recordatorios/logica/servicioAvisos';
 import { leerMiJardin } from '@/zonas/plantas/logica/servicioPlantas';
 import { leerAjustesLocales } from '@/zonas/cuenta/logica/servicioAjustes';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';

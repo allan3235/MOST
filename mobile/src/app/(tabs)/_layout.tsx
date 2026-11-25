@@ -2,7 +2,7 @@ import { TopTabs } from 'expo-router/js-top-tabs';
 
 import { TabBar } from '@/comun/presentacion/ui/tab-bar';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
-import { useAvisos } from '@/features/reminders/use-avisos';
+import { useAvisos } from '@/zonas/recordatorios/presentacion/use-avisos';
 import { es } from '@/comun/i18n/es';
 import { useCambioDeDia } from '@/comun/presentacion/use-cambio-de-dia';
 import { useSync } from '@/comun/presentacion/use-sync';

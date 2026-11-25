@@ -11,7 +11,10 @@
  * @historial 1.0.0 (2026-11-24): creación (antes en features/reminders/avisos.ts y en la pantalla).
  */
 
-import { fijarEnfoqueEnMemoria, reprogramarEnSegundoPlano } from '@/features/reminders/avisos';
+import {
+  fijarEnfoqueEnMemoria,
+  reprogramarEnSegundoPlano,
+} from '@/zonas/recordatorios/logica/servicioAvisos';
 
 import {
   borrarEnfoque,

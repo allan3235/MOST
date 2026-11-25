@@ -1,5 +1,5 @@
 import { es, formatear } from '@/comun/i18n/es';
-import { diaIso, diasEntre } from '@/comun/logica/dates';
+import { diaIso, diasEntre } from '@/comun/util/dates';
 
 // Cómo se nombra el día destino de una reprogramación: «a hoy», «a mañana», «al jueves 19» en la
 // tarjeta, «para hoy», «para mañana», «para el jueves 19» en el aviso de éxito, y «Hoy», «Mañana»,

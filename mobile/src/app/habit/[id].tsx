@@ -14,7 +14,7 @@ import { textoDuracion } from '@/features/habits/domain/formato';
 import { valoresDeHabito } from '@/features/habits/domain/valores-formulario';
 import { MINUTOS_MINIMOS } from '@/features/progression/domain/progresion';
 import { es, formatear } from '@/comun/i18n/es';
-import { fechaLocal } from '@/comun/logica/dates';
+import { fechaLocal } from '@/comun/util/dates';
 import type { HabitoFormValues } from '@/schemas/habit';
 import { colors } from '@/comun/tema';
 import { navegar } from '@/comun/presentacion/navegar';

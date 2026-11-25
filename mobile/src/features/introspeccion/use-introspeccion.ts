@@ -13,7 +13,7 @@ import { useState } from 'react';
 
 import { guardarIntrospeccion, leerTocaReflexion } from '@/db/introspeccion-repository';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
-import { fechaLocal } from '@/comun/logica/dates';
+import { fechaLocal } from '@/comun/util/dates';
 
 import type { MotivoIntrospeccion, Respuestas } from './domain/introspeccion';
 

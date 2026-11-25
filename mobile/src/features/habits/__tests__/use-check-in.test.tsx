@@ -52,7 +52,7 @@ jest.mock('@/zonas/plantas/logica/servicioPlantas', () => ({
   revisarHito: jest.fn(),
   leerSonidoLogros: jest.fn(),
 }));
-jest.mock('@/features/reminders/avisos', () => ({
+jest.mock('@/zonas/recordatorios/logica/servicioAvisos', () => ({
   mandarAvisoMotivacional: jest.fn(async () => undefined),
 }));
 jest.mock('@/comun/logica/fecha-hoy', () => ({

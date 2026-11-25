@@ -13,8 +13,8 @@
 import { asegurarDuenoBaseLocal, vaciarBaseLocal } from '@/comun/datos/database';
 import { establecerSesion } from '@/comun/datos/sesionGuardada';
 import { sincronizarAhora } from '@/comun/logica/sync/sync-engine';
-import { deviceTimeZone } from '@/comun/logica/time-zone';
-import { cancelarAvisos } from '@/features/reminders/avisos';
+import { deviceTimeZone } from '@/comun/util/time-zone';
+import { cancelarAvisos } from '@/zonas/recordatorios/logica/servicioAvisos';
 
 import { getProfile, saveMode, type AppMode, type Profile } from '../datos/repositorioPerfil';
 

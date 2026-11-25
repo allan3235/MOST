@@ -29,7 +29,7 @@ import {
 import { excesoDeTiempo } from '@/features/plan/domain/tiempo-libre';
 import { usePlanReviewStore } from '@/features/plan/plan-review-store';
 import { useRutasPlan } from '@/features/plan/use-rutas-plan';
-import { usePermisoAvisos } from '@/features/reminders/use-permiso-avisos';
+import { usePermisoAvisos } from '@/zonas/recordatorios/presentacion/use-permiso-avisos';
 import { es, formatear } from '@/comun/i18n/es';
 import type { HabitoPlan } from '@/schemas/plan';
 import { sincronizarAhora } from '@/comun/logica/sync/sync-engine';

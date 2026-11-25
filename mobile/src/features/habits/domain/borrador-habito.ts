@@ -1,4 +1,4 @@
-import { diasEntre } from '@/comun/logica/dates';
+import { diasEntre } from '@/comun/util/dates';
 import type { HabitoFormInput } from '@/schemas/habit';
 
 // Borrador del asistente al crear un hábito (pulidos antes del APK, estados de inactividad). Si

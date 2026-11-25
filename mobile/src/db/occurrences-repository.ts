@@ -14,7 +14,7 @@ import {
   type Propuesta,
 } from '@/features/reschedule/domain/reprogramar';
 import type { Barrera } from '@/features/reschedule/domain/barreras';
-import { diaIso, fechaLocal, sumarDias } from '@/comun/logica/dates';
+import { diaIso, fechaLocal, sumarDias } from '@/comun/util/dates';
 import type { OperacionOutbox } from '@/comun/logica/sync/sync-rules';
 
 import { aplicar } from '@/comun/datos/aplicar-cambio';

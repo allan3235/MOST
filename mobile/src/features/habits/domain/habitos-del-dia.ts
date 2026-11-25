@@ -1,4 +1,4 @@
-import { diaIso } from '@/comun/logica/dates';
+import { diaIso } from '@/comun/util/dates';
 
 // Qué hábitos tocan en una fecha (pantalla Hoy, SDD 9.4). Función pura: recibe las filas que ya
 // están en SQLite y decide, sin consultar nada más.

@@ -25,9 +25,9 @@ import {
 import { AREAS } from '@/comun/modelo/esquemas/onboarding';
 import { cardShadow, colors } from '@/comun/tema';
 
-import { usePermisoAvisos } from '@/features/reminders/use-permiso-avisos';
+import { usePermisoAvisos } from '@/zonas/recordatorios/presentacion/use-permiso-avisos';
 
-import { useRevisarAgenda } from '../../agenda/use-revisar-agenda';
+import { useRevisarAgenda } from '@/zonas/recordatorios/presentacion/use-revisar-agenda';
 import { ICONO_CATEGORIA } from '../categoria-icono';
 import type { PasoAsistente } from '../domain/borrador-habito';
 import { textoFecha } from '../domain/fechas';

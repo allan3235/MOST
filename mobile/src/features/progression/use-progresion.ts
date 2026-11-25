@@ -14,7 +14,7 @@ import {
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { es, formatear } from '@/comun/i18n/es';
 import { ErrorSinRed } from '@/comun/datos/clienteApi';
-import { fechaLocal } from '@/comun/logica/dates';
+import { fechaLocal } from '@/comun/util/dates';
 import { useSyncStore } from '@/comun/logica/sync/sync-store';
 import { navegar } from '@/comun/presentacion/navegar';
 

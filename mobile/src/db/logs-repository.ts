@@ -11,7 +11,7 @@ import {
   type Planta,
   type ResultadoRecompensa,
 } from '@/zonas/plantas/logica/recompensas';
-import { fechaLocal } from '@/comun/logica/dates';
+import { fechaLocal } from '@/comun/util/dates';
 import { pedirSincronizacion } from '@/comun/logica/sync/sync-engine';
 
 import {

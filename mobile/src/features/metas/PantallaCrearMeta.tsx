@@ -35,7 +35,7 @@ import { leerAjustesLocales } from '@/zonas/cuenta/logica/servicioAjustes';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { ListaMicroPasos } from '@/features/plan/components/ListaMicroPasos';
 import { es, formatear } from '@/comun/i18n/es';
-import { fechaLocal } from '@/comun/logica/dates';
+import { fechaLocal } from '@/comun/util/dates';
 import { navegar } from '@/comun/presentacion/navegar';
 import { AREAS, momentoPrincipal, type Area } from '@/comun/modelo/esquemas/onboarding';
 

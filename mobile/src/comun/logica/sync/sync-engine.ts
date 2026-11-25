@@ -25,9 +25,9 @@ import { asegurarDuenoBaseLocal, enTransaccion, getDb, guardarFilas } from '@/co
 import { claveDeFila, TABLAS, tablaLocal, type TablaLocal } from '@/comun/datos/local-schema';
 import { leerOutbox, quitarDeOutbox, sumarIntento } from '@/comun/datos/outbox';
 import { ErrorApi, ErrorSinRed, pedirApi } from '@/comun/datos/clienteApi';
-import { fechaLocal, sumarDias } from '@/comun/logica/dates';
+import { fechaLocal, sumarDias } from '@/comun/util/dates';
 import { leerSesion } from '@/comun/datos/sesionGuardada';
-import { deviceTimeZone } from '@/comun/logica/time-zone';
+import { deviceTimeZone } from '@/comun/util/time-zone';
 
 import {
   clavesPendientes,

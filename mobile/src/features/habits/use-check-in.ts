@@ -4,9 +4,9 @@ import { AccessibilityInfo } from 'react-native';
 import { completarHabito, deshacerHabito, RelojAtrasadoError } from '@/db/logs-repository';
 import { leerSonidoLogros, revisarHito } from '@/zonas/plantas/logica/servicioPlantas';
 import type { HitoParaCelebrar } from '@/zonas/plantas/presentacion/componentes/CelebracionHito';
-import { mandarAvisoMotivacional } from '@/features/reminders/avisos';
+import { mandarAvisoMotivacional } from '@/zonas/recordatorios/logica/servicioAvisos';
 import { es, formatear } from '@/comun/i18n/es';
-import { fechaLocal } from '@/comun/logica/dates';
+import { fechaLocal } from '@/comun/util/dates';
 import { useFechaHoy } from '@/comun/logica/fecha-hoy';
 import type { Area } from '@/comun/modelo/esquemas/onboarding';
 

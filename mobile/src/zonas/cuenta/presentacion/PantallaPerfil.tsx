@@ -14,8 +14,8 @@ import { guardarAjustes, leerAjustesPerfil } from '@/zonas/cuenta/logica/servici
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from './session-context';
 import { textoDuracion } from '@/features/habits/domain/formato';
-import { BudgetDialog } from '@/features/reminders/components/budget-dialog';
-import { useAvisosActivos } from '@/features/reminders/use-avisos-activos';
+import { BudgetDialog } from '@/zonas/recordatorios/presentacion/componentes/budget-dialog';
+import { useAvisosActivos } from '@/zonas/recordatorios/presentacion/use-avisos-activos';
 import { es, formatear } from '@/comun/i18n/es';
 import { navegar } from '@/comun/presentacion/navegar';
 import { cardShadow, colors } from '@/comun/tema';

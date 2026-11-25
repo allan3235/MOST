@@ -9,7 +9,7 @@ import { AppText } from '@/comun/presentacion/ui/app-text';
 import { Button } from '@/comun/presentacion/ui/button';
 import { ChoicePill } from '@/comun/presentacion/ui/choice-pill';
 import { Field } from '@/comun/presentacion/ui/field';
-import { useRevisarAgenda } from '@/features/agenda/use-revisar-agenda';
+import { useRevisarAgenda } from '@/zonas/recordatorios/presentacion/use-revisar-agenda';
 import { es, formatear } from '@/comun/i18n/es';
 import { NOMBRE_MAX, NOMBRE_MIN, TODOS_LOS_DIAS } from '@/schemas/habit';
 import type { HabitoPlan } from '@/schemas/plan';

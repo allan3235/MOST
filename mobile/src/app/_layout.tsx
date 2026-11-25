@@ -17,8 +17,8 @@ import { ProfileErrorView } from '@/zonas/cuenta/presentacion/componentes/profil
 import { SessionProvider } from '@/zonas/cuenta/presentacion/session-provider';
 import type { AppZone } from '@/zonas/cuenta/logica/session-route';
 import { useAppZone } from '@/zonas/cuenta/presentacion/use-app-zone';
-import { prepararAvisos } from '@/features/reminders/avisos';
-import { useRespuestaAviso } from '@/features/reminders/use-respuesta-aviso';
+import { prepararAvisos } from '@/zonas/recordatorios/logica/servicioAvisos';
+import { useRespuestaAviso } from '@/zonas/recordatorios/presentacion/use-respuesta-aviso';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 // Se carga desde el arranque: cada escritura local pide una sincronización (se suscribe al cargar).
 import '@/comun/logica/sync/sync-engine';

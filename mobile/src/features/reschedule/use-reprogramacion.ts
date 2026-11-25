@@ -9,7 +9,7 @@ import {
 import { aliviarConPasoLigero, leerPasosLigeros } from '@/db/progression-repository';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { es, formatear } from '@/comun/i18n/es';
-import { fechaLocal } from '@/comun/logica/dates';
+import { fechaLocal } from '@/comun/util/dates';
 
 import { alternativasPara, type Barrera } from './domain/barreras';
 import type { Propuesta } from './domain/reprogramar';

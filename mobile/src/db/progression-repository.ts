@@ -35,7 +35,7 @@ import { avanceDelPaso, type AvancePaso } from '@/zonas/plantas/logica/hitos';
 import { historial, type Pausa } from '@/zonas/progreso/logica/cumplimiento';
 import { rachaDeHabito } from '@/zonas/progreso/logica/rachas';
 import { pedirApi } from '@/comun/datos/clienteApi';
-import { fechaLocal } from '@/comun/logica/dates';
+import { fechaLocal } from '@/comun/util/dates';
 import {
   AREAS,
   respuestasSchema,

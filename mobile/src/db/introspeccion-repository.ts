@@ -16,7 +16,7 @@ import {
   type MotivoIntrospeccion,
   type Respuestas,
 } from '@/features/introspeccion/domain/introspeccion';
-import { fechaLocal } from '@/comun/logica/dates';
+import { fechaLocal } from '@/comun/util/dates';
 
 import { getDb } from '@/comun/datos/database';
 import { avisarCambioLocal } from '@/comun/datos/db-version-store';

@@ -11,7 +11,7 @@
  * @historial 1.0.0 (2026-11-23): creación.
  */
 
-import { diasEntre } from '@/comun/logica/dates';
+import { diasEntre } from '@/comun/util/dates';
 
 // ===== Tipos =====
 

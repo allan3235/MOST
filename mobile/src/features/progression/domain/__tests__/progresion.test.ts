@@ -2,7 +2,7 @@ import { disponibilidadIgual } from '@/comun/modelo/esquemas/onboarding';
 import type { Habito, Horario } from '@/features/habits/domain/habitos-del-dia';
 import type { ConfigPlan, FilaCatalogo } from '@/features/plan/domain/plan-engine';
 import type { OcurrenciaEstadistica } from '@/zonas/progreso/logica/cumplimiento';
-import { sumarDias } from '@/comun/logica/dates';
+import { sumarDias } from '@/comun/util/dates';
 import type { Respuestas } from '@/comun/modelo/esquemas/onboarding';
 
 import {

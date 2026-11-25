@@ -178,4 +178,4 @@ export function filasDelPlan(input: {
   };
 }
 
-export { fechaLocal } from '@/comun/logica/dates';
+export { fechaLocal } from '@/comun/util/dates';

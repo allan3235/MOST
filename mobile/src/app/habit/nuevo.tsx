@@ -18,7 +18,7 @@ import type { PasoAsistente } from '@/features/habits/domain/borrador-habito';
 import { textoDuracion } from '@/features/habits/domain/formato';
 import { valoresNuevos } from '@/features/habits/domain/valores-formulario';
 import { es, formatear } from '@/comun/i18n/es';
-import { fechaLocal } from '@/comun/logica/dates';
+import { fechaLocal } from '@/comun/util/dates';
 import type { HabitoFormInput, HabitoFormValues } from '@/schemas/habit';
 import { AREAS, type Area } from '@/comun/modelo/esquemas/onboarding';
 import { colors } from '@/comun/tema';

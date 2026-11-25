@@ -19,7 +19,7 @@ import {
 } from '@/zonas/progreso/logica/cumplimiento';
 import { ajustarMinutosEnTitulo } from '@most/compartido/textos';
 
-import { diasEntre, sumarDias } from '@/comun/logica/dates';
+import { diasEntre, sumarDias } from '@/comun/util/dates';
 import {
   areaDeObjetivo,
   OBJETIVOS,
