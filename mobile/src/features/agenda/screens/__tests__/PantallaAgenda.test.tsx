@@ -26,7 +26,7 @@ jest.mock('@/comun/presentacion/ui/snackbar', () => ({
     return mensaje ? <Text>{mensaje}</Text> : null;
   },
 }));
-jest.mock('@/features/auth/session-context', () => ({
+jest.mock('@/zonas/cuenta/presentacion/session-context', () => ({
   useSession: () => ({ session: { user: { id: 'u1' } } }),
 }));
 jest.mock('@/comun/presentacion/use-local-query', () => ({ useLocalQuery: () => ({ data: [] }) }));

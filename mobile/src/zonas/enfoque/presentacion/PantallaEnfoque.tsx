@@ -22,7 +22,7 @@ import { OptionChip } from '@/comun/presentacion/ui/option-chip';
 import { Screen } from '@/comun/presentacion/ui/screen';
 import { Snackbar } from '@/comun/presentacion/ui/snackbar';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
-import { useSession } from '@/features/auth/session-context';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 
 import { es, formatear } from '@/comun/i18n/es';
 

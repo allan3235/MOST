@@ -1,4 +1,4 @@
-import { ZoneRedirect } from '@/features/auth/components/zone-redirect';
+import { ZoneRedirect } from '@/zonas/cuenta/presentacion/componentes/zone-redirect';
 
 // Cualquier dirección desconocida (por ejemplo, un enlace viejo) lleva a la zona actual en vez
 // de mostrar la pantalla «Unmatched Route».

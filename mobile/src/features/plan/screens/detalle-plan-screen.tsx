@@ -18,7 +18,7 @@ import {
   type HabitoDelDetalle,
 } from '@/db/progression-repository';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
-import { useSession } from '@/features/auth/session-context';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { ICONO_CATEGORIA } from '@/features/habits/categoria-icono';
 import { textoDuracion } from '@/features/habits/domain/formato';
 import { useHabitActions } from '@/features/habits/use-habit-actions';

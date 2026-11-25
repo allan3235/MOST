@@ -1,7 +1,7 @@
 import { es } from '@/comun/i18n/es';
 import { ErrorApi, ErrorSinRed } from '@/comun/datos/clienteApi';
 
-import { authErrorMessage } from '../auth-error-message';
+import { authErrorMessage } from '@/zonas/cuenta/logica/auth-error-message';
 
 jest.mock('@/comun/config/env', () => ({ env: { urlApi: 'http://prueba' } }));
 

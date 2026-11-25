@@ -11,9 +11,13 @@ import { SettingsRow } from '@/comun/presentacion/ui/settings-row';
 import { SwitchRow } from '@/comun/presentacion/ui/switch-row';
 import { Snackbar } from '@/comun/presentacion/ui/snackbar';
 import { guardarSonidoLogros, leerSonidoLogros } from '@/zonas/plantas/logica/servicioPlantas';
-import { guardarAjustes, leerAjustesPerfil, type CambiosAjustes } from '@/db/settings-repository';
+import {
+  guardarAjustes,
+  leerAjustesPerfil,
+  type CambiosAjustes,
+} from '@/zonas/cuenta/logica/servicioAjustes';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
-import { useSession } from '@/features/auth/session-context';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { SecondNoticeToggle } from '@/features/plan/components/second-notice-toggle';
 import { fechaDesdeHora, horaDesdeFecha } from '@/features/plan/domain/plan-review';
 import { es } from '@/comun/i18n/es';

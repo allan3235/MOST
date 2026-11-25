@@ -14,7 +14,7 @@ import { StableBoldText } from '@/comun/presentacion/ui/stable-bold-text';
 import { leerHabitos } from '@/db/habits-repository';
 import { equiparAccesorio, leerMiJardin, type Accesorio } from '../logica/servicioPlantas';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
-import { useSession } from '@/features/auth/session-context';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { HabitCheckCard } from '@/features/habits/components/habit-check-card';
 import { useAgregarHabito } from '@/features/habits/use-agregar-habito';
 import { useHabitActions } from '@/features/habits/use-habit-actions';

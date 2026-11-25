@@ -1,6 +1,6 @@
 import { es, formatear } from '@/comun/i18n/es';
 
-import { EMAIL_MAX, loginSchema, registerSchema } from '../auth-schemas';
+import { EMAIL_MAX, loginSchema, registerSchema } from '@/zonas/cuenta/logica/auth-schemas';
 
 const v = es.auth.validacion;
 

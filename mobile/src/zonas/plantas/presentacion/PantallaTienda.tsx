@@ -10,7 +10,7 @@ import { Screen } from '@/comun/presentacion/ui/screen';
 import { avisarCambioLocal } from '@/comun/logica/cambios-locales';
 import { comprarAccesorio, equiparDesdeTienda, leerMiJardin } from '../logica/servicioPlantas';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
-import { useSession } from '@/features/auth/session-context';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { AccessoryCard } from '@/zonas/plantas/presentacion/componentes/accessory-card';
 import { CoinBalance } from '@/zonas/plantas/presentacion/componentes/coin-balance';
 import { PurchaseSheet } from '@/zonas/plantas/presentacion/componentes/purchase-sheet';

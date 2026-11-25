@@ -1,4 +1,4 @@
-import { resolveAppZone, type SessionRouteInput } from '../session-route';
+import { resolveAppZone, type SessionRouteInput } from '@/zonas/cuenta/logica/session-route';
 
 const base: SessionRouteInput = {
   initializing: false,

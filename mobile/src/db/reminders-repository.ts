@@ -21,7 +21,7 @@ import { fechaLocal, sumarDias } from '@/comun/logica/dates';
 import { globalesSchema, momentoPrincipal, type Momento } from '@/comun/modelo/esquemas/onboarding';
 
 import { getDb, leerFilas } from '@/comun/datos/database';
-import { leerAjustesEn, leerConfigAvisos } from './settings-repository';
+import { leerAjustesEn, leerConfigAvisos } from '@/zonas/cuenta/datos/repositorioAjustes';
 
 // Lo que necesitan los avisos (SDD 7.1), leído de SQLite: funciona sin conexión.
 

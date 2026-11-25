@@ -8,7 +8,7 @@ import { BackButton } from '@/comun/presentacion/ui/back-button';
 import { Button } from '@/comun/presentacion/ui/button';
 import { Screen } from '@/comun/presentacion/ui/screen';
 import { generarBorrador } from '@/db/plan-repository';
-import { leerMinutosPorDia } from '@/db/settings-repository';
+import { leerMinutosPorDia } from '@/zonas/cuenta/logica/servicioAjustes';
 import { respuestasCompletas } from '@/features/onboarding/domain/form-rules';
 import { useOnboardingStore } from '@/features/onboarding/onboarding-store';
 import { GrowingPlant } from '@/features/plan/components/growing-plant';

@@ -19,7 +19,7 @@ import type { DatosEstadisticas, Pausa } from '@/zonas/progreso/logica/cumplimie
 
 import { getDb, leerFilas } from '@/comun/datos/database';
 import { categoriasPorId } from '@/db/habits-repository';
-import { leerAjustesEn } from '@/db/settings-repository';
+import { leerAjustesEn } from '@/zonas/cuenta/datos/repositorioAjustes';
 
 // Progreso (SDD 8): todo sale de SQLite, así que funciona sin conexión. Se leen también los
 // hábitos archivados, porque su historial sigue contando en los periodos pasados. La carga

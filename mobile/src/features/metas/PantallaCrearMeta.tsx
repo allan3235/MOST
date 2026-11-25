@@ -31,8 +31,8 @@ import {
   type PropuestaMeta,
 } from '@/db/metasRepositorio';
 import { leerGlobalesFormulario } from '@/db/plan-repository';
-import { leerAjustesLocales } from '@/db/settings-repository';
-import { useSession } from '@/features/auth/session-context';
+import { leerAjustesLocales } from '@/zonas/cuenta/logica/servicioAjustes';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { ListaMicroPasos } from '@/features/plan/components/ListaMicroPasos';
 import { es, formatear } from '@/comun/i18n/es';
 import { fechaLocal } from '@/comun/logica/dates';

@@ -13,13 +13,13 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { ProfileErrorView } from '@/features/auth/components/profile-error-view';
-import { SessionProvider } from '@/features/auth/session-provider';
-import type { AppZone } from '@/features/auth/domain/session-route';
-import { useAppZone } from '@/features/auth/use-app-zone';
+import { ProfileErrorView } from '@/zonas/cuenta/presentacion/componentes/profile-error-view';
+import { SessionProvider } from '@/zonas/cuenta/presentacion/session-provider';
+import type { AppZone } from '@/zonas/cuenta/logica/session-route';
+import { useAppZone } from '@/zonas/cuenta/presentacion/use-app-zone';
 import { prepararAvisos } from '@/features/reminders/avisos';
 import { useRespuestaAviso } from '@/features/reminders/use-respuesta-aviso';
-import { useSession } from '@/features/auth/session-context';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 // Se carga desde el arranque: cada escritura local pide una sincronización (se suscribe al cargar).
 import '@/comun/logica/sync/sync-engine';
 

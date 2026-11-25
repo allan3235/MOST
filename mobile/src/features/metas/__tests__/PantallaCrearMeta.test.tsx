@@ -26,7 +26,7 @@ jest.mock('lucide-react-native', () => new Proxy({}, { get: () => () => null }))
 jest.mock('@/comun/presentacion/ui/back-button', () => ({ BackButton: () => null }));
 jest.mock('@/db/habits-repository', () => ({ crearHabito: jest.fn() }));
 jest.mock('@/db/metasRepositorio', () => ({ descomponerMeta: jest.fn() }));
-jest.mock('@/db/settings-repository', () => ({
+jest.mock('@/zonas/cuenta/logica/servicioAjustes', () => ({
   leerAjustesLocales: jest.fn(async () => ({
     horaManana: '08:00',
     horas: { manana: '08:00', mediodia: '13:00', tarde: '17:00', noche: '20:30' },
@@ -41,7 +41,7 @@ jest.mock('@/db/plan-repository', () => ({
     acompanamiento: 'recordatorio_suave',
   })),
 }));
-jest.mock('@/features/auth/session-context', () => ({
+jest.mock('@/zonas/cuenta/presentacion/session-context', () => ({
   useSession: () => ({ session: { user: { id: 'u1' } } }),
 }));
 jest.mock('@/comun/presentacion/navegar', () => ({

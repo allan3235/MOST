@@ -12,20 +12,22 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
-import { asegurarDuenoBaseLocal, vaciarBaseLocal } from '@/comun/datos/database';
-import { getProfile, saveMode, type AppMode, type Profile } from '@/db/profile-repository';
-import { cancelarAvisos } from '@/features/reminders/avisos';
+import { caducoSinConexion } from '../logica/sesion-caducada';
 import {
   cargarSesionGuardada,
+  cerrarSesion,
   escucharSesion,
-  establecerSesion,
+  guardarModo,
+  leerPerfil,
+  leerUltimaConexion,
+  marcarConexion,
+  marcarSesionCaducada,
+  olvidarSesionCaducada,
+  prepararBaseLocal,
+  type AppMode,
+  type Profile,
   type Sesion,
-} from '@/comun/datos/sesionGuardada';
-import { deviceTimeZone } from '@/comun/logica/time-zone';
-import { sincronizarAhora } from '@/comun/logica/sync/sync-engine';
-
-import { caducoSinConexion } from './domain/sesion-caducada';
-import { leerUltimaConexion, marcarConexion, marcarSesionCaducada } from './sesion-caducada-store';
+} from '../logica/servicioSesion';
 import { SessionContext, type ProfileStatus, type SessionContextValue } from './session-context';
 
 // ===== Tipos =====
@@ -57,7 +59,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           if (ultima === null) marcarConexion();
           else if (caducoSinConexion(ultima, Date.now())) {
             marcarSesionCaducada(true);
-            await establecerSesion(null, 'caducada');
+            await olvidarSesionCaducada();
             sesion = null;
           }
         }
@@ -91,12 +93,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (userId === null) return;
     let active = true;
-    asegurarDuenoBaseLocal(userId)
-      .then((vaciada) => (vaciada ? cancelarAvisos() : undefined))
+    prepararBaseLocal(userId)
       .catch(() => {
         // Si la revisión falla, la sincronización la repite antes de subir o bajar nada.
       })
-      .then(() => getProfile(userId))
+      .then(() => leerPerfil(userId))
       .then((profile) => {
         if (active) setProfileState({ userId, status: 'ready', profile });
       })
@@ -120,7 +121,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const chooseMode = useCallback(
     async (mode: AppMode) => {
       if (userId === null) return;
-      const updated = await saveMode(userId, mode, deviceTimeZone());
+      const updated = await guardarModo(userId, mode);
       setProfileState({ userId, status: 'ready', profile: updated });
     },
     [userId],
@@ -132,12 +133,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     // servidor. El borrado va en finally: ocurre aunque falle la sincronización.
     cerrandoAMano.current = true;
     try {
-      await sincronizarAhora().catch(() => {});
-      await establecerSesion(null, 'salida');
+      await cerrarSesion();
     } finally {
       cerrandoAMano.current = false;
-      await vaciarBaseLocal().catch(() => {});
-      await cancelarAvisos().catch(() => {});
     }
   }, []);
 

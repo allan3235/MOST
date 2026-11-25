@@ -52,7 +52,11 @@ import { avisarCambioLocal } from '@/comun/datos/db-version-store';
 import { categoriasPorId, guardarVersionHorario, idCategoria } from './habits-repository';
 import { contarHechosDePasos } from '@/zonas/plantas/datos/repositorioHitos';
 import { descartarMovidasDelPatron, filasDe, guardarOcurrencias } from './occurrences-repository';
-import { leerAjustesEn, leerConfigProgresion, leerPresupuestos } from './settings-repository';
+import {
+  leerAjustesEn,
+  leerConfigProgresion,
+  leerPresupuestos,
+} from '@/zonas/cuenta/datos/repositorioAjustes';
 
 // Progresión (SDD 6.3). Cada 7 días, al abrir la app, se revisan los hábitos del plan: las
 // propuestas (subir, meta intermedia de RF-15, hábito nuevo) quedan como tarjetas en Hoy. Todo se escribe en SQLite

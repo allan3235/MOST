@@ -9,7 +9,7 @@ import { Screen } from '@/comun/presentacion/ui/screen';
 import { avisarCambioLocal } from '@/comun/logica/cambios-locales';
 import { leerHabitos } from '@/db/habits-repository';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
-import { useSession } from '@/features/auth/session-context';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { ICONO_CATEGORIA } from '@/features/habits/categoria-icono';
 import { HabitCheckCard } from '@/features/habits/components/habit-check-card';
 import { useAgregarHabito } from '@/features/habits/use-agregar-habito';

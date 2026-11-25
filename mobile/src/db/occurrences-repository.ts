@@ -19,7 +19,7 @@ import type { OperacionOutbox } from '@/comun/logica/sync/sync-rules';
 
 import { aplicar } from '@/comun/datos/aplicar-cambio';
 import { guardarFilas, getDb, leerFilas } from '@/comun/datos/database';
-import { leerAjustesEn } from './settings-repository';
+import { leerAjustesEn } from '@/zonas/cuenta/datos/repositorioAjustes';
 
 // Reprogramación (SDD 6.2): qué ofrecer mover al abrir la app y cómo se guarda la decisión en
 // `habit_occurrences`. Todo en SQLite, así que funciona sin conexión.

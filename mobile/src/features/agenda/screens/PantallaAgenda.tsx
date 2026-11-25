@@ -35,7 +35,7 @@ import {
   type HabitoConHorario,
 } from '@/db/habits-repository';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
-import { useSession } from '@/features/auth/session-context';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { es, formatear } from '@/comun/i18n/es';
 import { cardShadow } from '@/comun/tema';
 

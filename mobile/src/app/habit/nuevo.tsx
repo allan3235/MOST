@@ -5,9 +5,9 @@ import { ActivityIndicator, Alert as AlertNativo, View } from 'react-native';
 import { ConfirmDialog } from '@/comun/presentacion/ui/confirm-dialog';
 import { Screen } from '@/comun/presentacion/ui/screen';
 import { crearHabito } from '@/db/habits-repository';
-import { leerAjustesLocales } from '@/db/settings-repository';
+import { leerAjustesLocales } from '@/zonas/cuenta/logica/servicioAjustes';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
-import { useSession } from '@/features/auth/session-context';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import {
   borrarBorradorHabito,
   guardarBorradorHabito,

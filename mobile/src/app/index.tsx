@@ -1,4 +1,4 @@
-import { ZoneRedirect } from '@/features/auth/components/zone-redirect';
+import { ZoneRedirect } from '@/zonas/cuenta/presentacion/componentes/zone-redirect';
 
 // Entrada de la app (most:/// o exp://.../--/). No tiene contenido: manda a la zona que
 // corresponde según la sesión.

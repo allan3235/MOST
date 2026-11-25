@@ -18,30 +18,14 @@ import { semanaDeApoyoEnPlanes, type PlanApoyo } from './semana-apoyo';
 // y devuelve los avisos de la ventana de 7 días con su texto ya resuelto. Cada vez que algo cambia
 // se vuelve a calcular todo, así que completar un hábito quita su segundo aviso sin más.
 
-export type MomentoAviso = 'manana' | 'mediodia' | 'tarde' | 'noche' | 'resumen_nocturno';
-/** Hora "HH:MM" de cada momento: las de Perfil sobre las de `app_config`. */
-export type HorasAvisos = Record<MomentoAviso, string>;
-
-export const HORAS_POR_DEFECTO: HorasAvisos = {
-  manana: '08:00',
-  mediodia: '13:00',
-  tarde: '17:00',
-  noche: '20:30',
-  resumen_nocturno: '21:00',
-};
-
-/** `app_config.notificaciones`. */
-export type ConfigAvisos = {
-  ventana_dias: number;
-  tope_programadas: number;
-  horas_segundo_aviso: number;
-};
-
-export const AVISOS_POR_DEFECTO: ConfigAvisos = {
-  ventana_dias: 7,
-  tope_programadas: 60,
-  horas_segundo_aviso: 2,
-};
+export {
+  AVISOS_POR_DEFECTO,
+  HORAS_POR_DEFECTO,
+  type ConfigAvisos,
+  type HorasAvisos,
+  type MomentoAviso,
+} from '@/comun/modelo/configuracion';
+import type { ConfigAvisos, HorasAvisos, MomentoAviso } from '@/comun/modelo/configuracion';
 
 // La ventana flexible empieza a la hora de «Tarde» y su segundo aviso llega 3 h después
 // (17:00 y 20:00 por defecto), así sigue la hora que la persona elija en Perfil.

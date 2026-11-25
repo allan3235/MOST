@@ -8,7 +8,7 @@ import {
   leerCupoHabitos,
   type HabitoConHorario,
 } from '@/db/habits-repository';
-import { useSession } from '@/features/auth/session-context';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { es, formatear } from '@/comun/i18n/es';
 import { useFechaHoy } from '@/comun/logica/fecha-hoy';
 import { navegar } from '@/comun/presentacion/navegar';

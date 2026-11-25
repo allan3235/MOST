@@ -8,7 +8,7 @@ import { AppText } from '@/comun/presentacion/ui/app-text';
 import { BackButton } from '@/comun/presentacion/ui/back-button';
 import { Button } from '@/comun/presentacion/ui/button';
 import { Screen } from '@/comun/presentacion/ui/screen';
-import { useSession } from '@/features/auth/session-context';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { pilaParaRetomar } from '@/features/onboarding/domain/retomar';
 import { useOnboardingStore } from '@/features/onboarding/onboarding-store';
 import { usePlanReviewStore } from '@/features/plan/plan-review-store';

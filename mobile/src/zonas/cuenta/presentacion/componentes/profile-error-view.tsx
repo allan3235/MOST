@@ -5,7 +5,7 @@ import { Button } from '@/comun/presentacion/ui/button';
 import { Screen } from '@/comun/presentacion/ui/screen';
 import { es } from '@/comun/i18n/es';
 
-import { useSession } from '../session-context';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 
 // Estado de error cuando hay sesión pero no se pudo leer el perfil (por ejemplo, sin red).
 

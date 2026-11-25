@@ -9,9 +9,13 @@ import { ConfirmDialog } from '@/comun/presentacion/ui/confirm-dialog';
 import { Screen } from '@/comun/presentacion/ui/screen';
 import { Snackbar } from '@/comun/presentacion/ui/snackbar';
 import { agregarAlPlan, pedirTextosIa, sugerenciasParaPlan } from '@/db/progression-repository';
-import { guardarAjustes, leerAjustes, leerMinutosPorDia } from '@/db/settings-repository';
+import {
+  guardarAjustes,
+  leerAjustes,
+  leerMinutosPorDia,
+} from '@/zonas/cuenta/logica/servicioAjustes';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
-import { useSession } from '@/features/auth/session-context';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { minutosPorDia } from '@/features/habits/domain/presupuesto';
 import { es, formatear } from '@/comun/i18n/es';
 import type { HabitoPlan } from '@/schemas/plan';

@@ -1,17 +1,27 @@
+/**
+ * @file repositorioAjustes.ts
+ * @proyecto most.
+ * @descripcion Capa de datos de los ajustes del usuario (`user_settings`) y de `app_config`: los lee
+ *   de SQLite con sus valores por defecto (modelo común) y guarda los cambios de Perfil con la cola
+ *   de salida (funciona sin conexión). Los cálculos (minutos por día, límite de duración) viven en
+ *   servicioAjustes.
+ * @autor Equipo most. (código heredado de Habit Green; reorganizado por Allan con Claude Code)
+ * @fecha 2026-11-24
+ * @version 1.1.0
+ * @historial 1.1.0 (2026-11-24): pasa a zonas/cuenta/datos (antes db/settings-repository.ts).
+ */
+
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-import { limiteDuracionPlan, minutosPorDia } from '@/features/habits/domain/presupuesto';
 import {
   AVISOS_POR_DEFECTO,
   HORAS_POR_DEFECTO,
+  PROGRESION_POR_DEFECTO,
   type ConfigAvisos,
+  type ConfigProgresion,
   type HorasAvisos,
   type MomentoAviso,
-} from '@/features/reminders/domain/planificar-avisos';
-import {
-  PROGRESION_POR_DEFECTO,
-  type ConfigProgresion,
-} from '@/features/progression/domain/progresion';
+} from '@/comun/modelo/configuracion';
 import {
   ACOMPANAMIENTOS,
   OBSTACULOS,
@@ -20,12 +30,8 @@ import {
   type Obstaculo,
   type Tiempo,
 } from '@/comun/modelo/esquemas/onboarding';
-import { pedirSincronizacion } from '@/comun/logica/sync/sync-engine';
-
-import { actualizarFila, enTransaccion, getDb, leerFilas } from '@/comun/datos/database';
-import { avisarCambioLocal } from '@/comun/datos/db-version-store';
-import { leerHabitos } from './habits-repository';
-import { encolar } from '@/comun/datos/outbox';
+import { aplicar } from '@/comun/datos/aplicar-cambio';
+import { actualizarFila, getDb, leerFilas } from '@/comun/datos/database';
 
 // Ajustes del usuario (`user_settings`). Se crean al confirmar el plan de la encuesta (UC-01); al
 // llegar a las pestañas, la sincronización los descarga a SQLite junto con `app_config`, y desde
@@ -136,54 +142,6 @@ export async function leerAjustes(userId: string): Promise<Ajustes | null> {
   return leerAjustesEn(await getDb(), userId);
 }
 
-export type AjustesPerfil = {
-  ajustes: Ajustes | null;
-  /** Minutos del día con más hábitos, para avisar si el tiempo diario queda corto. */
-  minutosDiaMasCargado: number;
-};
-
-/** Minutos de cada día (lunes … domingo) que suman los hábitos activos con horario. */
-export async function leerMinutosPorDia(): Promise<number[]> {
-  const habitos = await leerHabitos();
-  return minutosPorDia(
-    habitos
-      .filter((h) => h.habito.activo && h.horario !== undefined)
-      .map((h) => ({
-        duracion_min: h.habito.duracion_min,
-        dias_semana: h.horario?.dias_semana ?? [],
-      })),
-  );
-}
-
-/** Lo que muestra Perfil. */
-export async function leerAjustesPerfil(userId: string): Promise<AjustesPerfil> {
-  const [ajustes, habitos] = await Promise.all([leerAjustes(userId), leerHabitos()]);
-  const minutos = minutosPorDia(
-    habitos
-      .filter((h) => h.habito.activo && h.horario !== undefined)
-      .map((h) => ({
-        duracion_min: h.habito.duracion_min,
-        dias_semana: h.horario?.dias_semana ?? [],
-      })),
-  );
-  return { ajustes, minutosDiaMasCargado: Math.max(0, ...minutos) };
-}
-
-/**
- * Duración máxima de un hábito del plan (tiempo diario entre los hábitos activos del plan), o
- * null si el hábito es propio: esos no tienen límite (SDD 6.5).
- */
-export async function leerLimiteDuracion(userId: string, habitId: string): Promise<number | null> {
-  const [ajustes, habitos] = await Promise.all([leerAjustes(userId), leerHabitos()]);
-  const habito = habitos.find((h) => h.habito.id === habitId)?.habito;
-  if (!ajustes || !habito || habito.plan_id === null) return null;
-  // Los hábitos sin duración no gastan tiempo del día: no cuentan en el reparto.
-  const delPlan = habitos.filter(
-    (h) => h.habito.plan_id !== null && h.habito.activo && h.habito.duracion_min > 0,
-  ).length;
-  return limiteDuracionPlan(ajustes.presupuestoMin, delPlan, habito.duracion_min);
-}
-
 export type CambiosAjustes = Partial<{
   presupuesto_min: number;
   estilo_notificaciones: Acompanamiento;
@@ -194,23 +152,15 @@ export type CambiosAjustes = Partial<{
 
 /** Cambia ajustes desde Perfil: se guardan en el teléfono y se suben con la cola (SDD 3.4). */
 export async function guardarAjustes(userId: string, cambios: CambiosAjustes): Promise<void> {
-  const db = await getDb();
-  await enTransaccion(db, async () => {
+  await aplicar(async (db) => {
     await actualizarFila(
       db,
       'user_settings',
       { user_id: userId },
       { ...cambios, updated_at: new Date().toISOString() },
     );
-    await encolar(db, {
-      operacion: 'update',
-      tabla: 'user_settings',
-      clave: userId,
-      payload: cambios,
-    });
+    return [{ operacion: 'update', tabla: 'user_settings', clave: userId, payload: cambios }];
   });
-  avisarCambioLocal();
-  pedirSincronizacion();
 }
 
 export type AjustesLocales = {

@@ -9,7 +9,7 @@ import { Screen } from '@/comun/presentacion/ui/screen';
 import { avisarCambioLocal } from '@/comun/logica/cambios-locales';
 import { leerMiJardin } from '../logica/servicioPlantas';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
-import { useSession } from '@/features/auth/session-context';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { CoinBalance } from '@/zonas/plantas/presentacion/componentes/coin-balance';
 import { PlantPanel } from '@/zonas/plantas/presentacion/componentes/plant-panel';
 import { es } from '@/comun/i18n/es';

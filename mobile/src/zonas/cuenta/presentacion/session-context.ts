@@ -11,7 +11,7 @@
 
 import { createContext, useContext } from 'react';
 
-import type { AppMode, Profile } from '@/db/profile-repository';
+import type { AppMode, Profile } from '@/zonas/cuenta/logica/servicioSesion';
 import type { Sesion } from '@/comun/datos/sesionGuardada';
 
 // ===== Tipos =====

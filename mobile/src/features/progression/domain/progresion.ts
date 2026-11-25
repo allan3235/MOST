@@ -50,9 +50,13 @@ import type { HabitoPlan, Nivel } from '@/schemas/plan';
 // de hábitos del plan alcanzado no se propone ninguno; quien está en su versión corta primero
 // vuelve a la duración normal (salvo con `poco_tiempo`, donde la corta es la normal).
 
-/** RF-15: con menos de este cumplimiento en los últimos DIAS_EVALUADOS se propone bajar. */
-export const UMBRAL_CUMPLIMIENTO = 0.4;
-export const DIAS_EVALUADOS = 7;
+export {
+  DIAS_EVALUADOS,
+  PROGRESION_POR_DEFECTO,
+  UMBRAL_CUMPLIMIENTO,
+  type ConfigProgresion,
+} from '@/comun/modelo/configuracion';
+import type { ConfigProgresion } from '@/comun/modelo/configuracion';
 /**
  * RR-03 candado mínimo (decisión del 24-nov): ningún reajuste deja un hábito en menos de 1 día por
  * semana ni, si tiene duración, en menos de 2 minutos.
@@ -62,35 +66,7 @@ export const DIAS_MINIMOS_POR_SEMANA = 1;
 const DIA_POR_DEFECTO = 1;
 export const MINUTOS_MINIMOS = 2;
 
-export type ConfigProgresion = {
-  umbral_subir: number;
-  umbral_bajar: number;
-  ventana_dias: number;
-  /** Días que se miran para bajar (RF-15); los de subir son `ventana_dias`. */
-  ventana_dias_bajar: number;
-  ventana_dias_baja_frecuencia: number;
-  dias_por_semana_baja_frecuencia: number;
-  minimo_ocurrencias: number;
-  dias_entre_evaluaciones: number;
-  limite_habitos_plan: number;
-  dias_para_desbloqueo: number;
-  ventana_desbloqueo_dias: number;
-};
-
 /** Los valores de `app_config.progresion`, por si todavía no se descargan. */
-export const PROGRESION_POR_DEFECTO: ConfigProgresion = {
-  umbral_subir: 0.85,
-  umbral_bajar: UMBRAL_CUMPLIMIENTO,
-  ventana_dias: 14,
-  ventana_dias_bajar: DIAS_EVALUADOS,
-  ventana_dias_baja_frecuencia: 28,
-  dias_por_semana_baja_frecuencia: 2,
-  minimo_ocurrencias: 4,
-  dias_entre_evaluaciones: 7,
-  limite_habitos_plan: 4,
-  dias_para_desbloqueo: 90,
-  ventana_desbloqueo_dias: 28,
-};
 
 /** Un micro-paso guardado en SQLite (tabla micro_pasos). */
 export type MicroPasoLocal = {

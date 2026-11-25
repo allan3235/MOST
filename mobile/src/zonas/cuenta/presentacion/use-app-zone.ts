@@ -1,6 +1,6 @@
 import type { Href } from 'expo-router';
 
-import { resolveAppZone, type AppZone } from './domain/session-route';
+import { resolveAppZone, type AppZone } from '@/zonas/cuenta/logica/session-route';
 import { useSession } from './session-context';
 
 export function useAppZone(): AppZone {

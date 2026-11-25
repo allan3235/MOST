@@ -1,6 +1,6 @@
 import type { Href } from 'expo-router';
 
-import { useAppZone } from '@/features/auth/use-app-zone';
+import { useAppZone } from '@/zonas/cuenta/presentacion/use-app-zone';
 
 // El formulario y la revisión del plan se usan en dos lugares: en la bienvenida (primer plan,
 // zona «onboarding») y desde la app (Perfil → Mis planes → Crear plan, zona «tabs»). Las pantallas

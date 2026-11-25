@@ -1,4 +1,4 @@
-import { avisoDeFormulario } from '../form-aviso';
+import { avisoDeFormulario } from '@/zonas/cuenta/logica/form-aviso';
 
 const VACIO = ['vacío'];
 

@@ -4,8 +4,8 @@ import Animated, { FadeOut } from 'react-native-reanimated';
 import { Alert } from '@/comun/presentacion/ui/alert';
 import { es } from '@/comun/i18n/es';
 
-import { msRestantesAviso, SEGUNDOS_AVISO_CADUCADA } from '../domain/sesion-caducada';
-import { marcarSesionCaducada, sesionCaducada } from '../sesion-caducada-store';
+import { msRestantesAviso, SEGUNDOS_AVISO_CADUCADA } from '@/zonas/cuenta/logica/sesion-caducada';
+import { marcarSesionCaducada, sesionCaducada } from '@/zonas/cuenta/logica/servicioSesion';
 
 // «Tu sesión caducó…» en la bienvenida y el inicio de sesión, cuando la sesión se cerró sola (60 días
 // sin conexión o cerrada en otro lado). Se ve una sola vez y se quita a los 10 segundos: al

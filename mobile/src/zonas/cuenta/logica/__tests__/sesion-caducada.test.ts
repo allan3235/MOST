@@ -1,4 +1,4 @@
-import { caducoSinConexion, msRestantesAviso } from '../sesion-caducada';
+import { caducoSinConexion, msRestantesAviso } from '@/zonas/cuenta/logica/sesion-caducada';
 
 const DIA = 86_400_000;
 const AHORA = Date.UTC(2026, 10, 19);
