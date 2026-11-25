@@ -51,7 +51,8 @@ export default function RevisionPlanScreen() {
   const formulario = useOnboardingStore((s) => s.borrador);
   const reiniciarFormulario = useOnboardingStore((s) => s.reiniciar);
   const marcarRetomar = useOnboardingStore((s) => s.marcarRetomar);
-  const adicional = useOnboardingStore((s) => s.adicional);
+  // Un plan del catálogo con el perfil ya guardado no pisa los ajustes ni las respuestas.
+  const conPerfilGuardado = useOnboardingStore((s) => s.flujo === 'plan');
   const rutas = useRutasPlan();
   const { enApp } = rutas;
   useFocusEffect(
@@ -92,7 +93,7 @@ export default function RevisionPlanScreen() {
   // Tiempo diario contra el que se compara: el primer plan trae el suyo (P4); uno siguiente usa el
   // que ya tiene el usuario.
   const presupuestoBase =
-    adicional && ajustesActuales.data
+    conPerfilGuardado && ajustesActuales.data
       ? ajustesActuales.data.presupuestoMin
       : borrador.ajustes.presupuesto_min;
   const exceso = enApp
@@ -108,7 +109,7 @@ export default function RevisionPlanScreen() {
       const idsCompletos = usePlanReviewStore.getState().idsParaGuardar() ?? ids;
       if (enApp) {
         await guardarPlan(session.user.id, borrador, respuestas, idsCompletos, conRecordatorios, {
-          guardarAjustes: !adicional,
+          guardarAjustes: !conPerfilGuardado,
           presupuestoMin: exceso > 0 ? presupuestoBase + exceso : undefined,
         });
         guardado.current = true;

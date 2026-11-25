@@ -12,10 +12,10 @@ describe('retomar el formulario', () => {
     expect(ultimo).toEqual({ name: 'formulario/[paso]', params: { paso: '3' } });
   });
 
-  it('en la revisión del plan: los 7 pasos y la revisión al final', () => {
+  it('en la revisión: las 5 preguntas del perfil y la revisión al final', () => {
     const pila = pilaParaRetomar({ pantalla: 'revision' });
-    expect(pila).toHaveLength(9);
-    expect(pila[7]).toEqual({ name: 'formulario/[paso]', params: { paso: '7' } });
-    expect(pila[8]).toEqual({ name: 'revision' });
+    expect(pila).toHaveLength(7);
+    expect(pila[5]).toEqual({ name: 'formulario/[paso]', params: { paso: '5' } });
+    expect(pila[6]).toEqual({ name: 'revision' });
   });
 });

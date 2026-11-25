@@ -5,19 +5,50 @@ import {
   MAX_OBJETIVOS,
   MOMENTOS_CON_HORA,
   OBJETIVOS_POR_AREA,
+  perfilSchema,
   respuestasSchema,
   type Area,
   type Disponibilidad,
   type MomentoConHora,
   type Objetivo,
   type Obstaculo,
+  type Perfil,
   type Respuestas,
 } from '@/comun/modelo/esquemas/onboarding';
 
-// Reglas del formulario de 7 pasos (SDD 5.3), separadas de las pantallas para poder probarlas.
+// Reglas del formulario (SDD 5.3), separadas de las pantallas para poder probarlas. Las mismas
+// preguntas arman tres recorridos:
+// - «perfil»: la encuesta inicial (UC-01). Solo datos generales de la persona; no crea hábitos.
+// - «plan»: un plan del catálogo (Perfil → Mis planes) con el perfil ya guardado: área y objetivos.
+// - «perfil_y_plan»: un plan del catálogo sin perfil: las 7 preguntas.
 
-export const TOTAL_PASOS = 7;
-export type Paso = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+/** Una pregunta del formulario. */
+export type Campo =
+  'areas' | 'objetivos' | 'historial' | 'tiempo' | 'momento' | 'obstaculo' | 'acompanamiento';
+
+export type Flujo = 'perfil' | 'plan' | 'perfil_y_plan';
+
+/** Número de paso en la ruta (1 = primera pregunta del recorrido). */
+export type Paso = number;
+
+const CAMPOS_PERFIL: readonly Campo[] = [
+  'historial',
+  'tiempo',
+  'momento',
+  'obstaculo',
+  'acompanamiento',
+];
+const CAMPOS_PLAN: readonly Campo[] = ['areas', 'objetivos'];
+
+/** Preguntas de cada recorrido, en orden. */
+export const CAMPOS_POR_FLUJO: Record<Flujo, readonly Campo[]> = {
+  perfil: CAMPOS_PERFIL,
+  plan: CAMPOS_PLAN,
+  perfil_y_plan: [...CAMPOS_PLAN, ...CAMPOS_PERFIL],
+};
+
+/** Las 7 preguntas: el recorrido más largo. */
+export const TOTAL_PASOS = CAMPOS_POR_FLUJO.perfil_y_plan.length;
 
 /** Respuestas a medio llenar: las listas empiezan vacías y las preguntas únicas, sin valor. */
 export type Borrador = {
@@ -115,34 +146,41 @@ export function objetivosPorAreaElegida(
   return areas.map((area) => ({ area, objetivos: OBJETIVOS_POR_AREA[area] }));
 }
 
-/**
- * Pasos del formulario: el primer plan pregunta las 7; los planes siguientes solo las del área
- * (P1 área, P2 objetivos y P3 historial) y reusan las globales (P4 a P7) ya guardadas.
- */
-export const PASOS_PLAN_ADICIONAL = 3;
-
-export function totalPasos(adicional: boolean): number {
-  return adicional ? PASOS_PLAN_ADICIONAL : TOTAL_PASOS;
+/** Cuántas preguntas tiene el recorrido. */
+export function totalPasos(flujo: Flujo): number {
+  return CAMPOS_POR_FLUJO[flujo].length;
 }
 
-/** Verdadero si la respuesta del paso permite continuar. */
-export function pasoCompleto(paso: Paso, b: Borrador): boolean {
-  switch (paso) {
-    case 1:
+/** La pregunta de un paso del recorrido (un paso fuera de rango se acota). */
+export function campoDelPaso(flujo: Flujo, paso: Paso): Campo {
+  const campos = CAMPOS_POR_FLUJO[flujo];
+  return campos[Math.min(Math.max(paso, 1), campos.length) - 1] ?? 'historial';
+}
+
+/** Verdadero si la respuesta de la pregunta permite continuar. */
+export function pasoCompleto(campo: Campo, b: Borrador): boolean {
+  switch (campo) {
+    case 'areas':
       return b.areas.length > 0;
-    case 2:
+    case 'objetivos':
       return b.objetivos.length > 0;
-    case 3:
+    case 'historial':
       return b.historial !== undefined;
-    case 4:
+    case 'tiempo':
       return b.tiempo !== undefined;
-    case 5:
+    case 'momento':
       return b.disponibilidad.some((momentos) => momentos.length > 0);
-    case 6:
+    case 'obstaculo':
       return b.obstaculos.length > 0;
-    case 7:
+    case 'acompanamiento':
       return b.acompanamiento !== undefined;
   }
+}
+
+/** El perfil de la encuesta inicial, o null si falta alguna respuesta. */
+export function perfilCompleto(b: Borrador): Perfil | null {
+  const resultado = perfilSchema.safeParse(b);
+  return resultado.success ? resultado.data : null;
 }
 
 /** Convierte el borrador en respuestas válidas, o null si falta algo o no cumple las reglas. */
@@ -151,8 +189,12 @@ export function respuestasCompletas(b: Borrador): Respuestas | null {
   return resultado.success ? resultado.data : null;
 }
 
-/** Lee el número de paso de la ruta; cualquier valor raro vuelve al paso 1. */
-export function leerPaso(valor: string | string[] | undefined): Paso {
+/**
+ * Lee el número de paso de la ruta; cualquier valor raro vuelve al paso 1.
+ * @param valor Parámetro `paso` de la ruta.
+ * @param total Preguntas del recorrido (por defecto, las 7).
+ */
+export function leerPaso(valor: string | string[] | undefined, total = TOTAL_PASOS): Paso {
   const n = Number(Array.isArray(valor) ? valor[0] : valor);
-  return Number.isInteger(n) && n >= 1 && n <= TOTAL_PASOS ? (n as Paso) : 1;
+  return Number.isInteger(n) && n >= 1 && n <= total ? n : 1;
 }

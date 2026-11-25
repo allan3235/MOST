@@ -7,13 +7,16 @@
  *   necesita conexión; guardar funciona sin ella (cola de salida).
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-23
- * @version 1.1.0
+ * @version 1.2.0
  * @historial 1.0.0 (2026-11-23): creación.
  *   1.1.0 (2026-11-24): UC-01, sin el perfil de la encuesta invita a responderla; el
  *   recordatorio cae en el momento del perfil.
+ *   1.2.0 (2026-11-24): la encuesta solo guarda el perfil; al terminarla se llega aquí a crear el
+ *   primer hábito («Lo hago después» vuelve a Hoy). El perfil se revisa al volver a la pantalla.
  */
 
-import { useEffect, useState } from 'react';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { View } from 'react-native';
 
 import { Alert } from '@/comun/presentacion/ui/alert';
@@ -33,6 +36,7 @@ import {
 import { leerGlobalesFormulario } from '@/zonas/planes/logica/servicioPlanes';
 import { leerAjustesLocales } from '@/zonas/cuenta/logica/servicioAjustes';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
+import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
 import { ListaMicroPasos } from '@/zonas/planes/presentacion/componentes/ListaMicroPasos';
 import { es, formatear } from '@/comun/i18n/es';
 import { fechaLocal } from '@/comun/util/dates';
@@ -72,6 +76,8 @@ export function PantallaCrearMeta() {
   const t = es.crearMeta;
   const { session } = useSession();
   const userId = session?.user.id ?? '';
+  /** Recién terminada la encuesta de la bienvenida: su primer hábito. */
+  const esPrimera = useLocalSearchParams<{ primera?: string }>().primera === '1';
   const [texto, setTexto] = useState('');
   const [area, setArea] = useState<Area | null>(null);
   const [estado, setEstado] = useState<Estado>('escribiendo');
@@ -80,11 +86,27 @@ export function PantallaCrearMeta() {
   /** UC-01: sin la encuesta no hay perfil; null mientras se revisa. */
   const [sinPerfil, setSinPerfil] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    leerGlobalesFormulario(userId)
-      .then((globales) => setSinPerfil(globales === null))
-      .catch(() => setSinPerfil(false));
-  }, [userId]);
+  // Al volver de la encuesta el perfil ya existe: se revisa cada vez que se ve la pantalla.
+  useFocusEffect(
+    useCallback(() => {
+      let activo = true;
+      leerGlobalesFormulario(userId)
+        .then((globales) => {
+          if (activo) setSinPerfil(globales === null);
+        })
+        .catch(() => {
+          if (activo) setSinPerfil(false);
+        });
+      return () => {
+        activo = false;
+      };
+    }, [userId]),
+  );
+
+  const responderEncuesta = () => {
+    useOnboardingStore.getState().prepararPara(userId);
+    navegar.push({ pathname: '/plan-nuevo/[paso]', params: { paso: '1' } });
+  };
 
   const descomponer = async () => {
     const meta = texto.trim();
@@ -169,21 +191,18 @@ export function PantallaCrearMeta() {
 
       <View className="gap-2">
         <AppText variant="h1" accessibilityRole="header">
-          {t.titulo}
+          {esPrimera && !conPropuesta ? t.primeraTitulo : t.titulo}
         </AppText>
-        <AppText tone="ink-soft">{conPropuesta ? t.propuestaAyuda : t.subtitulo}</AppText>
+        <AppText tone="ink-soft">
+          {conPropuesta ? t.propuestaAyuda : esPrimera ? t.primeraAyuda : t.subtitulo}
+        </AppText>
       </View>
 
       {sinPerfil ? (
         <Card className="gap-4">
           <AppText variant="h3">{t.sinPerfilTitulo}</AppText>
           <AppText tone="ink-soft">{t.sinPerfilTexto}</AppText>
-          <Button
-            label={t.sinPerfilBoton}
-            onPress={() =>
-              navegar.replace({ pathname: '/plan-nuevo/[paso]', params: { paso: '1' } })
-            }
-          />
+          <Button label={t.sinPerfilBoton} onPress={responderEncuesta} />
         </Card>
       ) : conPropuesta ? (
         <>
@@ -245,6 +264,14 @@ export function PantallaCrearMeta() {
             loading={estado === 'pensando'}
             onPress={() => void descomponer()}
           />
+          {esPrimera ? (
+            <Button
+              variant="tertiary"
+              label={t.despues}
+              disabled={estado === 'pensando'}
+              onPress={() => navegar.back()}
+            />
+          ) : null}
           <AppText variant="small" tone="ink-soft">
             {formatear(t.privacidad, { n: LARGO_MAXIMO_META })}
           </AppText>

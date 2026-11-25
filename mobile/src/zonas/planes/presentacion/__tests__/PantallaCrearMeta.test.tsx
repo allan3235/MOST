@@ -6,12 +6,14 @@
  *   micro-pasos, resalta el campo con un mensaje neutro y conserva lo capturado.
  * @autor Allan Sebastian Zepeda Fragoso (con Claude Code)
  * @fecha 2026-11-23
- * @version 1.1.0
+ * @version 1.2.0
  * @historial 1.0.0 (2026-11-23): creación.
  *   1.1.0 (2026-11-24): UC-01, sin perfil de la encuesta se invita a responderla; hora del perfil.
+ *   1.2.0 (2026-11-24): primer hábito al terminar la encuesta y «Lo hago después».
  */
 
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { useLocalSearchParams } from 'expo-router';
 
 import { crearHabito } from '@/zonas/habitos/logica/servicioHabitos';
 import { leerGlobalesFormulario } from '@/zonas/planes/logica/servicioPlanes';
@@ -22,6 +24,17 @@ import { navegar } from '@/comun/presentacion/navegar';
 
 import { PantallaCrearMeta } from '@/zonas/planes/presentacion/PantallaCrearMeta';
 
+jest.mock('expo-router', () => {
+  const { useEffect } = jest.requireActual<typeof import('react')>('react');
+  return {
+    useFocusEffect: (efecto: () => void | (() => void)) => useEffect(efecto, [efecto]),
+    useLocalSearchParams: jest.fn(() => ({})),
+  };
+});
+const mockPrepararPara = jest.fn();
+jest.mock('@/zonas/cuestionario/logica/onboarding-store', () => ({
+  useOnboardingStore: { getState: () => ({ prepararPara: mockPrepararPara }) },
+}));
 jest.mock('lucide-react-native', () => new Proxy({}, { get: () => () => null }));
 jest.mock('@/comun/presentacion/ui/back-button', () => ({ BackButton: () => null }));
 jest.mock('@/zonas/habitos/logica/servicioHabitos', () => ({ crearHabito: jest.fn() }));
@@ -45,7 +58,7 @@ jest.mock('@/zonas/cuenta/presentacion/session-context', () => ({
   useSession: () => ({ session: { user: { id: 'u1' } } }),
 }));
 jest.mock('@/comun/presentacion/navegar', () => ({
-  navegar: { back: jest.fn(), replace: jest.fn() },
+  navegar: { back: jest.fn(), push: jest.fn() },
 }));
 
 // ===== Datos de prueba =====
@@ -77,6 +90,7 @@ const guardar = crearHabito as jest.MockedFunction<typeof crearHabito>;
 describe('PantallaCrearMeta', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (useLocalSearchParams as jest.Mock).mockReturnValue({});
     jest.useFakeTimers();
   });
   afterEach(() => jest.useRealTimers());
@@ -136,10 +150,23 @@ describe('PantallaCrearMeta', () => {
     expect(screen.getByText(t.sinPerfilTitulo)).toBeTruthy();
     expect(screen.queryByText(t.descomponer)).toBeNull();
     await fireEvent.press(screen.getByText(t.sinPerfilBoton));
-    expect(navegar.replace).toHaveBeenCalledWith({
+    // Abre la encuesta del perfil (5 preguntas) encima; al terminar vuelve aquí.
+    expect(mockPrepararPara).toHaveBeenCalledWith('u1');
+    expect(navegar.push).toHaveBeenCalledWith({
       pathname: '/plan-nuevo/[paso]',
       params: { paso: '1' },
     });
+    expect(pedir).not.toHaveBeenCalled();
+  });
+
+  it('UC-01 → UC-02: recién hecha la encuesta invita a su primer hábito y deja dejarlo para después', async () => {
+    (useLocalSearchParams as jest.Mock).mockReturnValue({ primera: '1' });
+    await render(<PantallaCrearMeta />);
+    await act(async () => {});
+
+    expect(screen.getByText(t.primeraTitulo)).toBeTruthy();
+    await fireEvent.press(screen.getByText(t.despues));
+    expect(navegar.back).toHaveBeenCalled();
     expect(pedir).not.toHaveBeenCalled();
   });
 });

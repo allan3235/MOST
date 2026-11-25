@@ -1,4 +1,5 @@
 import { Sun } from 'lucide-react-native';
+import { useEffect } from 'react';
 import { ActivityIndicator, ScrollView, useWindowDimensions, View } from 'react-native';
 
 import { Alert } from '@/comun/presentacion/ui/alert';
@@ -13,6 +14,7 @@ import { leerMiJardin } from '@/zonas/plantas/logica/servicioPlantas';
 import { leerAjustesLocales } from '@/zonas/cuenta/logica/servicioAjustes';
 import { useLocalQuery } from '@/comun/presentacion/use-local-query';
 import { useSession } from '@/zonas/cuenta/presentacion/session-context';
+import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
 import { HabitCheckCard } from '@/zonas/habitos/presentacion/componentes/habit-check-card';
 import { useCheckIn } from './use-check-in';
 import { CoinBalance } from '@/zonas/plantas/presentacion/componentes/coin-balance';
@@ -69,6 +71,15 @@ export default function HoyScreen() {
   const progresion = useProgresion(userId);
   const { height, fontScale } = useWindowDimensions();
   const todoDesplazable = fontScale >= ESCALA_MAXIMA_FIJA || height < ALTO_MINIMO_FIJO;
+
+  // UC-01 → UC-02: recién terminada la encuesta, se abre una vez «Crear meta» para su primer
+  // hábito. Con «atrás» o «Lo hago después» se queda aquí.
+  useEffect(() => {
+    const store = useOnboardingStore.getState();
+    if (!store.primerHabito) return;
+    store.pedirPrimerHabito(false);
+    navegar.push({ pathname: '/crear-meta', params: { primera: '1' } });
+  }, []);
 
   const saldo = ajustes.data?.saldo ?? 0;
   const items = hoy.data?.items ?? [];

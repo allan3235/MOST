@@ -17,6 +17,7 @@ import {
   alternarObstaculo,
   BORRADOR_VACIO,
   type Borrador,
+  type Flujo,
 } from './form-rules';
 import type { Retomar } from './retomar';
 
@@ -36,15 +37,19 @@ type OnboardingState = {
   borrador: Borrador;
   /** Paso del formulario o revisión del plan donde se quedó; null fuera del formulario. */
   retomar: Retomar | null;
-  /** Plan siguiente (3 pasos): las respuestas globales ya vienen del primer plan. */
-  adicional: boolean;
+  /** Qué recorrido es: la encuesta del perfil, un plan del catálogo o ambos. */
+  flujo: Flujo;
   /** Áreas que ya tienen un plan activo: no se pueden elegir en P1. */
   areasOcupadas: Area[];
+  /** Al terminar la encuesta de la bienvenida: Hoy abre «Crear meta» una vez (no se guarda). */
+  primerHabito: boolean;
+  pedirPrimerHabito: (pedir: boolean) => void;
   marcarRetomar: (retomar: Retomar | null) => void;
+  /** La encuesta del perfil (UC-01), en la bienvenida o desde «Crear meta». */
   prepararPara: (userId: string) => void;
   /**
-   * Crear un plan desde la app (Perfil → Mis planes). Con `globales` es un plan siguiente de 3
-   * pasos; sin ellas (nunca hizo el formulario) son los 7 pasos.
+   * Crear un plan del catálogo desde la app (Perfil → Mis planes). Con `globales` (el perfil ya
+   * guardado) solo se preguntan área y objetivos; sin ellas, las 7 preguntas.
    */
   prepararNuevoPlan: (userId: string, globales: Partial<Borrador> | null, ocupadas: Area[]) => void;
   /** Con 2 ya elegidos, el nuevo reemplaza al primero que se eligió. */
@@ -64,14 +69,17 @@ export const useOnboardingStore = create<OnboardingState>()(
       userId: null,
       borrador: BORRADOR_VACIO,
       retomar: null,
-      adicional: false,
+      flujo: 'perfil',
       areasOcupadas: [],
+      primerHabito: false,
+
+      pedirPrimerHabito: (primerHabito) => set({ primerHabito }),
 
       marcarRetomar: (retomar) => set({ retomar }),
 
       prepararPara: (userId) => {
         if (get().userId !== userId) set({ userId, borrador: BORRADOR_VACIO, retomar: null });
-        set({ adicional: false, areasOcupadas: [] });
+        set({ flujo: 'perfil', areasOcupadas: [] });
       },
 
       prepararNuevoPlan: (userId, globales, ocupadas) =>
@@ -79,7 +87,7 @@ export const useOnboardingStore = create<OnboardingState>()(
           userId,
           borrador: { ...BORRADOR_VACIO, ...(globales ?? {}) },
           retomar: null,
-          adicional: globales !== null,
+          flujo: globales !== null ? 'plan' : 'perfil_y_plan',
           areasOcupadas: ocupadas,
         }),
 
@@ -106,23 +114,36 @@ export const useOnboardingStore = create<OnboardingState>()(
       responder: (pregunta, valor) => set({ borrador: { ...get().borrador, [pregunta]: valor } }),
 
       reiniciar: () =>
-        set({ borrador: BORRADOR_VACIO, retomar: null, adicional: false, areasOcupadas: [] }),
+        set({ borrador: BORRADOR_VACIO, retomar: null, flujo: 'perfil', areasOcupadas: [] }),
     }),
     {
       name: 'most-onboarding',
       // 2: P5 por día y P6 con varias respuestas; un borrador guardado antes se convierte.
-      version: 2,
+      // 3: la encuesta inicial es solo el perfil (`flujo` en lugar de `adicional`); quien iba a
+      // mitad de los 7 pasos de la bienvenida retoma desde la primera pregunta del perfil.
+      version: 3,
       migrate: (guardado) => {
-        const estado = (guardado ?? {}) as { borrador?: unknown };
+        const estado = (guardado ?? {}) as {
+          borrador?: unknown;
+          adicional?: boolean;
+          retomar?: unknown;
+        };
+        const { adicional, ...resto } = estado;
         const borrador = normalizarRespuestas(estado.borrador) as Partial<Borrador> | undefined;
-        return { ...estado, borrador: { ...BORRADOR_VACIO, ...(borrador ?? {}) } } as never;
+        const enBienvenida = adicional !== true && Boolean(estado.retomar);
+        return {
+          ...resto,
+          borrador: { ...BORRADOR_VACIO, ...(borrador ?? {}) },
+          flujo: adicional === true ? 'plan' : 'perfil',
+          retomar: enBienvenida ? { pantalla: 'formulario', paso: 1 } : null,
+        } as never;
       },
       storage: createJSONStorage(() => almacenSincrono),
       partialize: (state) => ({
         userId: state.userId,
         borrador: state.borrador,
         retomar: state.retomar,
-        adicional: state.adicional,
+        flujo: state.flujo,
         areasOcupadas: state.areasOcupadas,
       }),
     },

@@ -1,47 +1,48 @@
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
+import { Alert } from '@/comun/presentacion/ui/alert';
 import { AppText } from '@/comun/presentacion/ui/app-text';
 import { BackButton } from '@/comun/presentacion/ui/back-button';
 import { Button } from '@/comun/presentacion/ui/button';
 import { ProgressSteps } from '@/comun/presentacion/ui/progress-steps';
 import { Screen } from '@/comun/presentacion/ui/screen';
+import { useSession } from '@/zonas/cuenta/presentacion/session-context';
 import { FormQuestion } from '@/zonas/cuestionario/presentacion/componentes/form-question';
 import {
+  campoDelPaso,
   leerPaso,
   pasoCompleto,
+  perfilCompleto,
   totalPasos,
-  type Paso,
 } from '@/zonas/cuestionario/logica/form-rules';
 import { useOnboardingStore } from '@/zonas/cuestionario/logica/onboarding-store';
+import { guardarPerfil } from '@/zonas/cuestionario/logica/servicioCuestionario';
 import { useRutasPlan } from '@/zonas/planes/presentacion/use-rutas-plan';
 import { es } from '@/comun/i18n/es';
 import { navegar } from '@/comun/presentacion/navegar';
 
 // Formulario (SDD 5.1): una pregunta por pantalla. Cada paso es una entrada de la pila de
 // navegación, así que «atrás» regresa al paso anterior y las respuestas siguen en el almacén. En la
-// bienvenida, el paso visible se guarda para volver a él si se cierra la app. Un plan siguiente
-// (Perfil → Mis planes) solo tiene 3 pasos: área, objetivos e historial.
-
-const CAMPO_POR_PASO = {
-  1: 'areas',
-  2: 'objetivos',
-  3: 'historial',
-  4: 'tiempo',
-  5: 'momento',
-  6: 'obstaculo',
-  7: 'acompanamiento',
-} as const satisfies Record<Paso, keyof typeof es.onboarding.formulario.preguntas>;
+// bienvenida, el paso visible se guarda para volver a él si se cierra la app.
+// La encuesta inicial (flujo «perfil», UC-01) solo pregunta datos generales y al final los guarda:
+// no crea hábitos. En la bienvenida lleva después a crear el primer hábito; desde «Crear meta»
+// regresa ahí. Un plan del catálogo (Perfil → Mis planes) pregunta área y objetivos y sigue a la
+// generación del plan.
 
 export default function FormularioPasoScreen() {
   const t = es.onboarding.formulario;
   const rutas = useRutasPlan();
-  const adicional = useOnboardingStore((s) => s.adicional);
-  const total = totalPasos(adicional);
-  const paso = Math.min(leerPaso(useLocalSearchParams<{ paso: string }>().paso), total) as Paso;
+  const { session, chooseMode } = useSession();
+  const flujo = useOnboardingStore((s) => s.flujo);
+  const total = totalPasos(flujo);
+  const paso = leerPaso(useLocalSearchParams<{ paso: string }>().paso, total);
+  const campo = campoDelPaso(flujo, paso);
   const borrador = useOnboardingStore((s) => s.borrador);
   const marcarRetomar = useOnboardingStore((s) => s.marcarRetomar);
+  const [guardando, setGuardando] = useState(false);
+  const [error, setError] = useState(false);
   useFocusEffect(
     useCallback(() => {
       if (!rutas.enApp) marcarRetomar({ pantalla: 'formulario', paso });
@@ -49,11 +50,41 @@ export default function FormularioPasoScreen() {
   );
 
   const pregunta =
-    paso === 1 && adicional ? t.preguntas.areasNuevoPlan : t.preguntas[CAMPO_POR_PASO[paso]];
+    campo === 'areas' && flujo === 'plan' ? t.preguntas.areasNuevoPlan : t.preguntas[campo];
   const esUltimo = paso === total;
+  const soloPerfil = flujo === 'perfil';
+
+  const terminarPerfil = async () => {
+    const perfil = perfilCompleto(borrador);
+    if (session === null || perfil === null) return;
+    setGuardando(true);
+    setError(false);
+    try {
+      await guardarPerfil(session.user.id, perfil);
+      const store = useOnboardingStore.getState();
+      store.reiniciar();
+      if (rutas.enApp) {
+        // Vuelve a «Crear meta», que ya encuentra el perfil.
+        navegar.dismissTo('/crear-meta');
+        return;
+      }
+      // Marca el onboarding como completo: el layout lleva a Hoy y Hoy abre «Crear meta».
+      store.pedirPrimerHabito(true);
+      await chooseMode('guiado');
+    } catch {
+      setError(true);
+      setGuardando(false);
+    }
+  };
 
   const continuar = () => {
-    navegar.push(esUltimo ? rutas.generando : rutas.paso(paso + 1));
+    if (!esUltimo) {
+      navegar.push(rutas.paso(paso + 1));
+    } else if (soloPerfil) {
+      void terminarPerfil();
+    } else {
+      navegar.push(rutas.generando);
+    }
   };
 
   // Arriba (flecha y avance) y abajo («Siguiente») quedan fijos; solo se desplaza la pregunta
@@ -84,12 +115,14 @@ export default function FormularioPasoScreen() {
           </AppText>
         </View>
 
-        <FormQuestion paso={paso} />
+        <FormQuestion campo={campo} />
       </ScrollView>
 
+      {error ? <Alert variant="error" message={t.errorPerfil} /> : null}
       <Button
-        label={esUltimo ? t.crearPlan : t.continuar}
-        disabled={!pasoCompleto(paso, borrador)}
+        label={esUltimo ? (soloPerfil ? t.guardarPerfil : t.crearPlan) : t.continuar}
+        disabled={!pasoCompleto(campo, borrador)}
+        loading={guardando}
         onPress={continuar}
       />
     </Screen>

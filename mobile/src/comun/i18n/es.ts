@@ -140,7 +140,7 @@ export const es = {
       // Cuentas que entraron antes sin la encuesta (UC-01): se pide una vez, sin perder nada.
       tituloPerfil: 'Cuéntanos un poco de ti',
       descripcionPerfil:
-        'Con 7 preguntas armamos micro-pasos a tu medida. Tus hábitos y tu historial se quedan como están.',
+        'Con 5 preguntas conocemos tu tiempo y tu ritmo, y así tus micro-pasos quedan a tu medida. Tus hábitos y tu historial se quedan como están.',
       botonPerfil: 'Responder',
       ilustracion: 'Persona caminando entre árboles',
       // Flecha atrás: con la sesión iniciada, volver a la bienvenida es salir de la cuenta.
@@ -152,6 +152,10 @@ export const es = {
     formulario: {
       continuar: 'Continuar',
       crearPlan: 'Crear mi plan',
+      // UC-01: la encuesta inicial solo guarda el perfil; los hábitos se crean después.
+      guardarPerfil: 'Guardar mis respuestas',
+      errorPerfil:
+        'No pudimos guardar tus respuestas. Revisa tu conexión e inténtalo de nuevo; lo que respondiste sigue aquí.',
       preguntas: {
         areas: {
           titulo: '¿En qué área quieres empezar?',
@@ -963,8 +967,13 @@ export const es = {
     // UC-01: sin el perfil de la encuesta no se generan micro-pasos.
     sinPerfilTitulo: 'Primero, cuéntanos un poco de ti',
     sinPerfilTexto:
-      'Con 7 preguntas sabemos cuánto tiempo tienes, a qué hora te acomoda y qué se te complica. Así tus micro-pasos quedan a tu medida.',
-    sinPerfilBoton: 'Responder 7 preguntas',
+      'Con 5 preguntas sabemos cuánto tiempo tienes, a qué hora te acomoda y qué se te complica. Así tus micro-pasos quedan a tu medida.',
+    sinPerfilBoton: 'Responder 5 preguntas',
+    // Al terminar la encuesta de la bienvenida (UC-01 → UC-02).
+    primeraTitulo: 'Ahora, tu primer hábito',
+    primeraAyuda:
+      'Cuéntanos con tus palabras qué te gustaría lograr y lo dividimos en micro-pasos pequeños.',
+    despues: 'Lo hago después',
     pensando: 'Armando tus micro-pasos…',
     propuestaAyuda:
       'Empiezas con el paso 1. Cuando te salga bien, te proponemos el siguiente; si cuesta, lo hacemos más pequeño.',

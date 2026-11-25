@@ -9,8 +9,10 @@ import {
   alternarObjetivo,
   alternarSeleccion,
   BORRADOR_VACIO,
+  campoDelPaso,
   leerPaso,
   pasoCompleto,
+  perfilCompleto,
   respuestasCompletas,
   totalPasos,
   type Borrador,
@@ -54,9 +56,22 @@ describe('alternarArea', () => {
     expect(alternarArea(borrador, 'finanzas')).toEqual({ areas: ['finanzas'], objetivos: [] });
   });
 
-  it('el primer plan tiene 7 pasos y los siguientes, 3', () => {
-    expect(totalPasos(false)).toBe(7);
-    expect(totalPasos(true)).toBe(3);
+  it('la encuesta inicial tiene 5 preguntas; un plan con perfil, 2; sin perfil, las 7', () => {
+    expect(totalPasos('perfil')).toBe(5);
+    expect(totalPasos('plan')).toBe(2);
+    expect(totalPasos('perfil_y_plan')).toBe(7);
+  });
+
+  it('la encuesta inicial no pregunta área ni objetivos (UC-01)', () => {
+    const campos = [1, 2, 3, 4, 5].map((paso) => campoDelPaso('perfil', paso));
+    expect(campos).toEqual(['historial', 'tiempo', 'momento', 'obstaculo', 'acompanamiento']);
+    expect(campoDelPaso('plan', 1)).toBe('areas');
+    expect(campoDelPaso('perfil_y_plan', 7)).toBe('acompanamiento');
+  });
+
+  it('un paso fuera del recorrido se acota', () => {
+    expect(campoDelPaso('plan', 9)).toBe('objetivos');
+    expect(leerPaso('6', totalPasos('perfil'))).toBe(1);
   });
 });
 
@@ -83,9 +98,21 @@ describe('pasoCompleto y respuestasCompletas', () => {
   };
 
   it('cada paso pide su respuesta', () => {
-    expect(pasoCompleto(1, BORRADOR_VACIO)).toBe(false);
-    expect(pasoCompleto(1, completo)).toBe(true);
-    expect(pasoCompleto(7, { ...completo, acompanamiento: undefined })).toBe(false);
+    expect(pasoCompleto('areas', BORRADOR_VACIO)).toBe(false);
+    expect(pasoCompleto('areas', completo)).toBe(true);
+    expect(pasoCompleto('acompanamiento', { ...completo, acompanamiento: undefined })).toBe(false);
+  });
+
+  it('el perfil está completo sin área ni objetivos', () => {
+    const perfil = { ...completo, areas: [], objetivos: [] };
+    expect(perfilCompleto(perfil)).toEqual({
+      historial: 'primera_vez',
+      tiempo: 'menos_10',
+      disponibilidad: completo.disponibilidad,
+      obstaculos: ['recursos'],
+      acompanamiento: 'minimo',
+    });
+    expect(perfilCompleto({ ...perfil, historial: undefined })).toBeNull();
   });
 
   it('devuelve las respuestas solo si todo está completo', () => {
@@ -129,12 +156,17 @@ describe('P5 por día y P6 con varias respuestas', () => {
   });
 
   it('la P5 está completa con al menos un momento en algún día; la P6, con al menos uno', () => {
-    expect(pasoCompleto(5, BORRADOR_VACIO)).toBe(false);
+    expect(pasoCompleto('momento', BORRADOR_VACIO)).toBe(false);
     expect(
-      pasoCompleto(5, { ...BORRADOR_VACIO, disponibilidad: alternarCelda(vacia, 6, 'noche') }),
+      pasoCompleto('momento', {
+        ...BORRADOR_VACIO,
+        disponibilidad: alternarCelda(vacia, 6, 'noche'),
+      }),
     ).toBe(true);
-    expect(pasoCompleto(6, BORRADOR_VACIO)).toBe(false);
-    expect(pasoCompleto(6, { ...BORRADOR_VACIO, obstaculos: ['olvido', 'recursos'] })).toBe(true);
+    expect(pasoCompleto('obstaculo', BORRADOR_VACIO)).toBe(false);
+    expect(
+      pasoCompleto('obstaculo', { ...BORRADOR_VACIO, obstaculos: ['olvido', 'recursos'] }),
+    ).toBe(true);
   });
 
   it('la P6 no tiene tope: se pueden marcar los seis', () => {

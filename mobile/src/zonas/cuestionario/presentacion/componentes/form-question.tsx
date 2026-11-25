@@ -1,35 +1,35 @@
 import { es } from '@/comun/i18n/es';
 import { ACOMPANAMIENTOS, HISTORIALES, TIEMPOS } from '@/comun/modelo/esquemas/onboarding';
 
-import type { Paso } from '@/zonas/cuestionario/logica/form-rules';
+import type { Campo } from '@/zonas/cuestionario/logica/form-rules';
 import { AreasQuestion } from './areas-question';
 import { ObjetivosQuestion } from './objetivos-question';
 import { PreguntaMomentos } from './PreguntaMomentos';
 import { PreguntaObstaculos } from './PreguntaObstaculos';
 import { SingleChoiceQuestion } from './single-choice-question';
 
-// Elige qué opciones mostrar en cada paso del formulario.
+// Elige qué opciones mostrar en cada pregunta del formulario.
 
 export type FormQuestionProps = {
-  paso: Paso;
+  campo: Campo;
 };
 
-export function FormQuestion({ paso }: FormQuestionProps) {
+export function FormQuestion({ campo }: FormQuestionProps) {
   const t = es.onboarding.formulario;
-  switch (paso) {
-    case 1:
+  switch (campo) {
+    case 'areas':
       return <AreasQuestion />;
-    case 2:
+    case 'objetivos':
       return <ObjetivosQuestion />;
-    case 3:
+    case 'historial':
       return <SingleChoiceQuestion campo="historial" claves={HISTORIALES} textos={t.historial} />;
-    case 4:
+    case 'tiempo':
       return <SingleChoiceQuestion campo="tiempo" claves={TIEMPOS} textos={t.tiempo} />;
-    case 5:
+    case 'momento':
       return <PreguntaMomentos />;
-    case 6:
+    case 'obstaculo':
       return <PreguntaObstaculos />;
-    case 7:
+    case 'acompanamiento':
       return (
         <SingleChoiceQuestion
           campo="acompanamiento"

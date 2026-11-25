@@ -1,4 +1,4 @@
-import { TOTAL_PASOS, type Paso } from './form-rules';
+import { totalPasos, type Paso } from './form-rules';
 
 // Retomar el formulario inicial donde se quedó (pulidos antes del APK, estados de inactividad).
 // Si la app se cierra a mitad, al abrirla se rearma la pila de pantallas completa: así «atrás»
@@ -23,5 +23,5 @@ export function pilaParaRetomar(retomar: Retomar): RutaOnboarding[] {
   // UC-01: ya no hay elección de modo; Empezar lleva directo a la encuesta.
   const base: RutaOnboarding[] = [{ name: 'empezar' }];
   if (retomar.pantalla === 'formulario') return [...base, ...pasosHasta(retomar.paso)];
-  return [...base, ...pasosHasta(TOTAL_PASOS), { name: 'revision' }];
+  return [...base, ...pasosHasta(totalPasos('perfil')), { name: 'revision' }];
 }

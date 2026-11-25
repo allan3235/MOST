@@ -96,7 +96,9 @@ export function elegirFilaCatalogo(
  * Segundo aviso según la precedencia P7/P6 (SDD 5.6): solo con `olvido`, con un estilo que ya avisa
  * por hábito y sin momento flexible (la ventana flexible ya tiene dos avisos).
  */
-export function usaSegundoAviso(r: Respuestas): boolean {
+export function usaSegundoAviso(
+  r: Pick<Respuestas, 'obstaculos' | 'acompanamiento' | 'disponibilidad'>,
+): boolean {
   return (
     tieneObstaculo(r, 'olvido') &&
     (r.acompanamiento === 'recordatorio_suave' || r.acompanamiento === 'recordatorio_y_animo') &&

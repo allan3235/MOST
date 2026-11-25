@@ -25,10 +25,12 @@ import {
   MOMENTOS_CON_HORA,
   momentoParaDias,
   momentosComunes,
+  perfilSchema,
   respuestasSchema,
   tieneObstaculo,
   type Area,
   type MomentoConHora,
+  type Perfil,
   type Respuestas,
 } from '@most/compartido/encuesta';
 import {
@@ -228,12 +230,12 @@ export class IaServicio {
    * @param usuarioId Usuario con sesión.
    * @returns Las respuestas validadas.
    */
-  private async leerPerfil(usuarioId: string): Promise<Respuestas> {
+  private async leerPerfil(usuarioId: string): Promise<Perfil> {
     const fila = await this.prisma.onboarding_answers.findUnique({
       where: { user_id: usuarioId },
       select: { respuestas: true },
     });
-    const perfil = respuestasSchema.safeParse(fila?.respuestas);
+    const perfil = perfilSchema.safeParse(fila?.respuestas);
     if (!perfil.success) {
       throw new ErrorConCodigo(
         HttpStatus.CONFLICT,

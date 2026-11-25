@@ -233,10 +233,15 @@ const respuestasBaseSchema = z
 /** Respuestas completas; acepta también las de la versión 3 (se convierten al validar). */
 export const respuestasSchema = z.preprocess(normalizarRespuestas, respuestasBaseSchema);
 
-/** P4 a P7: lo que comparten todos los planes de la persona (su perfil). */
+/**
+ * Perfil de la persona: la encuesta inicial (historial, tiempo, momentos libres, obstáculos y
+ * acompañamiento). Lo comparten todos sus hábitos y planes; el área y los objetivos se preguntan
+ * al crear cada hábito o plan.
+ */
 export const globalesSchema = z.preprocess(
   normalizarRespuestas,
   z.object({
+    historial: z.enum(HISTORIALES),
     tiempo: z.enum(TIEMPOS),
     disponibilidad: disponibilidadSchema,
     obstaculos: obstaculosSchema,
@@ -246,6 +251,9 @@ export const globalesSchema = z.preprocess(
 
 export type Respuestas = z.infer<typeof respuestasBaseSchema>;
 export type Globales = z.infer<typeof globalesSchema>;
+/** Mismo esquema con su nombre de producto: el perfil de la encuesta inicial. */
+export const perfilSchema = globalesSchema;
+export type Perfil = Globales;
 
 /**
  * Días (ISO) en los que la persona tiene algún momento libre.
